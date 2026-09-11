@@ -573,6 +573,40 @@ input[type="range"]:active::-webkit-slider-thumb { background: var(--paper); }
 .trial__link:hover { text-decoration-color: var(--signal); text-decoration-thickness: 3px; }
 .modal__close { margin-top: 26px; }
 
+/* ---------- Loader: first view of a session ----------
+   Shown only while the inline head script's html.is-loading is set, so it can never cover the page without
+   JavaScript. Two copies of the KS mark: the Paper one sits inside the Ink curtain and is clipped with it, the Ink
+   one sits underneath. As the curtain withdraws, the mark changes colour exactly at its edge. */
+.loader { display: none; }
+.is-loading .loader { display: block; position: fixed; inset: 0; z-index: 1000; touch-action: none; --mark-w: clamp(220px, 34vw, 640px); --travel: 158.8px; }
+/* Scrolling is held by main.js blocking wheel and scroll keys (touch: touch-action above), never by overflow, so the
+   scrollbar and the layout stay exactly as they are when the page is released. Lenis's stopped state clips overflow. */
+html.lenis.is-loading.lenis-stopped { overflow: visible; }
+.loader__under, .loader__curtain { position: absolute; inset: 0; }
+.loader__curtain { background: var(--ink); }
+.loader__mark {
+  position: absolute; left: 50%; top: 50%; display: block;
+  width: var(--mark-w); height: auto; overflow: visible;
+  margin: calc(var(--mark-w) * -.29794) 0 0 calc(var(--mark-w) * -.5); /* centred without a transform */
+  transform-origin: 0 0;
+}
+.loader__mark--paper .loader__glyph { fill: var(--paper); }
+.loader__mark--ink .loader__glyph { fill: var(--ink); }
+.loader__overlap { fill: var(--signal); }
+/* --u: 1 = K and S a letter apart, 0 = kerned into the logo. The pair stays centred while S travels. */
+.loader__pair { transform: translateX(calc(var(--u, 1) * var(--travel) * -.5)); }
+.loader__s { transform: translateX(calc(var(--u, 1) * var(--travel))); }
+/* Anchored at its left edge, so the digits changing (or the mono face arriving) never moves the text's start. */
+.loader__count {
+  position: absolute; left: var(--pad); bottom: clamp(16px, 2.2vw, 32px); margin: 0;
+  color: var(--paper); font-size: clamp(13px, .4vw + 11px, 16px); font-variant-numeric: tabular-nums;
+}
+/* Only the logo's KS part waits for the flying mark (it ends at 15.1% of the width, the wordmark starts at 19.4%). */
+.is-loading:not(.logo-landed) .nav__logo .logo { clip-path: inset(-25% -2% -25% 17.2%); }
+@media (max-width: 767.98px) {
+  .is-loading .loader { --mark-w: clamp(180px, 62vw, 360px); --travel: 104px; } /* K…S still fits a 375px screen */
+}
+
 /* ---------- No JS / font failure ---------- */
 .no-js .hero__readout, .no-js .hero__marker, .no-js .ctl--axes { display: none; }
 .no-js .tester__input { field-sizing: content; min-height: 2.1em; }

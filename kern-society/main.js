@@ -101,10 +101,17 @@
   const mqReduce = mq('(prefers-reduced-motion: reduce)');
   const mqMobile = mq('(max-width: 767.98px)');
 
-  const hasGSAP = typeof window.gsap !== 'undefined';
-  const hasST = hasGSAP && typeof window.ScrollTrigger !== 'undefined';
-  const hasSplit = hasGSAP && typeof window.SplitText !== 'undefined';
-  const hasLenis = typeof window.Lenis === 'function';
+  // Read at boot: this file runs before the deferred CDN scripts, so the loader can start as early as possible.
+  let hasGSAP = false;
+  let hasST = false;
+  let hasSplit = false;
+  let hasLenis = false;
+  const detectLibraries = () => {
+    hasGSAP = typeof window.gsap !== 'undefined';
+    hasST = hasGSAP && typeof window.ScrollTrigger !== 'undefined';
+    hasSplit = hasGSAP && typeof window.SplitText !== 'undefined';
+    hasLenis = typeof window.Lenis === 'function';
+  };
 
   const Motion = { lenis: null };
 
@@ -274,6 +281,265 @@
   };
   fontsReady.then(markSettled);
   onFontsUpdate(markSettled);
+
+  /* =============================================================== Loader */
+
+  /* First view of a session only. The inline head script decides (JavaScript on, not seen in this session, no reduced
+     motion), sets html.is-loading before the first paint, and clears it after 3s in case this file never runs.
+     - The counter follows real loading: it eases towards 90 while the font stylesheet and the three families arrive,
+       and reaches 100 only once the fonts have settled and ~900ms have passed, or at 2.5s regardless. The S slides
+       into the K in step with it and lands on the logo exactly at 100.
+     - Then the mark flies to the navigation logo (FLIP) and hands over to it, the Ink curtain withdraws from the top,
+       and the page parts come in one after another. Only transform, opacity and clip-path move: nothing shifts.
+     - is-loading is cleared as soon as the curtain has gone; the entrance never blocks clicks or scrolling.
+     - A click, tap or key fast-forwards everything (about 300ms). */
+  const Intro = { pending: html.classList.contains('is-loading'), resolve: null };
+  Intro.done = new Promise((resolve) => { Intro.resolve = resolve; });
+  const endIntro = () => {
+    Intro.pending = false;
+    Intro.resolve();
+  };
+
+  function initLoader() {
+    const loader = $('.loader');
+    const curtain = loader && $('.loader__curtain', loader);
+    const count = loader && $('.loader__count', loader);
+    const marks = loader ? $$('.loader__mark', loader) : [];
+    if (!Intro.pending || !curtain || !count || !marks.length) {
+      endIntro();
+      return;
+    }
+    clearTimeout(window.__ksLoaderFailsafe); // from here this file owns the loader
+
+    const EASE = 'cubic-bezier(.2, .7, .1, 1)'; // --ease in style.css
+    const MIN_MS = 900;
+    const MAX_MS = 2500;
+    const FINISH_MS = 320;
+    const BEAT_MS = 80;
+    const FLIGHT_MS = 600;
+    const CURTAIN_DELAY = 140; // the mark sets off first and is clear of the tagline by the time the curtain uncovers it
+    const CURTAIN_MS = 560; // ends after the flight (140 + 560 > 600), so the mark always lands on Paper
+    const STEP = 65; // stagger between page parts
+    const LOGO_GAP = 17.2; // % of the navigation logo's width: the KS part ends at 15.1, the wordmark starts at 19.4
+    const FAST = 6; // playback rate after a click, tap or key: what is left then takes about 300ms
+    const VIEW_H = 132.7; // viewBox height shared by the navigation logo and the loader mark
+    const LOGO_W = 1476.7; // navigation logo viewBox width; its KS part starts at x = 0
+    const MARK_Y = 13.8; // the loader mark's viewBox starts 13.8 units higher, which centres the glyphs
+    const canAnimate = typeof Element.prototype.animate === 'function';
+    const sheet = document.querySelector('link[data-fonts]');
+    const easeOut = (t) => 1 - Math.pow(1 - t, 3);
+    const skipEvents = ['pointerdown', 'keydown', 'touchstart'];
+    const animations = [];
+    let fontsDone = false;
+    let phase = 'wait';
+    let rate = 1;
+    let value = 0;
+    let phaseStart = 0;
+    let phaseFrom = 0;
+    let last = performance.now();
+    fontsReady.then(() => { fontsDone = true; });
+
+    // Share of real loading done: this script runs, the font stylesheet applies, each family loads.
+    const loadedShare = () => {
+      let share = 0.2;
+      if (sheet && sheet.media === 'all') share += 0.2;
+      if (document.fonts && typeof document.fonts.forEach === 'function') {
+        FAMILIES.forEach(([name]) => { if (familyStatus(name) === 'loaded') share += 0.2; });
+      }
+      return Math.min(1, share);
+    };
+
+    const show = (v) => {
+      value = v;
+      const text = String(Math.floor(v + 1e-6)).padStart(3, '0'); // rounds down: 100 appears only as the S lands
+      if (count.textContent !== text) count.textContent = text;
+      const x = clamp(v / 100, 0, 1);
+      loader.style.setProperty('--u', (1 - x * x).toFixed(4)); // 1 = a letter apart, 0 = kerned into the logo
+    };
+
+    const play = (el, keyframes, duration, delay = 0, easing = EASE) => {
+      if (!el || !canAnimate) return null;
+      const animation = el.animate(keyframes, { duration, delay, easing, fill: 'both' });
+      animation.playbackRate = rate;
+      animations.push(animation);
+      return animation;
+    };
+
+    const skip = () => {
+      if (rate === FAST) return;
+      rate = FAST;
+      animations.forEach((a) => { a.playbackRate = FAST; });
+      if (phase === 'wait') {
+        phase = 'finish';
+        phaseStart = performance.now();
+        phaseFrom = value;
+      }
+    };
+
+    // The page parts in order, on a clock that starts with the curtain. Returns every animation, the letters' apart
+    // (the desktop pulse waits for them) and the logo wordmark's (cancelled at the hand-over).
+    const enterPage = () => {
+      const list = [];
+      const add = (a) => { if (a) list.push(a); return a; };
+      const phone = mqMobile.matches;
+      const at = (ms) => CURTAIN_DELAY + ms;
+      const lift = (y) => [{ opacity: 0, translate: `0 ${y}px` }, { opacity: 1, translate: '0 0' }];
+      // 1. Navigation: the logo's wordmark unrolls to the right before the KS part lands, then links and button.
+      const wordmark = add(play($('.nav__logo .logo'), [
+        { clipPath: `inset(-25% ${100 - LOGO_GAP}% -25% ${LOGO_GAP}%)` },
+        { clipPath: `inset(-25% -2% -25% ${LOGO_GAP}%)` },
+      ], 440, at(-40)));
+      const navItems = phone ? [$('.nav__toggle')] : $$('.nav__links a').concat($('.nav__cta'));
+      navItems.forEach((el, i) => add(play(el, lift(-10), 520, at(i * 35))));
+      // 2. Meta row.
+      add(play($('.hero__meta'), lift(10), 560, at(STEP)));
+      // 3. Tagline: the LCP element, so it only moves and is never hidden.
+      add(play($('.hero__tagline'), [{ translate: '0 28px' }, { translate: '0 0' }], 700, at(STEP * 2)));
+      // 4. CTA and scroll hint.
+      [$('.hero__cta'), $('.hero__scroll')].forEach((el, i) => add(play(el, lift(12), 560, at(STEP * 3 + i * 40))));
+      // 5. The ruler draws from left to right.
+      add(play($('.hero__ruler'), [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }], 620, at(STEP * 4)));
+      // 6. The letters rise from below their baseline one after another, masked at the foot of their line
+      //    (desktop: the title box, whose foot is the line's; phones: each of the two lines).
+      const wm = $('.wm');
+      const risen = [];
+      let lettersEnd = at(STEP * 5);
+      if (wm) {
+        const hosts = (phone ? $$('.wm__line', wm) : [$('.hero__title')]).filter(Boolean);
+        const open = 'inset(-40% -10% 0% -10%)';
+        hosts.forEach((h) => { h.style.clipPath = open; });
+        const letters = wm.classList.contains('is-live') ? $$('.wm__l', wm).filter((l) => l.textContent.trim()) : [];
+        if (letters.length) {
+          letters.forEach((l, i) => risen.push(play(l, [{ translate: '0 115%' }, { translate: '0 0' }], 500, at(STEP * 5 + i * 22))));
+          lettersEnd = at(STEP * 5 + (letters.length - 1) * 22 + 500);
+        } else {
+          // Static fitting sets the letters inline (transforms do not apply), so each line is uncovered from its foot.
+          hosts.forEach((h, i) => risen.push(play(h, [{ clipPath: 'inset(100% -10% 0% -10%)' }, { clipPath: open }], 620, at(STEP * 5 + i * 70))));
+          lettersEnd = at(STEP * 5 + Math.max(0, hosts.length - 1) * 70 + 620);
+        }
+      }
+      risen.forEach(add);
+      // 7. Finally the Signal band slides in.
+      const ticker = $('.ticker');
+      const bandAt = Math.max(at(STEP * 6), lettersEnd - 400); // after the last letter has set off
+      add(play(ticker, [{ clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)' }], 600, bandAt));
+      add(play(ticker && $('.ticker__track', ticker), [{ translate: '12% 0' }, { translate: '0 0' }], 620, bandAt));
+      return { all: list, letters: risen.filter(Boolean), wordmark };
+    };
+
+    const listen = (on) => {
+      skipEvents.forEach((type) => window[on ? 'addEventListener' : 'removeEventListener'](type, skip, { capture: true, passive: true }));
+    };
+    // Scrolling is held by blocking its inputs (touch: touch-action on the loader), not by overflow, so the scrollbar
+    // and the layout never change when the page is released.
+    const SCROLL_KEYS = [' ', 'Spacebar', 'PageUp', 'PageDown', 'Home', 'End', 'ArrowUp', 'ArrowDown'];
+    const hold = (e) => {
+      if (e.type === 'keydown' && !SCROLL_KEYS.includes(e.key)) return;
+      if (e.cancelable) e.preventDefault();
+    };
+    const lock = (on) => {
+      ['wheel', 'keydown'].forEach((type) => window[on ? 'addEventListener' : 'removeEventListener'](type, hold, { capture: true, passive: false }));
+    };
+    const settle = (list) => Promise.all(list.map((a) => a.finished.catch(() => null)));
+    const clearMasks = () => { $$('.hero__title, .wm__line').forEach((el) => { el.style.clipPath = ''; }); };
+
+    const finish = () => {
+      listen(false);
+      animations.forEach((a) => a.cancel()); // every part already sits at its resting CSS state
+      clearMasks();
+      html.classList.remove('logo-landed');
+      if (Intro.pending) endIntro();
+    };
+
+    const leave = () => {
+      const logo = $('.nav__logo .logo');
+      const box = marks[0].getBoundingClientRect();
+      const to = logo ? logo.getBoundingClientRect() : null;
+      let flight = null;
+      if (to && to.width > 0 && to.height > 0 && box.height > 0) {
+        // FLIP onto the KS part of the navigation logo: same glyphs and viewBox height (the logo may be letterboxed).
+        const unit = Math.min(to.width / LOGO_W, to.height / VIEW_H);
+        const originX = to.left + (to.width - LOGO_W * unit) / 2;
+        const originY = to.top + (to.height - VIEW_H * unit) / 2;
+        const scale = unit / (box.height / VIEW_H);
+        const dx = originX - box.left;
+        const dy = originY - MARK_Y * unit - box.top;
+        const keyframes = [{ transform: 'translate(0px, 0px) scale(1)' }, { transform: `translate(${dx}px, ${dy}px) scale(${scale})` }];
+        marks.forEach((m) => { flight = play(m, keyframes, FLIGHT_MS); });
+      }
+      play(count, [{ opacity: 1 }, { opacity: 0 }], 240, 0, 'linear');
+      const withdraw = play(curtain, [{ clipPath: 'inset(0% 0% 0% 0%)' }, { clipPath: 'inset(100% 0% 0% 0%)' }], CURTAIN_MS, CURTAIN_DELAY);
+      const entered = enterPage();
+      // Hand-over: the flying mark is hidden in the same task that uncovers the logo's KS part, so no frame has both.
+      const land = () => {
+        marks.forEach((m) => { m.style.visibility = 'hidden'; });
+        if (entered.wordmark) entered.wordmark.cancel(); // done by now; its clip would otherwise keep the KS covered
+        html.classList.add('logo-landed');
+      };
+      // The curtain has gone: clicks and scrolling work again, even while the entrance is still running.
+      const release = () => {
+        land();
+        lock(false);
+        html.classList.remove('is-loading');
+        if (Motion.lenis) Motion.lenis.start();
+      };
+      if (flight) flight.finished.then(land, land);
+      else land();
+      if (withdraw) withdraw.finished.then(release, release);
+      else release();
+      settle(entered.letters).then(() => { if (Intro.pending) endIntro(); }); // the desktop pulse follows the letters
+      settle(entered.all).then(finish);
+    };
+
+    // Anything unexpected releases the page at once rather than leaving the curtain up.
+    const bail = (err) => {
+      console.error('[Kern Society] loader failed:', err);
+      listen(false);
+      lock(false);
+      animations.forEach((a) => a.cancel());
+      clearMasks();
+      marks.forEach((m) => { m.style.visibility = 'hidden'; });
+      html.classList.remove('is-loading', 'logo-landed');
+      if (Motion.lenis) Motion.lenis.start();
+      if (Intro.pending) endIntro();
+    };
+
+    const tick = (now) => {
+      try {
+        const dt = clamp(now - last, 0, 64);
+        last = now;
+        if (phase === 'wait') {
+          const target = Math.min(90, 90 * Math.max(1 - Math.exp(-now / 800), loadedShare()));
+          show(value + (target - value) * (1 - Math.exp(-dt / 160)));
+          if ((fontsDone && now >= MIN_MS - FINISH_MS) || now >= MAX_MS - FINISH_MS) {
+            phase = 'finish';
+            phaseStart = now;
+            phaseFrom = value;
+          }
+        }
+        if (phase === 'finish') {
+          const p = clamp(((now - phaseStart) * rate) / FINISH_MS, 0, 1);
+          show(lerp(phaseFrom, 100, easeOut(p)));
+          if (p >= 1) {
+            phase = 'beat';
+            phaseStart = now;
+          }
+        } else if (phase === 'beat' && (now - phaseStart) * rate >= BEAT_MS) {
+          phase = 'out';
+          leave();
+          return;
+        }
+        requestAnimationFrame(tick);
+      } catch (err) {
+        bail(err);
+      }
+    };
+
+    listen(true);
+    lock(true);
+    show(0);
+    requestAnimationFrame(tick);
+  }
 
   /* Scroll velocity in px/s, shared by the ticker and the footer wordmark. Decays when idle. */
   const Velocity = (function () {
@@ -1156,7 +1422,8 @@
       });
       if (mobile) lines.forEach((L) => { L.el.style.fontSize = L.fontSize.toFixed(3) + 'px'; });
       else wm.style.fontSize = lines[0].fontSize.toFixed(3) + 'px';
-      introAt = intro ? performance.now() + REVEAL_MS + 150 : 0; // desktop load pulse, after the fade-in
+      // Desktop load pulse: after the fade-in, or (Infinity = waiting) once the first-visit entrance has finished.
+      introAt = intro ? (Intro.pending ? Infinity : performance.now() + REVEAL_MS + 150) : 0;
       layout(true);
       lines.forEach((L) => L.letters.forEach((l) => { l.restCx = l.cx; })); // fixed reference for the phone marker
       readRects();
@@ -1273,8 +1540,9 @@
 
       const ease = 1 - Math.exp(-dt * (mobile ? 12 : 7.5)); // phones settle quickly once scrolling stops
       const vh = window.innerHeight;
-      const intro = introAt ? (now - introAt) / INTRO_MS : 1;
-      if (introAt && intro >= 1) introAt = 0;
+      const introWaiting = introAt === Infinity;
+      const intro = introAt && !introWaiting ? (now - introAt) / INTRO_MS : 1;
+      if (introAt && !introWaiting && intro >= 1) introAt = 0;
       const holding = now < holdUntil;
       if (intro < 1 || holding) moving = true;
       let best = null;
@@ -1361,6 +1629,14 @@
       else buildStatic();
       kick();
     };
+
+    // With the first-visit entrance, the desktop load pulse starts once the letters have risen into place.
+    Intro.done.then(() => {
+      if (introAt !== Infinity) return;
+      introAt = performance.now() + 120;
+      last = performance.now();
+      kick();
+    });
 
     // A later font load re-decides the mode (the axis may render now) and re-measures the letters.
     onFontsUpdate(() => {
@@ -1576,6 +1852,7 @@
       if (c.reduce) return null; // no Lenis when reduced motion is requested
       const lenis = new window.Lenis({ autoRaf: !hasGSAP, lerp: 0.11, smoothWheel: true });
       Motion.lenis = lenis;
+      if (html.classList.contains('is-loading')) lenis.stop(); // the loader locks scrolling until it releases the page
       let tickFn = null;
       if (hasGSAP) {
         tickFn = (time) => lenis.raf(time * 1000);
@@ -1696,6 +1973,7 @@
   /* ================================================================= Boot */
 
   function boot() {
+    detectLibraries();
     const run = (name, fn) => {
       try { fn(); } catch (err) { console.error('[Kern Society] ' + name + ' failed:', err); }
     };
@@ -1728,6 +2006,14 @@
     next();
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
+  // The loader starts now; the rest boots on DOMContentLoaded, after the deferred GSAP and Lenis scripts have run.
+  try {
+    initLoader();
+  } catch (err) {
+    console.error('[Kern Society] loader failed:', err);
+    html.classList.remove('is-loading');
+    endIntro();
+  }
+  if (document.readyState === 'complete') boot();
+  else document.addEventListener('DOMContentLoaded', boot, { once: true });
 })();
