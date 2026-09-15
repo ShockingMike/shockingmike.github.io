@@ -1,0 +1,664 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Rhumb Line Coffee Roasters · Six origins, one voyage</title>
+<meta name="description" content="Sail from the harbour town of Merrowick to six coffee farms with Rhumb Line Coffee Roasters, then find your roast in four questions. Plans from $16.">
+<meta name="theme-color" content="#140f0b">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<script>document.documentElement.className += ' js is-loading desk';</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&amp;family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap" media="print" onload="this.media='all'" data-fonts>
+<noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600&amp;family=EB+Garamond:ital,wght@0,400..800;1,400..800&amp;family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&amp;display=swap">
+</noscript>
+<style>
+/* Critical: the loader ("Plotting a course") paints before anything else loads. style.css is linked in <body> right
+   after the loader, so the loader paints at once while the page behind it is never drawn unstyled (no layout shift). */
+:root { --chart: #F1E8D4; --navy: #1B2A3A; --marker: #A63A24; --ground: #0c0a08; --progress: 0;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+html { background: var(--ground); color-scheme: dark; }
+html.is-loading, html.is-loading body { overflow: hidden; }
+body { margin: 0; }
+/* While the loader covers the page nothing behind it is drawn (the canvas excepted), so deciding between the desk
+   and the plain document never counts as a layout shift. */
+html.is-loading body > :not(#loader):not(.scene) { visibility: hidden !important; }
+#loader { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; touch-action: none;
+  background: radial-gradient(120% 90% at 50% 46%, #221912 0%, #140f0b 48%, #0a0806 100%); transition: opacity .55s ease; }
+html:not(.is-loading) #loader, #loader.is-gone { display: none; }
+#loader.is-leaving { opacity: 0; pointer-events: none; }
+.lchart { position: relative; width: min(88vw, 109vh, 1040px); aspect-ratio: 1400 / 1000; }
+.lchart svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+.lpaper { filter: drop-shadow(0 22px 38px rgba(0, 0, 0, .55)); }
+.lcourse__line { fill: none; stroke: var(--marker); stroke-width: 5; stroke-linecap: round; stroke-dasharray: 100 100;
+  stroke-dashoffset: calc((1 - var(--progress)) * 100px); }
+.lcourse__ship { transform-box: view-box; transform-origin: 0 0;
+  transform: translate(calc(378.2px + 817.8px * var(--progress)), calc(503.1px + 362.9px * var(--progress))) rotate(23.93deg); }
+/* The readout rides the course by transform only (moving left/top would count as layout shifts). Its offsets are
+   shares of the chart's width, min(88vw, 109vh, 1040px), and height (width x 1000/1400). */
+.lreadout { position: absolute; margin: 0; left: 27.011%; top: 50.315%;
+  transform: translate(calc(min(88vw, 109vh, 1040px) * .58417 * var(--progress) + 14px - (100% + 28px) * clamp(0, (var(--progress) - .62) * 1000, 1)), calc(min(88vw, 109vh, 1040px) * .25918 * var(--progress) - 130%));
+  padding: 5px 7px 4px; border-left: 2px solid var(--marker); background: rgba(241, 232, 212, .92); color: var(--navy);
+  font: 500 11px/1 var(--f-mono); letter-spacing: .12em; text-transform: uppercase; white-space: nowrap; }
+.lmsg { display: none; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(86%, 440px); margin: 0;
+  padding: 18px 20px 16px; background: var(--chart); color: var(--navy); border: 1px solid rgba(27, 42, 58, .4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .35); font: 400 13px/1.5 var(--f-mono); }
+.lmsg strong { display: block; margin-bottom: 8px; color: var(--marker); font: 600 14px/1.2 "Barlow Condensed", "Arial Narrow", sans-serif; letter-spacing: .16em; text-transform: uppercase; }
+#loader.is-error .lmsg { display: block; }
+#loader.is-error .lcourse, #loader.is-error .lreadout { display: none; }
+
+</style>
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.min.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"
+  }
+}
+</script>
+<script type="application/json" id="rl-manifest">{"files":[{"url":"style.css","bytes":62435},{"url":"app/main.js","bytes":4522},{"url":"app/bearing.js","bytes":1370},{"url":"app/data.js","bytes":16195},{"url":"app/desk.js","bytes":35160},{"url":"app/dial.js","bytes":9973},{"url":"app/dom.js","bytes":4203},{"url":"app/forms.js","bytes":2138},{"url":"app/label.js","bytes":9362},{"url":"app/lightbox.js","bytes":2382},{"url":"app/quiz.js","bytes":4450}]}</script>
+<script>
+/* Loader chart geometry, shared with the 3D harbour chart (scene/) so the hand-off lines up.
+   Units: a 1400 x 1000 sheet; land top-left, sea to the bottom-right. The SVG below is drawn from this object. */
+window.RLChart = (function () {
+  var W = 1400, H = 1000, M = 44, M2 = 58;
+  var A = [M, 742], B = [1030, M];
+  var tx = B[0] - A[0], ty = B[1] - A[1], L = Math.hypot(tx, ty); tx /= L; ty /= L;
+  var nx = -ty, ny = tx;
+  function wig(s) { return 36 * Math.sin(5.3 * s + 1.1) + 16 * Math.sin(13.9 * s + 0.3) + 7 * Math.sin(31.7 * s + 2.6) + 3 * Math.sin(71 * s + 0.9); }
+  function at(s, o) { return [A[0] + tx * L * s + nx * o, A[1] + ty * L * s + ny * o]; }
+  function line(off, k, amp) {
+    var pts = [];
+    for (var i = 0; i <= 200; i++) {
+      var s = -0.1 + i / 200 * 1.2;
+      var o = off + wig(s) * (1 - off / 440) + (amp ? amp * Math.sin(9.1 * s + k * 3) + amp * 0.5 * Math.sin(23 * s + k) : 0);
+      pts.push(at(s, o));
+    }
+    return pts;
+  }
+  function seaDist(x, y) { var s = ((x - A[0]) * tx + (y - A[1]) * ty) / L; return (x - A[0]) * nx + (y - A[1]) * ny - wig(s); }
+  var coast = line(0, 0, 0);
+  var s0 = 0.34, town = at(s0, wig(s0));
+  var course = { x1: town[0], y1: town[1], x2: 1196, y2: 866 };
+  var rose = { x: 268, y: 846, r: 92 };
+  var soundings = [], nums = [4, 7, 9, 11, 12, 14, 16, 19, 22, 26, 31, 38, 44, 52];
+  var cand = [[520,640],[640,520],[760,420],[900,330],[1040,240],[1180,160],[560,900],[700,780],[860,660],[980,560],[1120,470],[1290,380],[820,930],[980,820],[1300,640],[1300,900],[1150,720],[700,640],[430,760],[1260,250]];
+  function dCourse(x, y) {
+    var dx = course.x2 - course.x1, dy = course.y2 - course.y1, t = ((x - course.x1) * dx + (y - course.y1) * dy) / (dx * dx + dy * dy);
+    t = Math.max(0, Math.min(1, t)); return Math.hypot(x - course.x1 - dx * t, y - course.y1 - dy * t);
+  }
+  cand.forEach(function (p) {
+    var sd = seaDist(p[0], p[1]);
+    if (sd < 34 || dCourse(p[0], p[1]) < 40 || Math.hypot(p[0] - rose.x, p[1] - rose.y) < rose.r + 40) return;
+    soundings.push({ x: p[0], y: p[1], n: nums[Math.min(nums.length - 1, Math.floor(sd / 38))] });
+  });
+  return {
+    W: W, H: H, M: M, M2: M2, coast: coast,
+    contours: [
+      { pts: line(34, 1, 5), dash: [3, 8], w: 1.8 },
+      { pts: line(94, 2, 9), dash: [16, 8], w: 1.6 },
+      { pts: line(178, 3, 14), dash: [28, 10, 4, 10], w: 1.5 },
+      { pts: line(304, 4, 18), dash: [44, 14], w: 1.4 }
+    ],
+    land: coast.concat([[-60, -60]]),
+    town: { x: town[0], y: town[1] }, course: course, rose: rose, soundings: soundings,
+    title: { x: 96, y: 92, w: 600, h: 124 }, scale: { x: 1000, y: 918, w: 300 }
+  };
+})();
+</script>
+<script type="module" src="scene/boot.js" onerror="var h=document.documentElement;h.classList.remove('is-loading','js','desk');h.classList.add('no-webgl')"></script>
+</head>
+<body>
+<div id="loader" data-qa="loader" role="progressbar" aria-label="Sounding" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+  <div class="lchart" id="lchart">
+    <svg class="lpaper" id="lpaper" viewBox="0 0 1400 1000" aria-hidden="true" focusable="false"><defs><clipPath id="lclip"><rect x="58" y="58" width="1284" height="884"/></clipPath><radialGradient id="lage" cx="50%" cy="48%" r="75%"><stop offset="60%" stop-color="#F1E8D4" stop-opacity="0"/><stop offset="100%" stop-color="#b89a6a" stop-opacity=".28"/></radialGradient></defs><rect width="1400" height="1000" fill="#F1E8D4"/><g clip-path="url(#lclip)"><path d="M-53.6 813.2L-37.2 811.3L-21.5 808.4L-6.9 803.9L6.9 798.3L20.7 792.7L35 787.8L49.7 783.5L64.1 778.8L77.4 772.4L89.1 763.9L99.8 753.9L110.5 744L122.3 735.6L135.5 729.1L149.6 723.9L163.5 718.5L176.4 711.6L188.1 703.1L199.2 693.6L210.4 684.3L222 675.7L233.8 667.2L244.8 657.7L254.3 645.9L261.9 631.7L268.6 616L275.4 600.6L283.5 586.8L293 575.3L303.6 565.1L314.2 555L324.5 544.4L334.4 533.3L344.8 522.9L356.3 514.1L369.2 507.2L382.7 501.1L395.7 494.5L407.3 485.8L417.5 475.1L426.8 463.2L436.5 451.7L447.2 441.8L459 433.4L471.2 425.6L483.1 417.3L494.3 408L505.2 398.3L516.7 389.5L529.5 382.4L543.4 377L557.7 372.1L571.2 366L582.9 357.5L592.9 346.5L601.9 334.1L610.9 321.8L620.6 310.3L630.6 299.5L640.5 288.2L649.4 275.8L657.6 262.2L665.7 248.6L674.9 236.5L685.8 226.9L698.5 219.7L712 213.6L725.1 207.1L737.2 199.2L748.5 190L759.7 180.7L771.5 172.3L784.3 165.3L797.6 158.9L810.4 151.9L822.2 143.6L833.3 134.2L844.6 125L857.2 117.6L871.6 112.9L887.6 110.5L904.3 108.9L920.5 106.8L935.8 103.3L950.4 98.8L965 94.3L980 90.5L995.5 87.3L1010.6 83.6L1024.4 77.9L1036.3 69.6L1046.6 59.1L1056.6 48.1L1067.3 38.1L1079.2 29.9L1092.1 23L1105.2 16.4L1117.6 8.8L1129.2 0.1L1140.5 -8.9L-60 -60Z" fill="#E4D3AC"/><path d="M-53.6 813.2L-37.2 811.3L-21.5 808.4L-6.9 803.9L6.9 798.3L20.7 792.7L35 787.8L49.7 783.5L64.1 778.8L77.4 772.4L89.1 763.9L99.8 753.9L110.5 744L122.3 735.6L135.5 729.1L149.6 723.9L163.5 718.5L176.4 711.6L188.1 703.1L199.2 693.6L210.4 684.3L222 675.7L233.8 667.2L244.8 657.7L254.3 645.9L261.9 631.7L268.6 616L275.4 600.6L283.5 586.8L293 575.3L303.6 565.1L314.2 555L324.5 544.4L334.4 533.3L344.8 522.9L356.3 514.1L369.2 507.2L382.7 501.1L395.7 494.5L407.3 485.8L417.5 475.1L426.8 463.2L436.5 451.7L447.2 441.8L459 433.4L471.2 425.6L483.1 417.3L494.3 408L505.2 398.3L516.7 389.5L529.5 382.4L543.4 377L557.7 372.1L571.2 366L582.9 357.5L592.9 346.5L601.9 334.1L610.9 321.8L620.6 310.3L630.6 299.5L640.5 288.2L649.4 275.8L657.6 262.2L665.7 248.6L674.9 236.5L685.8 226.9L698.5 219.7L712 213.6L725.1 207.1L737.2 199.2L748.5 190L759.7 180.7L771.5 172.3L784.3 165.3L797.6 158.9L810.4 151.9L822.2 143.6L833.3 134.2L844.6 125L857.2 117.6L871.6 112.9L887.6 110.5L904.3 108.9L920.5 106.8L935.8 103.3L950.4 98.8L965 94.3L980 90.5L995.5 87.3L1010.6 83.6L1024.4 77.9L1036.3 69.6L1046.6 59.1L1056.6 48.1L1067.3 38.1L1079.2 29.9L1092.1 23L1105.2 16.4L1117.6 8.8L1129.2 0.1L1140.5 -8.9L1140.5 -8.9" fill="none" stroke="#C9DCD8" stroke-width="30" stroke-linejoin="round" opacity=".9"/><path d="M44 0V1000M262 0V1000M480 0V1000M698 0V1000M916 0V1000M1134 0V1000M1352 0V1000M0 44H1400M0 226H1400M0 408H1400M0 590H1400M0 772H1400M0 954H1400" stroke="#1B2A3A" stroke-opacity=".16" stroke-width="1.2"/><path d="M-32.9 842.4L-16.9 840L-1.4 836.8L13.1 832.1L26.8 826.5L40.6 820.8L54.8 815.8L69.4 811.3L83.6 806.3L96.6 799.6L108.1 790.7L118.6 780.4L128.9 770L140.2 760.8L152.7 753.4L166 747.1L179.1 740.5L191.3 732.7L202.5 723.3L213.1 713.2L223.9 703.4L235.3 694.5L247 685.9L258.1 676.5L267.9 665.2L276.2 651.8L283.6 637.3L291.3 623L300.2 610.5L310.4 599.9L321.6 590.5L332.8 581.3L343.6 571.4L354 561L364.7 551.1L376.4 542.5L389.3 535.6L402.6 529.3L415.5 522.4L427.1 513.7L437.3 503L446.8 491.4L456.6 480.1L467.5 470.4L479.4 462.2L491.9 454.7L504.1 446.9L515.7 438.2L527.2 429.3L539.2 421.2L552.4 414.7L566.6 409.8L581.2 405.2L594.8 399.4L606.7 391.2L617 380.5L626.2 368.4L635.2 356.1L644.7 344.5L654.5 333.1L663.9 321.4L672.5 308.4L680.3 294.3L688 280.1L696.7 267.4L707.2 257.1L719.3 249.1L732.2 242.3L745 235.2L756.9 227L768.2 217.7L779.4 208.5L791.3 200.3L804.2 193.3L817.4 187L830.3 180.1L842.3 171.9L853.5 162.7L864.8 153.6L877.2 146L891.3 140.8L906.8 137.6L922.8 135.1L938.4 132L953.1 127.7L967.2 122.5L981.3 117.3L995.9 113L1011.1 109.3L1026 105.2L1039.7 99.6L1051.9 91.7L1062.9 82L1073.5 72L1084.9 63L1097.5 55.7L1111 49.7L1124.7 43.9L1137.7 37.2L1149.9 29.4L1161.8 21.1L1161.8 21.1" fill="none" stroke="#1B2A3A" stroke-opacity=".55" stroke-width="1.8" stroke-dasharray="3 8"/><path d="M-5.1 881.7L11.3 879.8L27.2 877.1L42.2 873.2L56.5 868.4L70.7 863.3L85.2 858.7L99.9 854.4L114.1 849.4L127.3 842.9L139.1 834.5L150 824.8L160.8 815L172.5 806.4L185.3 799.4L198.8 793.4L212.3 787.3L225.1 780.4L237.1 772.3L248.8 763.7L260.7 755.4L273.1 747.8L285.7 740.5L297.7 732.4L308.5 722.6L317.8 710.6L326.2 697.4L334.6 684.1L343.7 671.9L353.7 661L364.3 650.9L374.7 640.5L384.6 629.3L394 617.5L403.6 606L414 595.6L425.4 586.7L437.4 578.4L449 569.8L459.7 559.8L469.4 548.4L478.6 536.3L488.3 524.9L499 514.9L510.7 506.4L523 498.7L535.1 490.7L546.7 482L558.1 473.1L570 464.7L582.8 457.7L596.4 451.8L610.2 446.2L623.1 439.4L634.6 430.5L644.6 419.6L653.8 407.4L662.9 395.2L672.5 383.7L682.5 372.8L692.4 361.7L701.8 349.8L710.8 337.4L719.9 325.2L730.1 314.5L741.9 306.1L755.3 299.9L769.4 294.8L783.5 289.6L796.8 283.3L809.5 276.1L822.1 268.8L835 262L848.6 256.1L862.3 250.4L875.5 243.9L887.7 236L899 226.9L910.3 217.8L922.3 209.7L935.7 203.6L950.3 199L965.3 195.2L980 190.8L994 185.5L1007.5 179.5L1021.2 173.7L1035.3 168.6L1050 164.2L1064.4 159.6L1077.9 153.5L1090 145.5L1100.9 135.9L1111.5 125.7L1122.6 116.2L1134.5 108L1147.1 100.7L1159.6 93.2L1171.3 84.8L1182.3 75.1L1192.9 65L1192.9 65" fill="none" stroke="#1B2A3A" stroke-opacity=".55" stroke-width="1.6" stroke-dasharray="16 8"/><path d="M59.3 972.7L74.4 968.9L88.7 964L101.9 957.6L114.3 950L126.3 941.8L138.2 933.7L150.2 925.5L161.8 916.7L172.5 906.8L182.4 895.6L191.6 883.7L201.1 871.9L211.4 861.5L222.9 852.6L235.2 844.8L247.8 837.5L260 829.7L271.8 821.3L283.5 812.7L295.4 804.4L307.7 796.7L320.1 789.1L332 780.8L342.8 771L352.3 759.4L361.1 746.7L369.8 733.9L379 721.8L388.9 710.7L399.3 700.3L409.8 690L420 679.3L430.1 668.6L440.7 658.4L452.3 649.7L464.9 642.4L478.3 636.2L491.7 630.1L504.6 623.3L517 615.6L529.1 607.6L541.5 600.1L554.6 593.5L568.4 587.9L582.3 582.5L595.8 576.4L608.6 569.4L620.9 561.7L633.2 554L645.9 546.8L658.9 540.1L671.8 533.2L683.9 525.2L694.7 515.5L704.4 504.1L713.5 491.8L722.7 479.6L732.3 468.1L742.3 457.2L752.3 446.3L762.1 435L771.7 423.4L781.3 412L791.8 401.7L803.4 393L816.1 385.8L829.2 379.2L841.9 372.1L853.9 363.9L865 354.6L875.9 344.8L886.9 335.2L898.1 326L909.3 316.8L920.2 307L930.3 296.2L940 284.8L949.8 273.5L960.5 263.6L972.5 255.5L985.8 249.3L999.9 244L1014.1 239L1028.1 233.7L1042.1 228.4L1056.5 223.6L1071.4 219.6L1086.8 216.2L1102.1 212.8L1116.6 208.2L1130 202L1142.4 194.4L1154.3 186.1L1166.4 178.1L1179 170.9L1191.9 164L1204.7 157L1216.9 149.1L1228.4 140.3L1239.7 131.2L1239.7 131.2" fill="none" stroke="#1B2A3A" stroke-opacity=".55" stroke-width="1.5" stroke-dasharray="28 10 4 10"/><path d="M116.2 1053L129.2 1046.3L141.8 1039L153.8 1031L165.5 1022.4L177.2 1013.7L189.1 1005.5L201.3 997.6L213.6 990L226 982.4L238.3 974.6L250.7 967L263.5 960.1L277.1 954.1L291.4 949.3L306.2 945.2L321.2 941.2L335.9 936.8L350.1 931.8L363.9 926.2L377.4 920.2L390.7 913.9L403.5 907L415.7 899L426.8 889.7L437 878.9L446.4 867.1L455.5 855L464.8 843L474.5 831.5L484.4 820.5L494.4 809.6L504.5 798.8L514.8 788.1L525.4 778.1L536.7 769L548.7 760.9L561.2 753.3L573.6 745.8L585.8 737.9L597.4 729.3L608.7 720.2L620 710.9L631.2 701.8L642.5 692.6L653.6 683.2L664.2 673.1L674.3 662.2L684 650.8L693.7 639.4L703.6 628.4L714 617.9L724.6 607.8L735.1 597.6L745.5 587.2L755.8 576.6L766.2 566.3L777.2 556.7L788.9 548.1L801.1 540.3L813.8 533.1L826.5 525.9L839.1 518.7L851.9 511.7L865 505.1L878.6 499.2L892.5 493.7L906.3 488.1L919.7 482L932.5 474.9L944.6 467L956.4 458.6L968.2 450.1L980 441.8L992 433.5L1003.8 425.1L1015.4 416.5L1027 407.7L1038.9 399.4L1051.4 392.1L1064.8 385.9L1079.1 380.9L1093.7 376.5L1108.4 372.2L1122.9 367.5L1137.1 362.5L1151.2 357.3L1165.2 352L1178.9 346.4L1192.2 340L1204.6 332.4L1215.8 323.2L1226.2 312.8L1235.9 301.4L1245.5 289.9L1255.1 278.4L1264.9 267.1L1274.6 255.7L1284.2 244.1L1293.6 232.4L1303.3 221L1303.3 221" fill="none" stroke="#1B2A3A" stroke-opacity=".55" stroke-width="1.4" stroke-dasharray="44 14"/><path d="M-53.6 813.2L-37.2 811.3L-21.5 808.4L-6.9 803.9L6.9 798.3L20.7 792.7L35 787.8L49.7 783.5L64.1 778.8L77.4 772.4L89.1 763.9L99.8 753.9L110.5 744L122.3 735.6L135.5 729.1L149.6 723.9L163.5 718.5L176.4 711.6L188.1 703.1L199.2 693.6L210.4 684.3L222 675.7L233.8 667.2L244.8 657.7L254.3 645.9L261.9 631.7L268.6 616L275.4 600.6L283.5 586.8L293 575.3L303.6 565.1L314.2 555L324.5 544.4L334.4 533.3L344.8 522.9L356.3 514.1L369.2 507.2L382.7 501.1L395.7 494.5L407.3 485.8L417.5 475.1L426.8 463.2L436.5 451.7L447.2 441.8L459 433.4L471.2 425.6L483.1 417.3L494.3 408L505.2 398.3L516.7 389.5L529.5 382.4L543.4 377L557.7 372.1L571.2 366L582.9 357.5L592.9 346.5L601.9 334.1L610.9 321.8L620.6 310.3L630.6 299.5L640.5 288.2L649.4 275.8L657.6 262.2L665.7 248.6L674.9 236.5L685.8 226.9L698.5 219.7L712 213.6L725.1 207.1L737.2 199.2L748.5 190L759.7 180.7L771.5 172.3L784.3 165.3L797.6 158.9L810.4 151.9L822.2 143.6L833.3 134.2L844.6 125L857.2 117.6L871.6 112.9L887.6 110.5L904.3 108.9L920.5 106.8L935.8 103.3L950.4 98.8L965 94.3L980 90.5L995.5 87.3L1010.6 83.6L1024.4 77.9L1036.3 69.6L1046.6 59.1L1056.6 48.1L1067.3 38.1L1079.2 29.9L1092.1 23L1105.2 16.4L1117.6 8.8L1129.2 0.1L1140.5 -8.9L1140.5 -8.9" fill="none" stroke="#1B2A3A" stroke-width="3" stroke-linejoin="round"/><g font-family="EB Garamond, Georgia, serif" font-style="italic" font-size="30" fill="#1B2A3A" fill-opacity=".75" text-anchor="middle"><text x="520" y="640">14</text><text x="640" y="520">12</text><text x="760" y="420">12</text><text x="900" y="330">14</text><text x="1040" y="240">12</text><text x="1180" y="160">12</text><text x="560" y="900">38</text><text x="700" y="780">38</text><text x="860" y="660">38</text><text x="980" y="560">38</text><text x="1120" y="470">38</text><text x="1290" y="380">31</text><text x="820" y="930">52</text><text x="980" y="820">52</text><text x="1300" y="640">52</text><text x="1300" y="900">52</text><text x="1150" y="720">52</text><text x="430" y="760">16</text><text x="1260" y="250">19</text></g><g transform="translate(268 846)" stroke="#1B2A3A" fill="none"><circle r="92" stroke-width="2"/><circle r="78" stroke-width="1"/><path d="M0 -92L0 -70M16 -90.6L14.2 -80.8M31.5 -86.5L28 -77.1M46 -79.7L41 -71M59.1 -70.5L52.7 -62.8M70.5 -59.1L62.8 -52.7M79.7 -46L71 -41M86.5 -31.5L77.1 -28M90.6 -16L80.8 -14.2M92 0L70 0M90.6 16L80.8 14.2M86.5 31.5L77.1 28M79.7 46L71 41M70.5 59.1L62.8 52.7M59.1 70.5L52.7 62.8M46 79.7L41 71M31.5 86.5L28 77.1M16 90.6L14.2 80.8M0 92L0 70M-16 90.6L-14.2 80.8M-31.5 86.5L-28 77.1M-46 79.7L-41 71M-59.1 70.5L-52.7 62.8M-70.5 59.1L-62.8 52.7M-79.7 46L-71 41M-86.5 31.5L-77.1 28M-90.6 16L-80.8 14.2M-92 0L-70 0M-90.6 -16L-80.8 -14.2M-86.5 -31.5L-77.1 -28M-79.7 -46L-71 -41M-70.5 -59.1L-62.8 -52.7M-59.1 -70.5L-52.7 -62.8M-46 -79.7L-41 -71M-31.5 -86.5L-28 -77.1M-16 -90.6L-14.2 -80.8" stroke-width="1.4"/><path d="M0 -74L12 -12L74 0L12 12L0 74L-12 12L-74 0L-12 -12Z" fill="#1B2A3A" fill-opacity=".85" stroke="none"/><path d="M0 -74L12 -12L0 0Z" fill="#A63A24" stroke="none"/></g><circle cx="378.2" cy="503.1" r="11" fill="#F1E8D4" stroke="#A63A24" stroke-width="4"/><circle cx="378.2" cy="503.1" r="3.5" fill="#A63A24"/><text x="352.2" y="477.1" text-anchor="end" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="600" font-size="32" letter-spacing="4" fill="#1B2A3A">Merrowick</text><rect x="96" y="92" width="600" height="124" fill="#F1E8D4" fill-opacity=".72" stroke="#1B2A3A" stroke-width="2"/><rect x="104" y="100" width="584" height="108" fill="none" stroke="#1B2A3A" stroke-width="1"/><text x="396" y="152" text-anchor="middle" font-family="EB Garamond, Georgia, serif" font-style="italic" font-weight="500" font-size="40" fill="#1B2A3A">Approaches to Merrowick Harbour</text><text x="396" y="188" text-anchor="middle" font-family="EB Garamond, Georgia, serif" font-size="21" letter-spacing="1" fill="#1B2A3A" fill-opacity=".8">Soundings in metres. Surveyed 1911, revised 2026.</text><rect x="1000" y="918" width="60" height="9" fill="#1B2A3A" stroke="#1B2A3A" stroke-width="1.5"/><rect x="1060" y="918" width="60" height="9" fill="#F1E8D4" stroke="#1B2A3A" stroke-width="1.5"/><rect x="1120" y="918" width="60" height="9" fill="#1B2A3A" stroke="#1B2A3A" stroke-width="1.5"/><rect x="1180" y="918" width="60" height="9" fill="#F1E8D4" stroke="#1B2A3A" stroke-width="1.5"/><rect x="1240" y="918" width="60" height="9" fill="#1B2A3A" stroke="#1B2A3A" stroke-width="1.5"/><text x="1150" y="906" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="20" letter-spacing="3" fill="#1B2A3A">nmi</text></g><rect x="44" y="44" width="1312" height="912" fill="none" stroke="#1B2A3A" stroke-width="3"/><rect x="58" y="58" width="1284" height="884" fill="none" stroke="#1B2A3A" stroke-width="1.2"/><path d="M44 44h36v14h-36zM44 942h36v14h-36zM116 44h36v14h-36zM116 942h36v14h-36zM188 44h36v14h-36zM188 942h36v14h-36zM260 44h36v14h-36zM260 942h36v14h-36zM332 44h36v14h-36zM332 942h36v14h-36zM404 44h36v14h-36zM404 942h36v14h-36zM476 44h36v14h-36zM476 942h36v14h-36zM548 44h36v14h-36zM548 942h36v14h-36zM620 44h36v14h-36zM620 942h36v14h-36zM692 44h36v14h-36zM692 942h36v14h-36zM764 44h36v14h-36zM764 942h36v14h-36zM836 44h36v14h-36zM836 942h36v14h-36zM908 44h36v14h-36zM908 942h36v14h-36zM980 44h36v14h-36zM980 942h36v14h-36zM1052 44h36v14h-36zM1052 942h36v14h-36zM1124 44h36v14h-36zM1124 942h36v14h-36zM1196 44h36v14h-36zM1196 942h36v14h-36zM1268 44h36v14h-36zM1268 942h36v14h-36zM1340 44h16v14h-16zM1340 942h16v14h-16zM44 58h14v36h-14zM1342 58h14v36h-14zM44 130h14v36h-14zM1342 130h14v36h-14zM44 202h14v36h-14zM1342 202h14v36h-14zM44 274h14v36h-14zM1342 274h14v36h-14zM44 346h14v36h-14zM1342 346h14v36h-14zM44 418h14v36h-14zM1342 418h14v36h-14zM44 490h14v36h-14zM1342 490h14v36h-14zM44 562h14v36h-14zM1342 562h14v36h-14zM44 634h14v36h-14zM1342 634h14v36h-14zM44 706h14v36h-14zM1342 706h14v36h-14zM44 778h14v36h-14zM1342 778h14v36h-14zM44 850h14v36h-14zM1342 850h14v36h-14zM44 922h14v20h-14zM1342 922h14v20h-14z" fill="#1B2A3A"/><rect width="1400" height="1000" fill="url(#lage)"/></svg>
+    <svg class="lcourse" id="lcourse" viewBox="0 0 1400 1000" aria-hidden="true" focusable="false"><line class="lcourse__line" x1="378.2" y1="503.1" x2="1196" y2="866" pathLength="100"/><g class="lcourse__ship"><path d="M26 0C14 -9 -8 -11 -22 -9L-22 9C-8 11 14 9 26 0Z" fill="#1B2A3A"/><path d="M-6 0L-6 -24L10 -4Z" fill="#F1E8D4" stroke="#1B2A3A" stroke-width="2.5" stroke-linejoin="round"/></g></svg>
+    <p class="lreadout" aria-hidden="true"><span data-loader-label>Sounding</span> <span data-loader-readout>0%</span></p>
+    <p class="lmsg" role="alert"><strong>Sounding</strong>The cabin view couldn’t load here. The ship’s log is below.</p>
+  </div>
+</div>
+<link rel="stylesheet" href="style.css">
+
+<div class="scene" data-qa="scene"><canvas id="scene" aria-hidden="true"></canvas></div>
+
+<div class="sound">
+  <button class="sound__toggle" type="button" data-qa="sound-toggle" aria-pressed="true" data-on="On" data-off="Off"><span class="sound__label">Sea sound</span> <span class="sound__state" data-sound-state>On</span></button>
+  <p class="sound__hint" data-qa="sound-hint" hidden>Click or tap to hear the sea</p>
+</div>
+
+<header class="deskhud">
+  <a class="stamp" href="#top" aria-label="Rhumb Line Coffee Roasters, back to top"><img src="favicon.svg" alt="" width="30" height="30"><span class="stamp__word" aria-hidden="true">RHUMB LINE</span></a>
+  <button class="menutoggle" type="button" data-menu-toggle aria-controls="desk-menu" aria-expanded="false" data-label-open="On the desk" data-label-short="Menu" data-label-close="Close"><span class="menutoggle__icon" aria-hidden="true"></span><span data-menu-label>On the desk</span></button>
+</header>
+
+<p class="beancount" data-qa="bean-count" data-template="Beans found {n}/6"><span class="beancount__sacks" aria-hidden="true"><i data-sack-dot="guatemala"></i><i data-sack-dot="colombia"></i><i data-sack-dot="brazil"></i><i data-sack-dot="kenya"></i><i data-sack-dot="ethiopia"></i><i data-sack-dot="sumatra"></i></span><span class="beancount__text" data-bean-text aria-live="polite">Beans found 0/6</span></p>
+
+<main class="deskroom" id="main" data-label-copy data-brand="RHUMB LINE" data-sub="Coffee Roasters" data-net="250 g" data-roasted="Roasted">
+
+  <section class="titlecard paper" id="top" data-qa="titlecard" aria-labelledby="hero-title">
+    <span class="tack" aria-hidden="true"></span>
+    <h1 class="wordmark" id="hero-title" tabindex="-1"><span class="wordmark__main">RHUMB LINE</span> <span class="wordmark__sub">Coffee Roasters</span></h1>
+    <p class="titlecard__tagline">A steady bearing to six farms. Roasted by the harbour.</p>
+    <a class="tag titlecard__cta" href="#chart">Chart your coffee</a>
+  </section>
+
+  <nav class="deskmenu paper" id="desk-menu" data-qa="desk-menu" aria-labelledby="desk-menu-title">
+    <h2 class="deskmenu__title" id="desk-menu-title">On the desk</h2>
+    <ul class="deskmenu__list">
+      <li><a class="deskmenu__item" href="#log" data-object="log"><span class="deskmenu__name">Ship’s log</span> <span class="deskmenu__hint">Why we sail each season</span></a></li>
+      <li><a class="deskmenu__item" href="#chart" data-object="chart"><span class="deskmenu__name">Ocean chart</span> <span class="deskmenu__hint">Six ports, six coffees</span></a></li>
+      <li><a class="deskmenu__item" href="#chest" data-object="chest"><span class="deskmenu__name">Sample chest</span> <span class="deskmenu__hint">The season’s six so far</span></a></li>
+      <li><a class="deskmenu__item" href="#compass" data-object="compass"><span class="deskmenu__name">Compass</span> <span class="deskmenu__hint">Steer by taste</span></a></li>
+      <li><a class="deskmenu__item" href="#crew-list" data-object="crew"><span class="deskmenu__name">The crew list</span> <span class="deskmenu__hint">Four questions, one plan</span></a></li>
+      <li><a class="deskmenu__item" href="#letter" data-object="letter"><span class="deskmenu__name">Letter</span> <span class="deskmenu__hint">News from the next voyage</span></a></li>
+      <li><a class="deskmenu__item" href="#cup" data-object="cup"><span class="deskmenu__name">Coffee cup</span> <span class="deskmenu__hint">Today’s cup, four ways to brew</span></a></li>
+      <li class="deskmenu__extra"><button class="deskmenu__item" type="button" data-object="porthole"><span class="deskmenu__name">Porthole</span> <span class="deskmenu__hint">Look out to sea</span></button></li>
+      <li class="deskmenu__extra"><button class="deskmenu__item" type="button" data-object="lamp"><span class="deskmenu__name">Oil lamp</span> <span class="deskmenu__hint">Sea sound on or off</span></button></li>
+    </ul>
+    <a class="tag deskmenu__cta" href="#crew-list">Take the quiz</a>
+  </nav>
+
+  <div class="objbuttons">
+    <button class="objbtn" type="button" data-qa="object-button" data-object="log"><span class="sr-only">Ship’s log, Why we sail each season</span></button>
+    <button class="objbtn" type="button" data-qa="object-button" data-object="chart"><span class="sr-only">Ocean chart, Six ports, six coffees</span></button>
+    <button class="objbtn" type="button" data-qa="object-button" data-object="chest"><span class="sr-only">Sample chest, The season’s six so far</span></button>
+    <button class="objbtn" type="button" data-qa="object-button" data-object="compass"><span class="sr-only">Compass, Steer by taste</span></button>
+    <button class="objbtn" type="button" data-qa="object-button" data-object="crew"><span class="sr-only">The crew list, Four questions, one plan</span></button>
+    <button class="objbtn" type="button" data-qa="object-button" data-object="letter"><span class="sr-only">Letter, News from the next voyage</span></button>
+    <button class="objbtn" type="button" data-qa="object-button" data-object="cup"><span class="sr-only">Coffee cup, Today’s cup, four ways to brew</span></button>
+    <button class="objbtn" type="button" data-qa="object-button" data-object="porthole"><span class="sr-only">Porthole, Look out to sea</span></button>
+    <button class="objbtn" type="button" data-qa="object-button" data-object="lamp"><span class="sr-only">Oil lamp, Sea sound on or off</span></button>
+  </div>
+  <p class="objtag" data-objtag aria-hidden="true"><span class="objtag__name" data-objtag-name></span><span class="objtag__hint" data-objtag-hint></span></p>
+  <div class="hintstack">
+    <p class="nexthint" data-qa="hint" data-object="" aria-live="polite" data-template="Next bearing on the desk: {object}" data-done="Everything on the desk is logged. The coffee is still warm."></p>
+    <p class="deskhint" data-qa="desk-hint" data-touch="Tap anything on the desk to open it.">Click anything on the desk to open it.</p>
+  </div>
+  <div class="interlude" data-qa="interlude" data-moment="" hidden><p class="interlude__text" data-interlude-text aria-live="polite"></p></div>
+
+  <section class="panel" data-qa="panel" data-object="log" id="log" aria-labelledby="log-title">
+    <div class="panel__bar"><button class="panel__close" type="button" data-qa="panel-close"><span class="panel__arrow" aria-hidden="true">←</span> Back to the desk</button></div>
+    <div class="panel__body">
+      <div class="logpage paper">
+        <header class="logpage__head"><p class="loglabel">Prologue · Day 1</p></header>
+        <h2 class="logpage__title" id="log-title" tabindex="-1">Six empty slots, one season</h2>
+        <div class="logpage__cols">
+          <ul class="logpage__margin">
+            <li>15 March · 05:40 · Sea smoke</li>
+            <li>Wind NW 12 kn · Glass 1024, steady</li>
+            <li>06:10 · Lines off · Six slots empty</li>
+          </ul>
+          <p class="logpage__body">Every season the roaster leaves Merrowick with a wooden sample chest and six empty slots. Green coffee can be ordered from a list, but a list cannot tell you how a farm smells after rain. So we go, holding one bearing at a time, and come home when every slot is full. Pull up a stool.</p>
+        </div>
+        <p class="orders">Orders: six slots, six farms, one season. Cup everything. Bring home only what we would drink ourselves.</p>
+      </div>
+      <p class="panelnext"><a class="tag panelnext__link" data-qa="panel-next" href="#chart" data-next="chart" data-template="Next: {object}">Next: Ocean chart</a></p>
+    </div>
+  </section>
+
+  <section class="panel panel--chart" data-qa="panel" data-object="chart" id="chart" aria-labelledby="chart-title">
+    <div class="panel__bar"><button class="panel__close" type="button" data-qa="panel-close"><span class="panel__arrow" aria-hidden="true">←</span> Back to the desk</button></div>
+    <div class="panel__body">
+      <div class="chartcard paper">
+        <p class="loglabel">Ocean chart</p>
+        <h2 class="chartcard__title" id="chart-title" tabindex="-1">Six origins, one voyage</h2>
+        <ol class="ports">
+          <li><a class="port" data-qa="chart-port" data-origin="guatemala" href="#leg-guatemala" data-route="chart/guatemala"><span class="port__n" aria-hidden="true">1</span><span class="port__name">Santo Tomás de Castilla<span class="port__comma">,</span></span> <span class="port__country">Guatemala</span><span class="port__coords">15°41′N 88°37′W</span></a></li>
+          <li><a class="port" data-qa="chart-port" data-origin="colombia" href="#leg-colombia" data-route="chart/colombia"><span class="port__n" aria-hidden="true">2</span><span class="port__name">Cartagena<span class="port__comma">,</span></span> <span class="port__country">Colombia</span><span class="port__coords">10°24′N 75°32′W</span></a></li>
+          <li><a class="port" data-qa="chart-port" data-origin="brazil" href="#leg-brazil" data-route="chart/brazil"><span class="port__n" aria-hidden="true">3</span><span class="port__name">Santos<span class="port__comma">,</span></span> <span class="port__country">Brazil</span><span class="port__coords">23°59′S 46°18′W</span></a></li>
+          <li><a class="port" data-qa="chart-port" data-origin="kenya" href="#leg-kenya" data-route="chart/kenya"><span class="port__n" aria-hidden="true">4</span><span class="port__name">Mombasa<span class="port__comma">,</span></span> <span class="port__country">Kenya</span><span class="port__coords">4°03′S 39°39′E</span></a></li>
+          <li><a class="port" data-qa="chart-port" data-origin="ethiopia" href="#leg-ethiopia" data-route="chart/ethiopia"><span class="port__n" aria-hidden="true">5</span><span class="port__name">Djibouti<span class="port__comma">,</span></span> <span class="port__country">Republic of Djibouti</span><span class="port__coords">11°36′N 43°08′E</span></a></li>
+          <li><a class="port" data-qa="chart-port" data-origin="sumatra" href="#leg-sumatra" data-route="chart/sumatra"><span class="port__n" aria-hidden="true">6</span><span class="port__name">Belawan<span class="port__comma">,</span></span> <span class="port__country">Sumatra, Indonesia</span><span class="port__coords">3°47′N 98°41′E</span></a></li>
+        </ol>
+        <div class="chartpick" data-chart-pick>
+          <p class="chartpick__line">Pick a port to read the log.</p>
+          <p class="bearing" data-qa="bearing"><span class="bearing__label">Bearing</span> <span class="bearing__deg" data-bearing-deg>114°</span> <span class="bearing__arrow" aria-hidden="true">→</span> <span class="bearing__name" data-bearing-name>Yirgacheffe, Ethiopia</span> <span class="bearing__dot" aria-hidden="true">·</span> <span class="bearing__nmi"><span data-bearing-nmi>5,795</span> nmi</span></p>
+        </div>
+        <div class="sailing" data-qa="chart-sailing" hidden>
+          <p class="sailing__line" data-sailing-line aria-live="polite" data-template="Under way, bound for {port}"></p>
+          <button class="stampbtn sailing__skip" type="button" data-qa="chart-skip">Skip to port</button>
+        </div>
+      </div>
+
+      <article class="leg" data-qa="leg" data-origin="guatemala" id="leg-guatemala" aria-labelledby="leg-guatemala-port">
+        <div class="logpage paper">
+          <header class="logpage__head"><p class="loglabel">Leg 1 of 6</p><p class="logpage__date">Day 8 · 22 March</p></header>
+          <h3 class="logpage__port" id="leg-guatemala-port" tabindex="-1">Santo Tomás de Castilla, Guatemala</h3>
+          <p class="logpage__coords">15°41′N 88°37′W</p>
+          <dl class="logmeta"><div><dt>Course from last port</dt><dd>Merrowick <span class="logmeta__pos">44°48′N 62°37′W</span></dd></div></dl>
+          <p class="logpage__weather">Wind NE 12 kn · Sea slight · Haze</p>
+          <h4 class="loglabel loglabel--sub">Ship’s log</h4>
+          <p class="logpage__body">Made fast at Santo Tomás at dusk. Two days by road, west and up into the Cuchumatanes. At Finca Viento Seco the last cherries were coming off the top rows. The owner wet a finger and held it up: the warm wind from Mexico, she said, is why frost never reaches them.</p>
+        </div>
+        <div class="photos photos--2" data-photos="guatemala">
+          <figure class="photo photo--wide" data-qa="photo" data-origin="guatemala" data-photo="guatemala-1"><span class="photo__frame"><img src="photos/guatemala-1.webp" width="1400" height="933" alt="Two hands pull ripe red and green coffee cherries from a branch, a basket of picked cherries below" loading="lazy" decoding="async"></span><figcaption>Hands picking ripe cherries, San Marcos, Guatemala</figcaption></figure>
+          <figure class="photo photo--wide" data-qa="photo" data-origin="guatemala" data-photo="guatemala-2"><span class="photo__frame"><img src="photos/guatemala-2.webp" width="1400" height="933" alt="Clusters of green coffee cherries, a few turning red, hang from thin branches beaded with dew" loading="lazy" decoding="async"></span><figcaption>Green cherries with dew, Tajumulco, Guatemala</figcaption></figure>
+        </div>
+        <div class="bagtag">
+          <h4 class="bagtag__stamp">Found and stowed</h4>
+          <canvas class="baglabel" data-bag-label data-origin="guatemala" width="340" height="470">
+            <span class="baglabel__fallback">
+              <span class="baglabel__name" data-f="name">Huehuetenango, Guatemala</span>
+              <span class="baglabel__farm" data-f="farm">Finca Viento Seco</span>
+              <span class="baglabel__specs">
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="altitude">Altitude</span> <span data-f="altitude">1,700–2,000 m</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="process">Process</span> <span data-f="process">Washed, patio-dried</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="variety">Variety</span> <span data-f="variety">Bourbon, Caturra, Catuaí</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="notes">In the cup</span> <span data-f="notes">Dark chocolate · Mandarin · Toasted almond</span></span>
+              </span>
+              <span class="baglabel__flavors" data-f="flavors">Chocolate, Citrus, Nutty</span>
+            </span>
+          </canvas>
+        </div>
+      </article>
+
+      <article class="leg" data-qa="leg" data-origin="colombia" id="leg-colombia" aria-labelledby="leg-colombia-port">
+        <div class="logpage paper">
+          <header class="logpage__head"><p class="loglabel">Leg 2 of 6</p><p class="logpage__date">Day 20 · 3 April</p></header>
+          <h3 class="logpage__port" id="leg-colombia-port" tabindex="-1">Cartagena, Colombia</h3>
+          <p class="logpage__coords">10°24′N 75°32′W</p>
+          <dl class="logmeta"><div><dt>Course from last port</dt><dd>Santo Tomás de Castilla, Guatemala <span class="logmeta__pos">15°41′N 88°37′W</span></dd></div></dl>
+          <p class="logpage__weather">Wind NE 18 kn · Sea moderate</p>
+          <h4 class="loglabel loglabel--sub">Ship’s log</h4>
+          <p class="logpage__body">Anchored off Cartagena in a fresh trade wind. Three days south by road, the last hour in a painted chiva with sacks on the roof. Huila was starting its mitaca, the smaller second picking. El Rumbo means “the course”. We took it as a sign and cupped until dark.</p>
+        </div>
+        <div class="photos photos--2" data-photos="colombia">
+          <figure class="photo photo--tall" data-qa="photo" data-origin="colombia" data-photo="colombia-1"><span class="photo__frame"><img src="photos/colombia-1.webp" width="1400" height="2100" alt="A cluster of red and cream coffee cherries among dark green leaves, close up against a soft background" loading="lazy" decoding="async"></span><figcaption>Ripe cherries on the branch, Huila, Colombia</figcaption></figure>
+          <figure class="photo photo--wide" data-qa="photo" data-origin="colombia" data-photo="colombia-2"><span class="photo__frame"><img src="photos/colombia-2.webp" width="1400" height="933" alt="Rows of leafy coffee shrubs lead up to a white farmhouse with a tiled roof among tall trees" loading="lazy" decoding="async"></span><figcaption>Coffee rows below a farmhouse, Huila, Colombia</figcaption></figure>
+        </div>
+        <div class="bagtag">
+          <h4 class="bagtag__stamp">Found and stowed</h4>
+          <canvas class="baglabel" data-bag-label data-origin="colombia" width="340" height="470">
+            <span class="baglabel__fallback">
+              <span class="baglabel__name" data-f="name">Huila, Colombia</span>
+              <span class="baglabel__farm" data-f="farm">Finca El Rumbo</span>
+              <span class="baglabel__specs">
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="altitude">Altitude</span> <span data-f="altitude">1,600–1,850 m</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="process">Process</span> <span data-f="process">Washed</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="variety">Variety</span> <span data-f="variety">Caturra, Castillo</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="notes">In the cup</span> <span data-f="notes">Red cherry · Panela · Cocoa nib</span></span>
+              </span>
+              <span class="baglabel__flavors" data-f="flavors">Fruity, Sweet, Chocolate</span>
+            </span>
+          </canvas>
+        </div>
+      </article>
+
+      <article class="leg" data-qa="leg" data-origin="brazil" id="leg-brazil" aria-labelledby="leg-brazil-port">
+        <div class="logpage paper">
+          <header class="logpage__head"><p class="loglabel">Leg 3 of 6</p><p class="logpage__date">Day 48 · 1 May</p></header>
+          <h3 class="logpage__port" id="leg-brazil-port" tabindex="-1">Santos, Brazil</h3>
+          <p class="logpage__coords">23°59′S 46°18′W</p>
+          <dl class="logmeta"><div><dt>Course from last port</dt><dd>Cartagena, Colombia <span class="logmeta__pos">10°24′N 75°32′W</span></dd></div></dl>
+          <p class="logpage__weather">Wind SE 8 kn · Sea slight · Low cloud</p>
+          <h4 class="loglabel loglabel--sub">Ship’s log</h4>
+          <p class="logpage__body">Alongside at Santos. The red hills of Mogiana take their name from the old railway that once carried their coffee on its way to this quay. Picking began the morning we reached Fazenda Pedra Clara. By noon the patio was striped with cherries, raked into rows to dry.</p>
+        </div>
+        <div class="photos photos--2" data-photos="brazil">
+          <figure class="photo photo--wide" data-qa="photo" data-origin="brazil" data-photo="brazil-1"><span class="photo__frame"><img src="photos/brazil-1.webp" width="1200" height="800" alt="Branches of a coffee tree heavy with ripe red cherries, lit by soft sun against green foliage" loading="lazy" decoding="async"></span><figcaption>Ripe cherries, São Sebastião da Grama, Brazil</figcaption></figure>
+          <figure class="photo photo--wide" data-qa="photo" data-origin="brazil" data-photo="brazil-2"><span class="photo__frame"><img src="photos/brazil-2.webp" width="1400" height="933" alt="Low sun over rolling hills planted with rows of coffee, dark boulders in the foreground" loading="lazy" decoding="async"></span><figcaption>Coffee hills at sunset, Espírito Santo do Pinhal, Brazil</figcaption></figure>
+        </div>
+        <div class="bagtag">
+          <h4 class="bagtag__stamp">Found and stowed</h4>
+          <canvas class="baglabel" data-bag-label data-origin="brazil" width="340" height="470">
+            <span class="baglabel__fallback">
+              <span class="baglabel__name" data-f="name">Mogiana, Brazil</span>
+              <span class="baglabel__farm" data-f="farm">Fazenda Pedra Clara</span>
+              <span class="baglabel__specs">
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="altitude">Altitude</span> <span data-f="altitude">950–1,150 m</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="process">Process</span> <span data-f="process">Natural</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="variety">Variety</span> <span data-f="variety">Yellow Bourbon, Mundo Novo</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="notes">In the cup</span> <span data-f="notes">Hazelnut · Milk chocolate · Caramel</span></span>
+              </span>
+              <span class="baglabel__flavors" data-f="flavors">Nutty, Chocolate, Sweet</span>
+            </span>
+          </canvas>
+        </div>
+      </article>
+
+      <p class="interlude-slip" data-moment-source="cape">19 May · Off the Cape. Wind NW 45 kn, seas 7 m. Chest lashed to the table. Half cups only.</p>
+
+      <article class="leg" data-qa="leg" data-origin="kenya" id="leg-kenya" aria-labelledby="leg-kenya-port">
+        <div class="logpage paper">
+          <header class="logpage__head"><p class="loglabel">Leg 4 of 6</p><p class="logpage__date">Day 76 · 29 May</p></header>
+          <h3 class="logpage__port" id="leg-kenya-port" tabindex="-1">Mombasa, Kenya</h3>
+          <p class="logpage__coords">4°03′S 39°39′E</p>
+          <dl class="logmeta"><div><dt>Course from last port</dt><dd>Santos, Brazil <span class="logmeta__pos">23°59′S 46°18′W</span></dd></div></dl>
+          <p class="logpage__weather">Wind SSE 17 kn · Sea moderate · Rain</p>
+          <h4 class="loglabel loglabel--sub">Ship’s log</h4>
+          <p class="logpage__body">Mombasa in the long rains. Up-country by train and road to Nyeri, where Mount Kenya showed its peak for an hour at dawn. The early crop was coming in to Gakiriko Factory. At dusk the growers queued with their sacks, and each weight went into a small book.</p>
+        </div>
+        <div class="photos photos--1" data-photos="kenya">
+          <figure class="photo photo--wide" data-qa="photo" data-origin="kenya" data-photo="kenya-1"><span class="photo__frame"><img src="photos/kenya-1.webp" width="1400" height="933" alt="Black-and-white photo of raised drying tables spread with coffee beans, two workers tending them, trees beyond" loading="lazy" decoding="async"></span><figcaption>Raised drying beds on a coffee farm, Kenya, 1936</figcaption></figure>
+        </div>
+        <div class="bagtag">
+          <h4 class="bagtag__stamp">Found and stowed</h4>
+          <canvas class="baglabel" data-bag-label data-origin="kenya" width="340" height="470">
+            <span class="baglabel__fallback">
+              <span class="baglabel__name" data-f="name">Nyeri, Kenya</span>
+              <span class="baglabel__farm" data-f="farm">Gakiriko Factory</span>
+              <span class="baglabel__specs">
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="altitude">Altitude</span> <span data-f="altitude">1,700–1,900 m</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="process">Process</span> <span data-f="process">Double fermented</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="variety">Variety</span> <span data-f="variety">SL28, SL34, Batian</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="notes">In the cup</span> <span data-f="notes">Blackcurrant · Pink grapefruit · Cane sugar</span></span>
+              </span>
+              <span class="baglabel__flavors" data-f="flavors">Fruity, Citrus, Sweet</span>
+            </span>
+          </canvas>
+        </div>
+      </article>
+
+      <article class="leg" data-qa="leg" data-origin="ethiopia" id="leg-ethiopia" aria-labelledby="leg-ethiopia-port">
+        <div class="logpage paper">
+          <header class="logpage__head"><p class="loglabel">Leg 5 of 6</p><p class="logpage__date">Day 90 · 12 June</p></header>
+          <h3 class="logpage__port" id="leg-ethiopia-port" tabindex="-1">Djibouti, Republic of Djibouti</h3>
+          <p class="logpage__coords">11°36′N 43°08′E</p>
+          <dl class="logmeta"><div><dt>Course from last port</dt><dd>Mombasa, Kenya <span class="logmeta__pos">4°03′S 39°39′E</span></dd></div></dl>
+          <p class="logpage__weather">Wind W 26 kn · Khamsin · Dust haze</p>
+          <h4 class="loglabel loglabel--sub">Ship’s log</h4>
+          <p class="logpage__body">Djibouti in a hot wind. Train to Dire Dawa, on to Addis, then a day south through false banana gardens. Picking ended in January, but Bokkicho had kept one lot back in parchment. They roasted a handful in a pan over charcoal and passed it round. Jasmine.</p>
+        </div>
+        <div class="photos photos--1" data-photos="ethiopia">
+          <figure class="photo photo--tall" data-qa="photo" data-origin="ethiopia" data-photo="ethiopia-1"><span class="photo__frame"><img src="photos/ethiopia-1.webp" width="1400" height="2100" alt="A hand holds a dark pan of freshly roasted coffee beans with a stirring rod, a striped white dress behind" loading="lazy" decoding="async"></span><figcaption>Freshly roasted beans, Shashemene, Ethiopia</figcaption></figure>
+        </div>
+        <div class="bagtag">
+          <h4 class="bagtag__stamp">Found and stowed</h4>
+          <canvas class="baglabel" data-bag-label data-origin="ethiopia" width="340" height="470">
+            <span class="baglabel__fallback">
+              <span class="baglabel__name" data-f="name">Yirgacheffe, Ethiopia</span>
+              <span class="baglabel__farm" data-f="farm">Bokkicho Washing Station</span>
+              <span class="baglabel__specs">
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="altitude">Altitude</span> <span data-f="altitude">1,900–2,200 m</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="process">Process</span> <span data-f="process">Washed</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="variety">Variety</span> <span data-f="variety">Kurume, Wolisho</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="notes">In the cup</span> <span data-f="notes">Jasmine · Bergamot · White peach</span></span>
+              </span>
+              <span class="baglabel__flavors" data-f="flavors">Floral, Citrus, Fruity</span>
+            </span>
+          </canvas>
+        </div>
+      </article>
+
+      <p class="interlude-slip interlude-slip--night" data-moment-source="night">Indian Ocean, 02:00. Monsoon swell astern, stars between squalls, five slots full.</p>
+
+      <article class="leg" data-qa="leg" data-origin="sumatra" id="leg-sumatra" aria-labelledby="leg-sumatra-port">
+        <div class="logpage paper">
+          <header class="logpage__head"><p class="loglabel">Leg 6 of 6</p><p class="logpage__date">Day 112 · 4 July</p></header>
+          <h3 class="logpage__port" id="leg-sumatra-port" tabindex="-1">Belawan, Sumatra, Indonesia</h3>
+          <p class="logpage__coords">3°47′N 98°41′E</p>
+          <dl class="logmeta"><div><dt>Course from last port</dt><dd>Djibouti, Republic of Djibouti <span class="logmeta__pos">11°36′N 43°08′E</span></dd></div></dl>
+          <p class="logpage__weather">Wind SW 9 kn · Squall at dawn</p>
+          <h4 class="loglabel loglabel--sub">Ship’s log</h4>
+          <p class="logpage__body">A squall at first light, then Belawan steaming in the sun. A day up the mountain road to Takengon and Lake Laut Tawar, where the fly crop was in. Wet-hulled beans lay on tarpaulins along the lake road, darkening to jade. Kabut Tinggi means “high mist”; by four it came down.</p>
+        </div>
+        <div class="photos photos--2" data-photos="sumatra">
+          <figure class="photo photo--wide" data-qa="photo" data-origin="sumatra" data-photo="sumatra-1"><span class="photo__frame"><img src="photos/sumatra-1.webp" width="1400" height="933" alt="Clusters of white coffee flowers on a branch in close-up, set against dark leaves and soft light" loading="lazy" decoding="async"></span><figcaption>Coffee in flower, Aceh, Indonesia</figcaption></figure>
+          <figure class="photo photo--wide" data-qa="photo" data-origin="sumatra" data-photo="sumatra-2"><span class="photo__frame"><img src="photos/sumatra-2.webp" width="1400" height="933" alt="A lake with small boats below steep green hills and a line of lakeside houses under a blue sky" loading="lazy" decoding="async"></span><figcaption>Lake Laut Tawar, Takengon, Aceh, Indonesia</figcaption></figure>
+        </div>
+        <div class="bagtag">
+          <h4 class="bagtag__stamp">Found and stowed</h4>
+          <canvas class="baglabel" data-bag-label data-origin="sumatra" width="340" height="470">
+            <span class="baglabel__fallback">
+              <span class="baglabel__name" data-f="name">Gayo, Sumatra</span>
+              <span class="baglabel__farm" data-f="farm">Kabut Tinggi Cooperative</span>
+              <span class="baglabel__specs">
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="altitude">Altitude</span> <span data-f="altitude">1,300–1,600 m</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="process">Process</span> <span data-f="process">Wet-hulled</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="variety">Variety</span> <span data-f="variety">Tim Tim, Ateng, Gayo 1</span></span>
+                <span class="baglabel__row"><span class="baglabel__dt" data-l="notes">In the cup</span> <span data-f="notes">Clove · Pipe tobacco · Molasses</span></span>
+              </span>
+              <span class="baglabel__flavors" data-f="flavors">Spice, Roasty, Sweet</span>
+            </span>
+          </canvas>
+        </div>
+      </article>
+
+      <p class="interlude-slip interlude-slip--dusk" data-moment-source="homeward">Homeward by Suez. Six slots full, and the cabin smells of six countries at once.</p>
+
+      <nav class="legnav" aria-labelledby="chart-title">
+        <a class="stampbtn legnav__prev" href="#leg-sumatra" data-route="chart/sumatra" data-chart-prev><span aria-hidden="true">←</span> Previous port</a>
+        <a class="tag legnav__next" href="#leg-colombia" data-route="chart/colombia" data-chart-next>Next port</a>
+      </nav>
+      <p class="panelnext"><a class="tag panelnext__link" data-qa="panel-next" href="#chest" data-next="chest" data-template="Next: {object}">Next: Sample chest</a></p>
+    </div>
+  </section>
+
+  <section class="panel" data-qa="panel" data-object="chest" id="chest" aria-labelledby="chest-title">
+    <div class="panel__bar"><button class="panel__close" type="button" data-qa="panel-close"><span class="panel__arrow" aria-hidden="true">←</span> Back to the desk</button></div>
+    <div class="panel__body">
+      <div class="chestcard paper">
+        <p class="loglabel">The season’s six so far</p>
+        <h2 class="chestcard__title" id="chest-title" tabindex="-1">Sample chest</h2>
+        <p class="chestcard__progress" data-chest-progress>Beans found 0/6</p>
+        <ol class="sacks" data-sacks data-found-template="{origin}, found. Sail to this leg" data-empty-template="{origin}, still to find. Sail to this leg">
+          <li class="sack" data-qa="chest-sack" data-origin="guatemala" data-found="false"><span class="sack__art" aria-hidden="true"><canvas class="baglabel baglabel--thumb" data-bag-label data-origin="guatemala" width="340" height="470"></canvas><span class="sack__empty"></span></span><a class="sack__go" href="#leg-guatemala" data-route="chart/guatemala" data-sack-go>Huehuetenango, Guatemala, still to find. Sail to this leg</a><figure class="photo photo--sack" data-qa="photo" data-origin="guatemala" data-photo="guatemala-1"><span class="photo__frame"><img src="photos/guatemala-1.webp" width="1400" height="933" alt="Two hands pull ripe red and green coffee cherries from a branch, a basket of picked cherries below" loading="lazy" decoding="async"></span></figure></li>
+          <li class="sack" data-qa="chest-sack" data-origin="colombia" data-found="false"><span class="sack__art" aria-hidden="true"><canvas class="baglabel baglabel--thumb" data-bag-label data-origin="colombia" width="340" height="470"></canvas><span class="sack__empty"></span></span><a class="sack__go" href="#leg-colombia" data-route="chart/colombia" data-sack-go>Huila, Colombia, still to find. Sail to this leg</a><figure class="photo photo--sack" data-qa="photo" data-origin="colombia" data-photo="colombia-1"><span class="photo__frame"><img src="photos/colombia-1.webp" width="1400" height="2100" alt="A cluster of red and cream coffee cherries among dark green leaves, close up against a soft background" loading="lazy" decoding="async"></span></figure></li>
+          <li class="sack" data-qa="chest-sack" data-origin="brazil" data-found="false"><span class="sack__art" aria-hidden="true"><canvas class="baglabel baglabel--thumb" data-bag-label data-origin="brazil" width="340" height="470"></canvas><span class="sack__empty"></span></span><a class="sack__go" href="#leg-brazil" data-route="chart/brazil" data-sack-go>Mogiana, Brazil, still to find. Sail to this leg</a><figure class="photo photo--sack" data-qa="photo" data-origin="brazil" data-photo="brazil-1"><span class="photo__frame"><img src="photos/brazil-1.webp" width="1200" height="800" alt="Branches of a coffee tree heavy with ripe red cherries, lit by soft sun against green foliage" loading="lazy" decoding="async"></span></figure></li>
+          <li class="sack" data-qa="chest-sack" data-origin="kenya" data-found="false"><span class="sack__art" aria-hidden="true"><canvas class="baglabel baglabel--thumb" data-bag-label data-origin="kenya" width="340" height="470"></canvas><span class="sack__empty"></span></span><a class="sack__go" href="#leg-kenya" data-route="chart/kenya" data-sack-go>Nyeri, Kenya, still to find. Sail to this leg</a><figure class="photo photo--sack" data-qa="photo" data-origin="kenya" data-photo="kenya-1"><span class="photo__frame"><img src="photos/kenya-1.webp" width="1400" height="933" alt="Black-and-white photo of raised drying tables spread with coffee beans, two workers tending them, trees beyond" loading="lazy" decoding="async"></span></figure></li>
+          <li class="sack" data-qa="chest-sack" data-origin="ethiopia" data-found="false"><span class="sack__art" aria-hidden="true"><canvas class="baglabel baglabel--thumb" data-bag-label data-origin="ethiopia" width="340" height="470"></canvas><span class="sack__empty"></span></span><a class="sack__go" href="#leg-ethiopia" data-route="chart/ethiopia" data-sack-go>Yirgacheffe, Ethiopia, still to find. Sail to this leg</a><figure class="photo photo--sack" data-qa="photo" data-origin="ethiopia" data-photo="ethiopia-1"><span class="photo__frame"><img src="photos/ethiopia-1.webp" width="1400" height="2100" alt="A hand holds a dark pan of freshly roasted coffee beans with a stirring rod, a striped white dress behind" loading="lazy" decoding="async"></span></figure></li>
+          <li class="sack" data-qa="chest-sack" data-origin="sumatra" data-found="false"><span class="sack__art" aria-hidden="true"><canvas class="baglabel baglabel--thumb" data-bag-label data-origin="sumatra" width="340" height="470"></canvas><span class="sack__empty"></span></span><a class="sack__go" href="#leg-sumatra" data-route="chart/sumatra" data-sack-go>Gayo, Sumatra, still to find. Sail to this leg</a><figure class="photo photo--sack" data-qa="photo" data-origin="sumatra" data-photo="sumatra-1"><span class="photo__frame"><img src="photos/sumatra-1.webp" width="1400" height="933" alt="Clusters of white coffee flowers on a branch in close-up, set against dark leaves and soft light" loading="lazy" decoding="async"></span></figure></li>
+        </ol>
+      </div>
+      <p class="panelnext"><a class="tag panelnext__link" data-qa="panel-next" href="#compass" data-next="compass" data-template="Next: {object}">Next: Compass</a></p>
+    </div>
+  </section>
+
+  <section class="landfall paper" data-qa="landfall" id="landfall" aria-labelledby="landfall-heading">
+    <p class="loglabel">Landfall · Day 153</p>
+    <h2 class="landfall__title" id="landfall-heading" tabindex="-1">Home to Merrowick, every slot full</h2>
+    <p class="landfall__body">The sun was going down behind Ropewalk Quay as the lines went ashore. The chest came up the gangway first, before anyone’s kit. Tomorrow we light the roaster, and six farms become six coffees.</p>
+    <div class="landfall__actions">
+      <a class="tag" href="#compass">Steer by taste</a>
+      <a class="tag" href="#crew-list">Take the quiz</a>
+      <button class="stampbtn" type="button" data-landfall-close>Back to the desk</button>
+    </div>
+  </section>
+
+  <section class="panel" data-qa="panel" data-object="compass" id="compass" aria-labelledby="compass-title">
+    <div class="panel__bar"><button class="panel__close" type="button" data-qa="panel-close"><span class="panel__arrow" aria-hidden="true">←</span> Back to the desk</button></div>
+    <div class="panel__body">
+      <div class="indexcard paper">
+        <p class="loglabel">Day 154 · Cupping</p>
+        <h2 class="indexcard__title" id="compass-title" tabindex="-1">Steer by taste</h2>
+        <p class="indexcard__text">Six coffees on the cupping table. Eight flavour families, laid out like a compass. Turn the wheel until one points north.</p>
+        <p class="indexcard__hint" id="dial-hint">Drag to turn, or use the arrow keys.</p>
+      </div>
+      <div class="volvelle">
+        <span class="volvelle__rim" aria-hidden="true"></span>
+        <div class="dial" data-qa="wheel" tabindex="0" role="slider" aria-valuemin="1" aria-valuemax="8" aria-valuenow="1" aria-valuetext="Floral" aria-labelledby="compass-title" aria-describedby="dial-hint">
+          <svg class="dial__svg" data-dial-svg viewBox="-300 -300 600 600" aria-hidden="true" focusable="false"></svg>
+        </div>
+        <span class="volvelle__rivet" aria-hidden="true"></span>
+      </div>
+      <div class="picked paper" data-qa="wheel-selected" data-flavor="floral" aria-live="polite">
+        <p class="picked__n" data-p="index" aria-hidden="true">01 / 08</p>
+        <p class="picked__name" data-p="name">Floral</p>
+        <p class="picked__detail" data-p="detail">Jasmine · Orange blossom · Black tea</p>
+        <p class="picked__desc" data-p="desc">Perfumed and delicate. It shows up in high-grown washed coffees and fades fast in a dark roast.</p>
+        <p class="picked__origins" data-p="origins">Yirgacheffe, Ethiopia</p>
+      </div>
+      <details class="flist paper" open>
+        <summary class="flist__label">The eight flavour families</summary>
+        <ul class="flist__items">
+          <li class="flist__item" data-family="floral"><button class="flist__btn" type="button" data-pick="floral" aria-pressed="true"><span class="flist__n" aria-hidden="true">01</span> <span data-f="name">Floral</span></button><p class="flist__detail" data-f="detail">Jasmine · Orange blossom · Black tea</p><p class="flist__desc" data-f="desc">Perfumed and delicate. It shows up in high-grown washed coffees and fades fast in a dark roast.</p></li>
+          <li class="flist__item" data-family="fruity"><button class="flist__btn" type="button" data-pick="fruity" aria-pressed="false"><span class="flist__n" aria-hidden="true">02</span> <span data-f="name">Fruity</span></button><p class="flist__detail" data-f="detail">Blackcurrant · Red cherry · Peach</p><p class="flist__desc" data-f="desc">Juicy and ripe, from bright berries to soft stone fruit. Naturals push it towards jam.</p></li>
+          <li class="flist__item" data-family="citrus"><button class="flist__btn" type="button" data-pick="citrus" aria-pressed="false"><span class="flist__n" aria-hidden="true">03</span> <span data-f="name">Citrus</span></button><p class="flist__detail" data-f="detail">Bergamot · Grapefruit · Mandarin</p><p class="flist__desc" data-f="desc">Crisp acidity that wakes the cup up. It sharpens as the coffee cools.</p></li>
+          <li class="flist__item" data-family="sweet"><button class="flist__btn" type="button" data-pick="sweet" aria-pressed="false"><span class="flist__n" aria-hidden="true">04</span> <span data-f="name">Sweet</span></button><p class="flist__detail" data-f="detail">Caramel · Cane sugar · Molasses</p><p class="flist__desc" data-f="desc">The backbone of a good roast. Sugars brown in the drum and round off the edges.</p></li>
+          <li class="flist__item" data-family="chocolate"><button class="flist__btn" type="button" data-pick="chocolate" aria-pressed="false"><span class="flist__n" aria-hidden="true">05</span> <span data-f="name">Chocolate</span></button><p class="flist__detail" data-f="detail">Milk chocolate · Dark chocolate</p><p class="flist__desc" data-f="desc">Comforting and familiar. It deepens as the roast goes darker and gets along well with milk.</p></li>
+          <li class="flist__item" data-family="nutty"><button class="flist__btn" type="button" data-pick="nutty" aria-pressed="false"><span class="flist__n" aria-hidden="true">06</span> <span data-f="name">Nutty</span></button><p class="flist__detail" data-f="detail">Hazelnut · Toasted almond · Pecan</p><p class="flist__desc" data-f="desc">Toasty and mellow, the kind of cup you can drink every day. Common in Brazilian naturals.</p></li>
+          <li class="flist__item" data-family="spice"><button class="flist__btn" type="button" data-pick="spice" aria-pressed="false"><span class="flist__n" aria-hidden="true">07</span> <span data-f="name">Spice</span></button><p class="flist__detail" data-f="detail">Clove · Cinnamon · Black pepper</p><p class="flist__desc" data-f="desc">Warm and a little woody. Wet-hulled Sumatran coffees carry it, often with a hint of cedar.</p></li>
+          <li class="flist__item" data-family="roasty"><button class="flist__btn" type="button" data-pick="roasty" aria-pressed="false"><span class="flist__n" aria-hidden="true">08</span> <span data-f="name">Roasty</span></button><p class="flist__detail" data-f="detail">Pipe tobacco · Malt · Toast</p><p class="flist__desc" data-f="desc">Deep, toasty and a little smoky. It comes from the drum as much as the farm, so darker roasts show more.</p></li>
+        </ul>
+      </details>
+      <p class="panelnext"><a class="tag panelnext__link" data-qa="panel-next" href="#crew-list" data-next="crew" data-template="Next: {object}">Next: The crew list</a></p>
+    </div>
+  </section>
+
+  <section class="panel" data-qa="panel" data-object="crew" id="crew-list" aria-labelledby="crew-title">
+    <div class="panel__bar"><button class="panel__close" type="button" data-qa="panel-close"><span class="panel__arrow" aria-hidden="true">←</span> Back to the desk</button></div>
+    <div class="panel__body">
+      <div class="orderform paper">
+        <p class="loglabel">The crew list</p>
+        <h2 class="orderform__title" id="crew-title" tabindex="-1">Join the crew</h2>
+        <p class="orderform__intro">Four questions about how you brew and what you like. We’ll find your berth: a plan, an origin and the right grind.</p>
+
+        <form class="quiz" id="quiz" method="dialog" novalidate tabindex="-1" aria-labelledby="crew-title">
+          <div class="quiz__top">
+            <p class="quiz__progress" data-quiz-progress data-template="Question {n} of 4" aria-live="polite">Question 1 of 4</p>
+            <p class="quiz__scale" aria-hidden="true"><i></i><i></i><i></i><i></i></p>
+          </div>
+
+          <fieldset class="q" data-step="1" tabindex="-1">
+            <legend class="q__title">How do you brew at home?</legend>
+            <div class="q__opts">
+              <label class="opt"><input type="radio" name="q1" value="espresso" data-qa="quiz-option" data-question="1" data-value="espresso" data-grind="Fine"><span class="opt__text">Espresso machine</span></label>
+              <label class="opt"><input type="radio" name="q1" value="filter" data-qa="quiz-option" data-question="1" data-value="filter" data-grind="Medium"><span class="opt__text">Pour-over or drip</span></label>
+              <label class="opt"><input type="radio" name="q1" value="press" data-qa="quiz-option" data-question="1" data-value="press" data-grind="Coarse"><span class="opt__text">French press</span></label>
+              <label class="opt"><input type="radio" name="q1" value="moka" data-qa="quiz-option" data-question="1" data-value="moka" data-grind="Medium-fine"><span class="opt__text">Moka pot</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="q" data-step="2" tabindex="-1">
+            <legend class="q__title">What should the cup taste like?</legend>
+            <div class="q__opts">
+              <label class="opt"><input type="radio" name="q2" value="bright" data-qa="quiz-option" data-question="2" data-value="bright"><span class="opt__text">Bright and fruity</span></label>
+              <label class="opt"><input type="radio" name="q2" value="balanced" data-qa="quiz-option" data-question="2" data-value="balanced"><span class="opt__text">Sweet and balanced</span></label>
+              <label class="opt"><input type="radio" name="q2" value="deep" data-qa="quiz-option" data-question="2" data-value="deep"><span class="opt__text">Deep and chocolatey</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="q" data-step="3" tabindex="-1">
+            <legend class="q__title">How many cups a week, counting everyone?</legend>
+            <div class="q__opts">
+              <label class="opt"><input type="radio" name="q3" value="few" data-qa="quiz-option" data-question="3" data-value="few"><span class="opt__text">A few: 1–5 cups</span></label>
+              <label class="opt"><input type="radio" name="q3" value="steady" data-qa="quiz-option" data-question="3" data-value="steady"><span class="opt__text">Steady: 6–14 cups</span></label>
+              <label class="opt"><input type="radio" name="q3" value="crew" data-qa="quiz-option" data-question="3" data-value="crew"><span class="opt__text">A whole crew: 15+ cups</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="q" data-step="4" tabindex="-1">
+            <legend class="q__title">Keep one origin, or change course each delivery?</legend>
+            <div class="q__opts">
+              <label class="opt"><input type="radio" name="q4" value="stay" data-qa="quiz-option" data-question="4" data-value="stay"><span class="opt__text">Stay with one origin</span></label>
+              <label class="opt"><input type="radio" name="q4" value="rotate" data-qa="quiz-option" data-question="4" data-value="rotate"><span class="opt__text">A new origin every delivery</span></label>
+            </div>
+          </fieldset>
+
+          <div class="quiz__nav">
+            <button class="stampbtn quiz__back" type="button" data-quiz-back hidden>Back</button>
+            <button class="tag quiz__next" type="button" data-qa="quiz-next" disabled>Next</button>
+          </div>
+
+          <div class="result" data-qa="quiz-result" data-plan="" tabindex="-1" hidden>
+            <p class="result__label">Your berth aboard</p>
+            <p class="result__plan" data-r="name"></p>
+            <p class="result__summary" data-r="summary"></p>
+            <p class="result__pitch" data-r="pitch"></p>
+            <dl class="result__specs">
+              <div><dt>Suggested origin</dt><dd data-r="origin"></dd></div>
+              <div><dt>Grind</dt><dd data-r="grind"></dd></div>
+              <div><dt>Price per delivery</dt><dd class="result__price" data-r="price"></dd></div>
+            </dl>
+            <span class="result__stamp" aria-hidden="true"><span data-r-stamp></span></span>
+            <div class="result__actions">
+              <button class="tag" type="button" data-qa="quiz-subscribe">Start subscription</button>
+              <button class="stampbtn" type="button" data-restart>Start over</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="plans">
+          <p class="plans__intro">Three ways to sign on. Every bag ships within a day of roasting.</p>
+          <ul class="plans__list">
+            <li class="plan" data-plan="harbour"><p class="plan__name" data-f="name">Harbour</p><p class="plan__summary" data-f="summary">1 bag · 250 g · every 2 weeks</p><p class="plan__price" data-f="price">$16</p><p class="plan__pitch" data-f="pitch">Home waters for one drinker and a daily cup. Pause any time.</p></li>
+            <li class="plan" data-plan="passage"><p class="plan__name" data-f="name">Passage</p><p class="plan__summary" data-f="summary">2 bags · 250 g each · every 2 weeks</p><p class="plan__price" data-f="price">$29</p><p class="plan__pitch" data-f="pitch">For a household that brews every morning. Two bags, so the galley never runs dry.</p></li>
+            <li class="plan" data-plan="expedition"><p class="plan__name" data-f="name">Expedition</p><p class="plan__summary" data-f="summary">3 origins · 250 g each · every month</p><p class="plan__price" data-f="price">$44</p><p class="plan__pitch" data-f="pitch">Three origins a month from this season’s chest, cupped side by side. For the curious.</p></li>
+          </ul>
+        </div>
+      </div>
+      <p class="panelnext"><a class="tag panelnext__link" data-qa="panel-next" href="#letter" data-next="letter" data-template="Next: {object}">Next: Letter</a></p>
+    </div>
+  </section>
+
+  <section class="panel" data-qa="panel" data-object="letter" id="letter" aria-labelledby="letter-title">
+    <div class="panel__bar"><button class="panel__close" type="button" data-qa="panel-close"><span class="panel__arrow" aria-hidden="true">←</span> Back to the desk</button></div>
+    <div class="panel__body">
+      <p class="logend__line">14 August, 21:10 · Lines doubled, lamp out. End of the season’s log.</p>
+      <div class="tidecard paper">
+        <h2 class="tidecard__title" id="letter-title" tabindex="-1">Tide tables and new origins</h2>
+        <p class="tidecard__body">A short letter when a new origin lands, with the month’s tides for Merrowick. Once a month at most.</p>
+        <form class="nl" method="dialog" novalidate data-msg-success="Logged. This is a demo, so nothing was sent." data-msg-error="That email is off course. Check it and try again.">
+          <label class="sr-only" for="nl-email">Email address for the newsletter</label>
+          <div class="nl__row">
+            <input class="nl__input" id="nl-email" name="email" type="email" inputmode="email" autocomplete="email" placeholder="deckhand@example.com" data-qa="nl-email" aria-describedby="nl-message">
+            <button class="stampbtn nl__btn" type="submit" data-qa="nl-submit">Sign up</button>
+          </div>
+          <p class="nl__msg" id="nl-message" data-qa="nl-message" aria-live="polite"></p>
+        </form>
+      </div>
+      <div class="portcard paper">
+        <p class="portcard__name">Merrowick</p>
+        <p class="portcard__coords">44°48′N 62°37′W</p>
+        <p class="portcard__address">Shed 4, Ropewalk Quay, off Chandlery Lane</p>
+      </div>
+      <p class="panelnext"><a class="tag panelnext__link" data-qa="panel-next" href="#log" data-next="log" data-template="Next: {object}">Next: Ship’s log</a></p>
+    </div>
+  </section>
+
+  <section class="panel" data-qa="panel" data-object="cup" id="cup" aria-labelledby="cup-title">
+    <div class="panel__bar"><button class="panel__close" type="button" data-qa="panel-close"><span class="panel__arrow" aria-hidden="true">←</span> Back to the desk</button></div>
+    <div class="panel__body">
+      <div class="cupcard paper">
+        <p class="loglabel">Galley · Today’s cup</p>
+        <h2 class="cupcard__title" id="cup-title" tabindex="-1">A cup for the watch</h2>
+        <p class="cupcard__intro">The pot on the galley stove is never empty for long. Here is what’s in it today, and how to make the same cup at home.</p>
+        <p class="cupcard__today">Gayo, Sumatra, ground medium-fine for the moka pot on the galley stove.</p>
+      </div>
+      <h3 class="cuplabel">Brewing ashore</h3>
+      <ol class="recipes">
+        <li class="recipe paper" data-brew="espresso"><h4 class="recipe__name">Espresso machine</h4><p class="recipe__line"><span>18 g</span> · <span>36 g out, water at 93 °C</span> · <span>Fine</span> · <span>25–30 s</span></p><p class="recipe__tip">Judge the shot by weight in the cup. Sour and fast: grind finer. Bitter and slow: grind coarser.</p></li>
+        <li class="recipe paper" data-brew="filter"><h4 class="recipe__name">Pour-over or drip</h4><p class="recipe__line"><span>15 g</span> · <span>250 g water at 93–96 °C</span> · <span>Medium</span> · <span>about 3 min</span></p><p class="recipe__tip">Rinse the paper with hot water, then bloom with 30 g of water for 30–45 s before the main pour.</p></li>
+        <li class="recipe paper" data-brew="press"><h4 class="recipe__name">French press</h4><p class="recipe__line"><span>30 g</span> · <span>500 g water at 93–96 °C</span> · <span>Coarse</span> · <span>4 min</span></p><p class="recipe__tip">At four minutes, stir the crust and skim the foam. Press gently and pour it all off at once.</p></li>
+        <li class="recipe paper" data-brew="moka"><h4 class="recipe__name">Moka pot</h4><p class="recipe__line"><span>Basket level, not tamped</span> · <span>Hot water below the valve</span> · <span>Medium-fine</span> · <span>3–5 min, medium heat</span></p><p class="recipe__tip">Lid up. Take it off the heat as the stream turns pale, then cool the base under a cold tap.</p></li>
+      </ol>
+      <p class="cupnote">Treat every number here as a first bearing. Taste, change one thing at a time, and log what you did.</p>
+      <p class="panelnext"><a class="tag panelnext__link" data-qa="panel-next" href="#log" data-next="log" data-template="Next: {object}">Next: Ship’s log</a></p>
+    </div>
+  </section>
+
+</main>
+
+<p class="byline" data-qa="byline"><a href="../">Designed &amp; built by Shocking Mike</a></p>
+
+<nav class="objectbar" data-qa="object-bar" aria-label="Menu">
+  <ul class="objectbar__list">
+    <li><a class="objectbar__btn" href="#log" data-object="log"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6.5C10 5 7 4.6 4 5v13c3-.4 6 0 8 1.5M12 6.5C14 5 17 4.6 20 5v13c-3-.4-6 0-8 1.5M12 6.5v13"/></svg><span class="sr-only">Ship’s log</span></a></li>
+    <li><a class="objectbar__btn" href="#chart" data-object="chart"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.5 6.5 9 4.5l6 2 5.5-2v13l-5.5 2-6-2-5.5 2zM9 4.5v13M15 6.5v13"/></svg><span class="sr-only">Ocean chart</span></a></li>
+    <li><a class="objectbar__btn" href="#chest" data-object="chest"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.5 9.5h17v9.5h-17zM3.5 9.5l2-4h13l2 4M9.2 9.5v9.5M14.8 9.5v9.5M3.5 14.2h17"/></svg><span class="sr-only">Sample chest</span></a></li>
+    <li><a class="objectbar__btn" href="#compass" data-object="compass"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5a8.5 8.5 0 1 0 0 17 8.5 8.5 0 1 0 0-17zM12 6.5l2.3 5.5L12 17.5 9.7 12z"/></svg><span class="sr-only">Compass</span></a></li>
+    <li><a class="objectbar__btn" href="#crew-list" data-object="crew"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 4.5h11v16h-11zM9 3.5h6v2.5H9zM9 9.5h6M9 13h6M9 16.5h4"/></svg><span class="sr-only">The crew list</span></a></li>
+    <li><a class="objectbar__btn" href="#letter" data-object="letter"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3.5 6.5h17v11h-17zM3.5 6.5l8.5 6.5 8.5-6.5"/></svg><span class="sr-only">Letter</span></a></li>
+    <li><a class="objectbar__btn" href="#cup" data-object="cup"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 9.5h11v4.5a5 5 0 0 1-5 5h-1a5 5 0 0 1-5-5zM16 11h1.3a2.3 2.3 0 0 1 0 4.6H15.6M8.5 3.5c-.8 1 .8 2 0 3M12 3.5c-.8 1 .8 2 0 3M4 21h14"/></svg><span class="sr-only">Coffee cup</span></a></li>
+  </ul>
+</nav>
+<nav class="objectdock" data-qa="object-dock" aria-label="On the desk"></nav>
+
+<dialog class="modal paper" id="modal-subscribe" data-qa="modal-subscribe" aria-labelledby="modal-subscribe-title">
+  <span class="modal__stamp" aria-hidden="true"></span>
+  <h2 class="modal__title" id="modal-subscribe-title">Signed on. Nothing charged.</h2>
+  <p class="modal__body">Demo checkout. No payment was taken and no data was sent.</p>
+  <button class="tag modal__close" type="button" data-close>Close</button>
+</dialog>
+<dialog class="lightbox" id="lightbox" data-qa="lightbox" data-enlarge="Enlarge photo" aria-label="Enlarge photo">
+  <figure class="lightbox__print">
+    <img class="lightbox__img" alt="" decoding="async">
+    <figcaption class="lightbox__caption"></figcaption>
+  </figure>
+  <button class="lightbox__close stampbtn" type="button" data-qa="lightbox-close">Close</button>
+</dialog>
+</body>
+</html>
