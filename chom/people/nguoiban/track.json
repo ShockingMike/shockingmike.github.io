@@ -1,0 +1,54 @@
+{
+ "note": "people/nguoiban: the customer (people/khach) hands the note over on this drawing; noteLocal = the note in her frame (her root: at, turned toward face) on the drawing before. Made by prototypes/chom-people-seller (state.exportTrack) with the layout below.",
+ "handoff": 116,
+ "noteLocal": [
+  -0.141528,
+  -0.419129,
+  0.896828,
+  0,
+  0.451323,
+  -0.833634,
+  -0.318373,
+  0,
+  0.881066,
+  0.3597,
+  0.307145,
+  0,
+  -0.213697,
+  0.988434,
+  0.446356,
+  1
+ ],
+ "layout": {
+  "customerAt": [
+   2,
+   0,
+   -4.2
+  ],
+  "customerFace": [
+   2.840595899938053,
+   0,
+   -4.326089384990708
+  ],
+  "sellerAt": [
+   2.840595899938053,
+   0,
+   -4.326089384990708
+  ],
+  "exchange": [
+   2.4529,
+   0.97,
+   -4.0455
+  ],
+  "exchangeInCustomer": [
+   -0.22,
+   0.97,
+   0.425
+  ],
+  "sellerInCustomer": [
+   0,
+   0,
+   0.85
+  ]
+ }
+}

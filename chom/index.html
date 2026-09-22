@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="vi" class="is-loading">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chớm, Xưởng hương Hà Nội · Mùi mở lại một buổi hồi bé</title>
+<meta name="description" content="Xưởng nước hoa nhỏ ở Hà Nội. Mỗi chai mở lại một buổi hồi bé của phố: mưa phùn tháng Hai, sen tháng Sáu, hoa sữa tháng Mười, khói than tháng Mười Hai.">
+<meta name="color-scheme" content="light">
+<noscript><meta http-equiv="refresh" content="0; url=page/read-vi.html"></noscript>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@800&family=EB+Garamond:ital,wght@0,500;1,500&display=swap">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"
+  }
+}
+</script>
+<style>
+html { background: #efe2d2; }
+body { margin: 0; }
+html.is-loading, html.is-loading body { overflow: hidden; }
+#scene { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
+/* the scroll room: the scene stays, the page scrolls, the scroll position drives the camera */
+.room { height: 420vh; }
+.veil {
+  position: fixed; inset: 0; display: grid; place-items: center; z-index: 5;
+  background: radial-gradient(120% 90% at 30% 20%, #fbeedc 0%, #f0dcc6 60%, #e2cab8 100%);
+  transition: opacity 1.4s cubic-bezier(.2,.7,.2,1), visibility 0s linear 1.4s;
+}
+html:not(.is-loading) .veil { opacity: 0; visibility: hidden; pointer-events: none; }
+.veil i { display: block; width: min(240px, 40vw); height: 1px; background: rgba(60,40,40,.15); overflow: hidden; }
+.veil b { display: block; height: 100%; background: #c0607a; transform: scaleX(0); transform-origin: left; transition: transform .5s ease; }
+/* embedded in journey.html: transparent, no scroll room, no veil (the parent has its own) */
+html.embed, html.embed body { background: transparent; overflow: hidden; }
+html.embed .room { height: 100vh; }
+html.embed .veil { display: none; }
+/* the four seasons (no ?season=): the scenes live in frames, stacked; this page only scrolls (core/journey.js) */
+html.journey { background: #1c1a22; }
+html.journey #scene, html.journey #bottle-hit, html.journey #notes { display: none; }
+html.journey.is-focus, html.journey.is-focus body { overflow: hidden; }
+html.journey .room { height: var(--room, 1890vh); }
+html.journey .veil { z-index: 50; }
+html.journey.has-page .veil { display: none; }
+#stage .season { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: block; background: transparent; }
+#stage .season.is-off { visibility: hidden; }
+/* a cut to another season (core/journey.js scrollToSeason(i, { cut: true })) */
+#stage .cut-veil { position: fixed; inset: 0; z-index: 30; pointer-events: none; opacity: 0; background: #efe2d2; transition: opacity .2s ease; }
+#stage .cut-veil.is-on { opacity: 1; transition: opacity .2s ease; }
+#page-tail { position: relative; z-index: 40; }
+#dev { position: fixed; left: 12px; bottom: 12px; z-index: 6; font: 12px/1.3 ui-monospace, Consolas, monospace; color: #f6e6b8; background: rgba(0,0,0,.6); padding: 4px 8px; }
+
+/* the bottle is a real button laid over its painted shape */
+.bottle-hit {
+  position: fixed; left: 0; top: 0; width: 44px; height: 44px; z-index: 2;
+  margin: 0; padding: 0; border: 0; border-radius: 10px; background: transparent; cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.bottle-hit:focus { outline: none; }
+.bottle-hit:focus-visible { outline: 2px solid #fff8ec; outline-offset: 3px; box-shadow: 0 0 0 5px rgba(40, 28, 30, .55); }
+html.is-focus .bottle-hit { cursor: default; }
+
+/* the notes: a solid paper card beside the bottle; it only fades in and out, it never moves */
+.notes {
+  position: fixed; z-index: 3; box-sizing: border-box;
+  right: max(4vw, 24px); top: 50%; margin-top: -13.5rem;
+  width: min(25rem, 42vw);
+  padding: 1.6rem 1.75rem 1.5rem;
+  background: #f4efe6; color: #2a2320;
+  border: 1px solid rgba(42, 35, 32, .14); border-radius: 3px;
+  box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 18px 40px -18px rgba(30, 22, 20, .45);
+  font: 400 1rem/1.55 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  opacity: 0; visibility: hidden;
+  transition: opacity .45s ease, visibility 0s linear .45s;
+}
+.notes.is-shown { opacity: 1; visibility: visible; transition: opacity .6s ease, visibility 0s; }
+.notes h2 { margin: 0; font: 500 2.6rem/1 "EB Garamond", Georgia, serif; letter-spacing: .01em; }
+.notes .sub { margin: .35rem 0 0; font: italic 500 1.15rem/1.35 "EB Garamond", Georgia, serif; color: #5a4c48; }
+.notes .opener { margin: 1rem 0 0; max-width: 34ch; }
+.notes dl { margin: 1.15rem 0 0; padding: .9rem 0; border-top: 1px solid rgba(42,35,32,.16); border-bottom: 1px solid rgba(42,35,32,.16); display: grid; grid-template-columns: auto 1fr; gap: .35rem 1.1rem; align-items: baseline; }
+.notes dt { font-size: .8125rem; letter-spacing: .12em; text-transform: uppercase; color: #6e5e5a; }
+.notes dd { margin: 0; }
+.notes dd.heart { color: #9a3a58; }
+.notes .memory { margin: 1rem 0 0; max-width: 36ch; color: #3e3431; }
+.notes-close {
+  position: absolute; top: .55rem; right: .55rem; width: 44px; height: 44px;
+  display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #3e3431; cursor: pointer;
+}
+.notes-close:hover { background: rgba(42,35,32,.07); }
+.notes-close:focus-visible { outline: 2px solid #2a2320; outline-offset: -4px; }
+.notes-close svg { width: 16px; height: 16px; }
+@media (max-aspect-ratio: 95/100) {
+  .notes { left: 16px; right: 16px; width: auto; top: auto; bottom: max(16px, env(safe-area-inset-bottom)); margin-top: 0; padding: 1.2rem 1.25rem 1.1rem; }
+  .notes h2 { font-size: 2.1rem; }
+}
+</style>
+</head>
+<body>
+<canvas id="scene" aria-label="A painted, living scene of a Hanoi street"></canvas>
+<div class="room" aria-hidden="true"></div>
+<button type="button" class="bottle-hit" id="bottle-hit" hidden aria-haspopup="dialog" aria-expanded="false" aria-controls="notes" aria-label="The season's bottle: open its notes"></button>
+<section class="notes" id="notes" role="dialog" aria-modal="false" aria-labelledby="notes-title" hidden>
+  <button type="button" class="notes-close" id="notes-close" aria-label="Close">
+    <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2l12 12M14 2L2 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+  </button>
+  <h2 id="notes-title" lang="vi">Xuân</h2>
+  <p class="sub">Spring · sun through drizzle, peach blossom</p>
+  <p class="opener">Spring comes in as drizzle so fine it never quite lands.</p>
+  <dl>
+    <dt>Top</dt><dd>Dong leaf</dd>
+    <dt>Heart</dt><dd class="heart">Peach blossom</dd>
+    <dt>Base</dt><dd>Damp lime plaster</dd>
+  </dl>
+  <p class="memory">Peach branches ride home on the backs of motorbikes, through the drizzle. Every doorway smells of wet tile and the dong leaves for New Year cakes.</p>
+</section>
+<div class="veil" aria-hidden="true"><i><b id="bar"></b></i></div>
+<div id="dev" hidden></div>
+<script type="module">
+// ?season=<id> shows one season (and is how the four-season page embeds each one); no ?season= is the four-season journey
+if (new URLSearchParams(location.search).has('season')) import('./core/world.js');
+else import('./core/journey.js');
+</script>
+</body>
+</html>

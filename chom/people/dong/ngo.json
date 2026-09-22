@@ -1,0 +1,51 @@
+{
+ "who": "ngo",
+ "height": 1.5,
+ "seated": true,
+ "seat": 0.26,
+ "headCentre": [
+  0.0,
+  0.9764,
+  0.103
+ ],
+ "eye": [
+  0.0,
+  0.9354,
+  0.1633
+ ],
+ "eyeUp": -0.0156,
+ "eyeFwd": 0.0712,
+ "headAxis": [
+  0.0,
+  0.9277,
+  0.3732
+ ],
+ "headFwd": [
+  0.0,
+  -0.3732,
+  0.9277
+ ],
+ "neckR": 0.046,
+ "hipY": 0.3446,
+ "collarTop": [
+  0.0,
+  0.88,
+  0.0487
+ ],
+ "tris": {
+  "Body": 3600,
+  "Jacket": 6499,
+  "Pants": 3400,
+  "Scarf": 3200,
+  "Hat": 1800,
+  "Socks": 1000,
+  "Shoes": 584,
+  "H_Body": 1979,
+  "H_Jacket": 1949,
+  "H_Pants": 1020,
+  "H_Scarf": 960,
+  "H_Hat": 540,
+  "H_Socks": 300,
+  "H_Shoes": 174
+ }
+}

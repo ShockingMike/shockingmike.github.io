@@ -1,0 +1,57 @@
+{
+ "who": "tram",
+ "height": 1.63,
+ "seated": false,
+ "seat": 0.0,
+ "headCentre": [
+  0.0,
+  1.5102,
+  0.1303
+ ],
+ "eye": [
+  0.0,
+  1.4675,
+  0.2004
+ ],
+ "eyeUp": -0.0202,
+ "eyeFwd": 0.0795,
+ "headAxis": [
+  0.0,
+  0.956,
+  0.2932
+ ],
+ "headFwd": [
+  0.0,
+  -0.2932,
+  0.956
+ ],
+ "neckR": 0.0586,
+ "hipY": 0.842,
+ "collarTop": [
+  0.0,
+  1.4028,
+  0.075
+ ],
+ "tris": {
+  "Body": 3600,
+  "Jacket": 6500,
+  "Pants": 3400,
+  "Under": 1399,
+  "Scarf": 3199,
+  "Hat": 1800,
+  "Hair": 138,
+  "Buttons": 480,
+  "Socks": 1000,
+  "Shoes": 792,
+  "H_Body": 1980,
+  "H_Jacket": 1950,
+  "H_Pants": 1020,
+  "H_Under": 418,
+  "H_Scarf": 959,
+  "H_Hat": 540,
+  "H_Hair": 40,
+  "H_Buttons": 144,
+  "H_Socks": 300,
+  "H_Shoes": 236
+ }
+}

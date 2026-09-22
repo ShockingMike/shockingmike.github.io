@@ -1,0 +1,53 @@
+{
+ "who": "co",
+ "height": 1.56,
+ "seated": true,
+ "seat": 0.3,
+ "headCentre": [
+  0.0,
+  1.0453,
+  0.108
+ ],
+ "eye": [
+  0.0,
+  1.0006,
+  0.1705
+ ],
+ "eyeUp": -0.0195,
+ "eyeFwd": 0.0743,
+ "headAxis": [
+  0.0,
+  0.9348,
+  0.3552
+ ],
+ "headFwd": [
+  0.0,
+  -0.3552,
+  0.9348
+ ],
+ "neckR": 0.0485,
+ "hipY": 0.3878,
+ "collarTop": [
+  0.0,
+  0.9019,
+  0.0137
+ ],
+ "tris": {
+  "Body": 3600,
+  "Jacket": 6500,
+  "Pants": 3400,
+  "Under": 1399,
+  "Scarf": 3199,
+  "Hair": 5199,
+  "Buttons": 480,
+  "Shoes": 1600,
+  "H_Body": 1979,
+  "H_Jacket": 1950,
+  "H_Pants": 1020,
+  "H_Under": 418,
+  "H_Scarf": 959,
+  "H_Hair": 1559,
+  "H_Buttons": 144,
+  "H_Shoes": 480
+ }
+}

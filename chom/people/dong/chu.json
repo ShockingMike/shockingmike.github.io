@@ -1,0 +1,53 @@
+{
+ "who": "chu",
+ "height": 1.65,
+ "seated": true,
+ "seat": 0.3,
+ "headCentre": [
+  0.0,
+  1.0528,
+  0.1079
+ ],
+ "eye": [
+  0.0,
+  1.0071,
+  0.1758
+ ],
+ "eyeUp": -0.0206,
+ "eyeFwd": 0.0792,
+ "headAxis": [
+  0.0,
+  0.9438,
+  0.3305
+ ],
+ "headFwd": [
+  0.0,
+  -0.3305,
+  0.9438
+ ],
+ "neckR": 0.0588,
+ "hipY": 0.3926,
+ "collarTop": [
+  0.0,
+  0.985,
+  0.0784
+ ],
+ "tris": {
+  "Body": 3600,
+  "Jacket": 6500,
+  "Pants": 3400,
+  "Scarf": 3200,
+  "Hat": 1296,
+  "Buttons": 480,
+  "Band": 96,
+  "Shoes": 1600,
+  "H_Body": 1979,
+  "H_Jacket": 1950,
+  "H_Pants": 1020,
+  "H_Scarf": 960,
+  "H_Hat": 388,
+  "H_Buttons": 144,
+  "H_Band": 28,
+  "H_Shoes": 480
+ }
+}

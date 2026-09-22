@@ -1,0 +1,1094 @@
+/* Chớm page layer. Words stand still on solid painted paper; they only fade in and out where they are.
+   No backdrop-filter, no large blurred shadows, nothing that has to be recomputed per frame. */
+
+.pg {
+  --paper: #f3eadb;
+  --paper-2: #e7d9c3;
+  --paper-3: #d9c7ad;
+  --field: #fbf6ee;
+  --ink: #2b2320;
+  --ink-2: #4e413b;
+  --ink-3: #6a5b54;
+  --night: #1f2239;
+  --night-2: #2c304d;
+  --night-ink: #f1e8d6;
+  --night-ink-2: #cfc6b5;
+  --err: #9b2c2c;
+  --c-xuan: #a8405f;
+  --c-ha: #4b6a2d;
+  --c-thu: #34406e;
+  --c-dong: #a3451b;
+  --serif: "EB Garamond", "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --sans: "Be Vietnam Pro", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --gutter: clamp(20px, 5.5vw, 96px);
+  --vh: 100vh;
+}
+@supports (height: 100svh) { .pg { --vh: 100svh; } }
+/* the scroll bar's place is kept while the page is locked, so stepping in does not narrow the page (no new layout,
+   no resize of the scene) */
+/* A phone lays the whole page out wider than its screen as soon as one thing sticks out sideways, and then every
+   measurement after that is wrong. Nothing here is meant to be scrolled sideways, so anything that sticks out is
+   cut off instead. */
+html.pg { scrollbar-gutter: stable; background-color: #efe2d2; overflow-x: clip; }
+
+.pg body { font: 400 17px/1.6 var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+.pg.pg-menu-open, .pg.pg-menu-open body { overflow: hidden; }
+
+/* ------------------------------------------------------------------ painted paper
+   Any .pg-paint element sits on a solid patch of its own colour (--pc) whose edge is a real brush scan.
+   The patch is solid all over the element's box; only the margin around it is ragged. */
+.pg-paint { position: relative; isolation: isolate; }
+.pg-paint::before {
+  content: ""; position: absolute; z-index: -1; pointer-events: none;
+  inset: calc(var(--edge, 12px) * -0.7);
+  background: var(--pc, var(--paper));
+}
+.pg-brush-ready .pg-paint::before {
+  inset: calc(var(--edge, 12px) * -1);
+  -webkit-mask:
+    linear-gradient(#000 0 0) center / calc(100% - var(--edge, 12px) * 2) calc(100% - var(--edge, 12px) * 2) no-repeat,
+    var(--pg-edge-t) top / 100% calc(var(--edge, 12px) * 2.6) no-repeat,
+    var(--pg-edge-b) bottom / 100% calc(var(--edge, 12px) * 2.6) no-repeat,
+    var(--pg-edge-l) left / calc(var(--edge, 12px) * 2.6) 100% no-repeat,
+    var(--pg-edge-r) right / calc(var(--edge, 12px) * 2.6) 100% no-repeat;
+  mask:
+    linear-gradient(#000 0 0) center / calc(100% - var(--edge, 12px) * 2) calc(100% - var(--edge, 12px) * 2) no-repeat,
+    var(--pg-edge-t) top / 100% calc(var(--edge, 12px) * 2.6) no-repeat,
+    var(--pg-edge-b) bottom / 100% calc(var(--edge, 12px) * 2.6) no-repeat,
+    var(--pg-edge-l) left / calc(var(--edge, 12px) * 2.6) 100% no-repeat,
+    var(--pg-edge-r) right / calc(var(--edge, 12px) * 2.6) 100% no-repeat;
+}
+
+/* ------------------------------------------------------------------ shared bits */
+.pg-sr { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+.pg-sceneimg { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.pg-no3d-only { display: none !important; }
+.pg :where(a, button, input, [tabindex]):focus { outline: none; }
+.pg :where(a, button, input, [tabindex]):focus-visible { outline: 2px solid var(--paper); outline-offset: 2px; box-shadow: 0 0 0 4px var(--ink); }
+.pg [data-tone="night"] :where(a, button, [tabindex]):focus-visible,
+.pg[data-tone="night"] .pg-nav :where(a, button):focus-visible { outline-color: var(--night); box-shadow: 0 0 0 4px var(--night-ink); }
+.pg :where(h1, h2, h3)[tabindex="-1"]:focus-visible { box-shadow: none; outline: none; }
+.pg i { font-style: italic; }
+.pg :where(h1, h2, h3, .pg-blend__line, .pg-sum__name, .pg-hint, .pg-card__street, .pg-card__sub) { text-wrap: balance; }
+.pg .pg-card__h { text-wrap: wrap; }
+.pg :where(p, li) { text-wrap: pretty; }
+
+.pg-skip {
+  position: fixed; left: 16px; top: 12px; z-index: 90; padding: 10px 16px;
+  background: var(--ink); color: var(--paper); font: 600 15px/1.2 var(--sans); text-decoration: none;
+  transform: translateY(-160%);
+}
+.pg-skip:focus-visible { transform: none; }
+
+.pg-btn {
+  --pc: var(--ink); --edge: 7px;
+  appearance: none; border: 0; margin: 0; background: transparent; cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; gap: .5em;
+  min-height: 48px; padding: 13px 24px;
+  color: var(--paper); font: 600 16px/1.25 var(--sans); letter-spacing: .01em; text-decoration: none; text-align: center;
+  -webkit-tap-highlight-color: transparent;
+}
+.pg-btn:hover { --pc: #45372f; }
+.pg-btn--quiet { --pc: var(--paper-3); color: var(--ink); }
+.pg-btn--quiet:hover { --pc: #cdb99c; }
+.pg-btn[aria-disabled="true"] { --pc: #c4b6a2; color: #3a302c; cursor: not-allowed; }
+.pg-btn--small { min-height: 40px; padding: 8px 15px; font-size: 15px; --edge: 6px; }
+.pg-btn[hidden] { display: none; }
+
+.pg-body { margin: 0; font: 400 18px/1.62 var(--sans); }
+
+.pg-hint { margin: 0; font: italic 400 18px/1.4 var(--serif); transition: opacity .6s ease; }
+.pg-hint.is-done { opacity: 0; }
+
+
+/* ------------------------------------------------------------------ waiting screen + language chooser */
+.pg-loader {
+  position: fixed; inset: 0; z-index: 60; overflow: auto;
+  display: grid; place-items: center; padding: 24px;
+  background-color: var(--paper);
+  background-image: url("../tex/linen.jpg");
+  background-size: 360px;
+  background-blend-mode: soft-light;
+  color: var(--ink);
+  /* the ground's fade is an animation in loader.js (GROUND_MS, GROUND_EASE), not a transition here: the name's ink
+     turns on the same clock as the ground, and only an animation the page starts itself can be put on that clock */
+}
+/* once the page behind is built, the waiting screen lets it be painted in advance (not quite opaque, its own layer),
+   so stepping in only fades a layer that is already drawn */
+.pg-loader { will-change: opacity; }
+.pg.pg-built .pg-loader { opacity: .999; }
+.pg .pg-loader.is-leaving { pointer-events: none; }
+/* one season word written once on the waiting screen, almost invisible, so the browser has drawn a blurred word before
+   the bar needs one (page.js warmWord). Same height as the bar's words. */
+.pg-warm { position: absolute; left: 0; top: 0; height: 28px; opacity: .02; pointer-events: none; }
+.pg-loader[hidden] { display: none; }
+.pg-loader__in { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 16px; max-width: 44rem; }
+/* the name writing itself: the drawing is the only thing on the waiting screen, and the smoke leaves from the point
+   the drawing names (data-wisp), so it runs on into the scent over the bottle when the screen gives way */
+.pg-loader__swatch { position: relative; display: block; width: min(340px, 74vw); }
+.pg-loader__swatch svg { display: block; width: 100%; height: auto; }
+.pg-loader { --pg-logo-ink: #211A17; --pg-logo-accent: #C2185B; }
+.pg-loader__wisp { position: absolute; width: 0; height: 0; pointer-events: none; }
+.pg-loader__wisp i {
+  position: absolute; left: -1.5px; bottom: 0; width: 3px; height: 14px; border-radius: 2px;
+  background: var(--pg-logo-accent); opacity: 0;
+}
+.pg-loader.is-smoking .pg-loader__wisp i { animation: pg-loader-smoke 1.5s ease-out forwards; }
+.pg-loader.is-smoking .pg-loader__wisp i:nth-child(2) { animation-delay: .16s; left: 2px; }
+.pg-loader.is-smoking .pg-loader__wisp i:nth-child(3) { animation-delay: .32s; left: -5px; }
+@keyframes pg-loader-smoke {
+  0% { opacity: 0; transform: translate(0, 0) scaleY(.4); }
+  15% { opacity: .55; }
+  100% { opacity: 0; transform: translate(6px, -120px) scaleY(2.6); }
+}
+.pg-loader__meter { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.pg-loader__label { margin: 0; }
+.pg-loader__label span { display: block; font: italic 400 23px/1.3 var(--serif); }
+.pg-loader__label span + span { color: var(--ink-2); }
+.pg-loader__pct { margin: 0; font: 500 14px/1 var(--sans); letter-spacing: .06em; color: var(--ink-3); font-variant-numeric: tabular-nums; transition: opacity .4s ease; }
+.pg-loader.is-failed .pg-loader__pct { opacity: 0; }
+.pg-loader__error { max-width: 34rem; }
+.pg-loader__error p { margin: 0 0 .4em; font: 400 17px/1.55 var(--sans); }
+.pg-loader__error[hidden] { display: none; }
+/* the logo's accent colour, season by season (the logo artwork uses it; the stand-in wordmark shows it on the mark) */
+/* These, and the bar's own ink below, are set on the bar, not on the page: a colour kept in a custom property on the
+   page's root is inherited by every element, so changing it at a change of season made the browser work out the style
+   of all ~725 elements again, on the very frame the viewer scrolls into spring (21/9 night, measured: 4.5 ms of the
+   one frame that came out long). On the bar only the bar's own elements are looked at again. */
+.pg { --pg-logo-accent: #d86f8e; }
+.pg-nav[data-season="ha"] { --pg-logo-accent: #d2749b; }
+.pg-nav[data-season="thu"] { --pg-logo-accent: #efe3c4; }
+.pg-nav[data-season="dong"] { --pg-logo-accent: #e0763e; }
+
+/* ------------------------------------------------------------------ nav: three paper tags over the scene */
+.pg-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 45;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+  padding: 16px var(--gutter) 0; pointer-events: none;
+}
+.pg-nav > * { pointer-events: auto; }
+.pg.is-loading:not(.pg-built) .pg-nav, .pg.is-loading:not(.pg-built) .pg-over, .pg.is-loading:not(.pg-built) .pg-tail { display: none; }
+.pg-tag { --edge: 9px; --pc: var(--paper); color: var(--ink); }
+.pg[data-tone="night"] .pg-tag { --pc: var(--night); color: var(--night-ink); }
+.pg-brand {
+  display: inline-flex; flex-direction: row; align-items: baseline; gap: 12px;
+  padding: 5px 12px 6px; text-decoration: none;
+  transform-origin: 0 0; transition: transform .9s cubic-bezier(.2, .7, .2, 1);
+}
+.pg-brand.is-hero { transform: scale(1.75); }
+.pg-nav__seasons { margin-left: auto; }
+/* ---------------------------------------------------------------- the painted name
+   The drawings share one grid: a box 178 tall with the letters 116 tall. Setting the box to 1.534 times the letter
+   height keeps "Chớm" and the season word on the same line. Both colours are variables, so the name takes the
+   light of the street it stands in (brand/chom/logo/accent.json). */
+/* Mike chose (18/9): the whole name takes the season's colour, not only the tone mark; the mark separates itself
+   by being one step darker on a bright street and one step lighter on a dark one. No halo and no sheet behind it —
+   spring reads because the market awning went into the scene. Numbers measured by Agent Logo at 18 px, at the very
+   place the name sits (accent.json, "mau_theo_mua"): spring 99,8% of the area at 3:1 or better, summer 100%,
+   autumn 99,4%, winter 100%. */
+.pg { --pg-logo-ink: #211A17; --pg-logo-accent: #C2185B; }
+.pg-nav[data-logo="xuan"] { --pg-logo-ink: #8E1C3F; --pg-logo-accent: #66112B; }
+.pg-nav[data-logo="ha"] { --pg-logo-ink: #255539; --pg-logo-accent: #153221; }
+.pg-nav[data-logo="thu"] { --pg-logo-ink: #F0C765; --pg-logo-accent: #F5DEA8; }
+.pg-nav[data-logo="dong"] { --pg-logo-ink: #F4803F; --pg-logo-accent: #F6AD85; }
+.pg-logo__art { display: block; width: auto; height: 100%; overflow: visible; }
+/* The word is written, not swapped. Each stroke is let in along the centre line the hand drew (the drawing carries
+   it as a mask), in the order a hand makes them; the blurred copy under it spreads a little as each stroke lands,
+   so the ink looks wet. Nothing here changes the page's layout: it is all inside the drawing. */
+.pg-logo__art .pg-net { stroke-dasharray: none; }
+.pg-logo__art.is-writing .pg-net {
+  stroke-dasharray: var(--l); stroke-dashoffset: var(--l);
+  animation: pg-write 200ms linear calc(var(--i) * 42ms) forwards;
+}
+@keyframes pg-write { to { stroke-dashoffset: 0; } }
+.pg-logo__art.is-writing .pg-loang { animation: pg-bleed 640ms ease-out; }
+@keyframes pg-bleed { 0% { opacity: .18; } 55% { opacity: .74; } 100% { opacity: .42; } }
+
+/* a thread of scent from the tone mark: three hairs of the season's colour, rising and thinning. Two pixels wide,
+   never above a third of full strength — it has to be found, not noticed. */
+.pg-wisp { position: absolute; width: 0; height: 0; pointer-events: none; }
+.pg-wisp i {
+  position: absolute; left: -1px; bottom: 0; width: 2px; height: 8px; border-radius: 1px;
+  background: var(--pg-logo-accent); opacity: 0; will-change: transform, opacity;
+  animation: pg-wisp 5.4s linear infinite;
+}
+.pg-wisp i:nth-child(2) { left: 1px; animation-delay: 1.8s; animation-duration: 6.2s; }
+.pg-wisp i:nth-child(3) { left: -3px; animation-delay: 3.5s; animation-duration: 4.9s; }
+@keyframes pg-wisp {
+  0% { opacity: 0; transform: translate(0, 0) scaleY(.5); }
+  20% { opacity: .34; }
+  60% { opacity: .2; transform: translate(1.5px, -9px) scaleY(1); }
+  100% { opacity: 0; transform: translate(-1px, -17px) scaleY(1.3); }
+}
+/* Mike, 2026-09-18: the name sits small in the corner so it never competes with the street. 28 px of box means
+   letters about 18 px tall — the smallest the logo is allowed to go is 16. */
+.pg-brand__mark { position: relative; display: block; height: 28px; }
+.pg-brand__word.is-off { display: none; }
+/* the season standing next to the name, the same size as it (Mike chose 1:1). It only ever fades where it is
+   (page.js sets the amount from the scroll). */
+/* the season word fades on its own layer: the painted letters are then rasterised once, and a scroll that changes
+   only the amount of fade never has to redraw them */
+.pg-brand__season { display: block; height: 28px; opacity: 0; transition: opacity .3s ease; will-change: opacity; }
+.pg-nav__seasons { list-style: none; margin: 0; padding: 7px 18px 8px; display: flex; gap: 26px; }
+.pg-nav__season { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit; padding: 2px 2px 6px; position: relative; }
+.pg-nav__name { font: 500 22px/1.1 var(--serif); }
+.pg-nav__sub { font: 400 13px/1.2 var(--sans); color: var(--ink-3); }
+.pg[data-tone="night"] .pg-nav__sub { color: var(--night-ink-2); }
+.pg-nav__season::after {
+  content: ""; position: absolute; left: -4px; right: -4px; bottom: -2px; height: 7px;
+  background: var(--sc, var(--c-xuan)); opacity: 0; transition: opacity .5s ease;
+  -webkit-mask: var(--pg-stroke-2) center / 100% 100% no-repeat; mask: var(--pg-stroke-2) center / 100% 100% no-repeat;
+}
+.pg-nav__season[data-season="xuan"] { --sc: #d86f8e; }
+.pg-nav__season[data-season="ha"] { --sc: #7f9d5a; }
+.pg-nav__season[data-season="thu"] { --sc: #efe3c4; }
+.pg-nav__season[data-season="dong"] { --sc: #e0763e; }
+.pg-nav__season[aria-current]::after { opacity: 1; }
+.pg-nav__season:hover .pg-nav__name { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+.pg-nav__end { display: flex; align-items: center; gap: 18px; padding: 8px 12px 8px 16px; }
+.pg-nav__link { color: inherit; font: 500 15px/1.2 var(--sans); text-decoration: none; padding: 8px 2px; }
+.pg-nav__link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.pg-nav__blend { white-space: nowrap; }
+.pg[data-tone="night"] .pg-nav__blend { --pc: var(--night-ink); color: var(--night); }
+.pg-nav__lang, .pg-nav__menu {
+  appearance: none; border: 0; background: transparent; color: inherit; cursor: pointer;
+  font: 500 14px/1.2 var(--sans); padding: 10px 4px; min-height: 40px;
+  text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 4px;
+}
+.pg-nav__menu { display: none; text-decoration: none; font-weight: 600; font-size: 15px; }
+
+/* Two ways of sitting on the scene, for Mike to choose (page.js: ?nav=logo | bare).
+   No solid paper, no drop shadow under the letters: on a busy scene a very light wash carries the words. */
+.pg[data-nav="logo"] .pg-brand::before,
+.pg[data-nav="bare"] .pg-tag::before { display: none; }
+.pg[data-nav="logo"] .pg-brand,
+.pg[data-nav="bare"] .pg-tag { color: var(--ink); }
+.pg[data-nav="logo"][data-tone="night"] .pg-brand,
+.pg[data-nav="bare"][data-tone="night"] .pg-tag { color: var(--night-ink); }
+.pg[data-nav="bare"] .pg-nav__blend { --pc: var(--ink); color: var(--paper); }
+.pg[data-nav="bare"][data-tone="night"] .pg-nav__blend { --pc: var(--night-ink); color: var(--night); }
+.pg[data-nav="bare"] .pg-nav__sub { color: inherit; opacity: .9; }
+/* the very light wash: a band of the season's own paper colour, fading out downwards */
+.pg[data-nav="bare"] .pg-nav::before,
+.pg[data-nav="logo"] .pg-nav::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 150px; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(243, 234, 219, .82), rgba(243, 234, 219, .72) 36%, rgba(243, 234, 219, .18) 72%, rgba(243, 234, 219, 0) 100%);
+}
+.pg[data-tone="night"][data-nav="bare"] .pg-nav::before,
+.pg[data-tone="night"][data-nav="logo"] .pg-nav::before {
+  background: linear-gradient(to bottom, rgba(18, 20, 34, .78), rgba(18, 20, 34, .68) 36%, rgba(18, 20, 34, .18) 72%, rgba(18, 20, 34, 0) 100%);
+}
+.pg[data-nav="logo"] .pg-nav::before { left: 0; right: auto; width: min(34rem, 60%); }
+.pg-no3d .pg-nav::before { display: none; }
+.pg[data-nav="bare"] .pg-brand__mark, .pg[data-nav="logo"] .pg-brand__mark { color: inherit; }
+/* on a sheet of paper (the "paper" bar) the painted name keeps the reading ink, not the season's */
+.pg[data-nav="paper"] .pg-brand, .pg-no3d .pg-brand { --pg-logo-ink: #211A17; --pg-logo-accent: #C2185B; }
+
+/* phone menu: a full sheet of paper */
+.pg-menu {
+  position: fixed; inset: 0; z-index: 80; overflow: auto;
+  background: var(--paper); color: var(--ink);
+  padding: 16px 24px 32px; opacity: 0; transition: opacity .35s ease;
+}
+.pg-menu.is-on { opacity: 1; }
+.pg-menu[hidden] { display: none; }
+.pg-menu__top { display: flex; align-items: center; justify-content: space-between; min-height: 48px; }
+.pg-menu__mark { font: 500 30px/1 var(--serif); }
+.pg-menu__close { appearance: none; border: 0; background: transparent; color: inherit; font: 600 16px/1 var(--sans); padding: 12px 4px; min-height: 44px; cursor: pointer; }
+.pg-menu__list { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.pg-menu__lang { appearance: none; border: 0; background: transparent; color: inherit; cursor: pointer; font: 500 16px/1.2 var(--sans); padding: 12px 0; margin-bottom: 10px; text-decoration: underline; text-underline-offset: 4px; }
+.pg-menu__season { display: flex; align-items: baseline; gap: 14px; padding: 8px 0; color: inherit; text-decoration: none; }
+.pg-menu__name { font: 500 38px/1.15 var(--serif); }
+.pg-menu__sub { font: 400 15px/1.3 var(--sans); color: var(--ink-3); }
+.pg-menu__link { display: block; padding: 12px 0; color: inherit; font: 500 20px/1.3 var(--sans); text-decoration: none; }
+.pg-menu__link--blend { text-decoration: underline; text-underline-offset: 5px; }
+
+/* ------------------------------------------------------------------ words over the scene
+   Steps are stacked in one fixed layer. Only one is on; the one leaving fades out before the next fades in.
+   Places follow the no-go boxes measured per season in docs/content/chom-text-layout.md (bottle, main people). */
+.pg-over { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
+.pg-scene { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+/* A step's own fade is its paper's. Its words are the children of each sheet, and they show only while the step
+   carries `is-set` — given by page.js once the step (and so every sheet in it) is solid, and taken away the moment
+   the step is left. So coming in: paper, then words; going out: words (0.2 s), then paper (it waits 0.2 s). There is
+   never a frame with words on half a sheet. Where a sheet has no paper drawn (the opening room on a wide screen), its
+   words have nothing to wait for and come with the step. */
+.pg-step { position: absolute; inset: 0; opacity: 0; transition: opacity .35s ease .2s; }
+/* Every step on a layer of its own, always (22/9). A step used to get its layer only when its fade began, so on the
+   frame the viewer scrolls from the opening room into spring the browser had to rebuild the page's layers and redraw
+   them (the page's thread 12-27 ms on that frame, measured first walk by first walk with page/qa/spring-in.mjs; with
+   this, 7-12 ms). A step at opacity 0 is not drawn, so the layers cost nothing until they are needed. */
+.pg:not(.pg-no3d) .pg-step { will-change: opacity; }
+.pg-step.is-on { opacity: 1; transition: opacity .6s ease .4s; }
+.pg-step.is-on.is-first { transition-delay: .05s; }
+.pg:not(.pg-no3d) .pg-step .pg-paint > * { opacity: 0; transition: opacity .2s ease; }
+.pg:not(.pg-no3d) .pg-step.is-set .pg-paint > * { opacity: 1; transition: opacity .35s ease; }
+@media (min-width: 761px) {
+  .pg:not(.pg-no3d) .pg-step--hero .pg-paint > * { opacity: 1; transition: none; }
+}
+.pg-step[data-tone="day"] .pg-paint { --pc: var(--paper); color: var(--ink); }
+.pg-step[data-tone="night"] .pg-paint { --pc: var(--night); color: var(--night-ink); }
+.pg-step h1, .pg-step h2, .pg-step h3, .pg-step p, .pg-step dl, .pg-step dd { margin: 0; }
+.pg-step .pg-body { font-size: 17px; line-height: 1.6; }
+
+.pg-panel { --edge: 14px; padding: 18px 22px 20px; box-sizing: border-box; }
+.pg-panel h1 { font: 500 clamp(38px, 3.1vw, 46px)/1.16 var(--serif); letter-spacing: -.005em; }
+.pg-panel h2 { font: 500 clamp(32px, 2.7vw, 40px)/1.18 var(--serif); }
+.pg-panel .pg-body { margin-top: 10px; }
+
+/* The opening room (seasons/mocua): one bottle, its cap off, the scent going up. The words sit in the dark left
+   column, written straight on the room — the wall there never rises above about 120 in brightness, so ivory reads
+   at roughly 5:1 and a sheet of paper would only hide the room. Nothing goes over the bottle, the lamp or the scent. */
+/* Wide screens only. Measured with qa/hero-read.mjs: in the left column of the room every opening word keeps at
+   least 4.5:1 in ivory with nothing behind it. On a phone the room fills the screen and the lamp and the scent run
+   right through the words (1.0–2.9:1 measured), so there the words keep their sheet of paper. */
+@media (min-width: 761px) {
+  .pg:not(.pg-no3d) .pg-step--hero {
+    color: var(--night-ink);
+    --pg-logo-ink: #FFF3DC; --pg-logo-accent: #E8A0B4;
+  }
+  .pg:not(.pg-no3d) .pg-step--hero .pg-paint { color: var(--night-ink); }
+  .pg:not(.pg-no3d) .pg-step--hero .pg-paint::before { display: none; }
+  /* measured on the room (qa/hero-read.mjs): the dimmer ivory only reached 3.95:1 on the lit wood, so every line
+     here takes the full ivory */
+  .pg:not(.pg-no3d) .pg-step--hero .pg-body { color: var(--night-ink); }
+  /* no sheet of paper here, so the invitation's own padding is only air: without it the line sits a clear 24 px
+     off the stopper lying on the table (measured, page/qa/page-check.mjs) */
+  .pg:not(.pg-no3d) .pg-step--hero .pg-cue { padding-top: 0; padding-bottom: 0; }
+}
+/* ---------------------------------------------------------------- the opening screen
+   Two tiers and nothing else (Mike, 2026-09-21): the painted name, largest thing on the screen, and one short
+   piece of writing under it that says what Chom is. An earlier draft had four blocks flush left at nearly one
+   weight, evenly spaced, so the eye read a list; the one after it led with a couplet twice the size of the name,
+   which put the brand second on its own front door. Both are gone. Mike chose the left-aligned setting out of
+   three (21/9), so the other two have gone with them.
+   The empty wall between the two tiers is for the writing to breathe in, not to be filled.
+
+   ALIGNING TO A PAINTED WORD: the drawing of "Chom" carries 5.93% of its own box as empty paper before the first
+   brush stroke -- measured by scanning the drawing itself for its first inked column (2026-09-21). The box is
+   2.528 wide for every 1 tall, so that strip is 0.0593 x 2.528 = 0.150 of the height. Lining the two boxes up
+   therefore leaves the writing sticking out to the left by that much, which is exactly what Mike saw. The name is
+   pulled left by 0.15 of its height so the INK lines up with the words, not the box.
+   The four season words do not need this: their ink starts at the box edge (Xuan, Ha, Dong 0.00%; Thu 1.61%,
+   which is 2.3 px on a season card). */
+.pg:not(.pg-no3d) .pg-lead { display: flex; flex-direction: column; align-items: flex-start; }
+.pg-lead > * { margin: 0; }
+.pg-lead h1.pg-hero__logo {
+  display: block; font: inherit; letter-spacing: normal;
+  height: var(--logo-h, 88px); margin-left: calc(var(--logo-h, 88px) * -0.15);
+}
+.pg-lead .pg-epi { max-width: 46ch; }
+/* the piece of writing: body type, a long measure, generous leading -- it is the only reading on the screen */
+.pg-hero__intro { font: 400 17px/1.78 var(--sans); transition: opacity .45s ease; }
+/* while the name travels to its place, the opening words stay out of its way (page.js nameTarget) */
+.pg .pg-step .pg-lead.pg-lead--wait > .pg-hero__intro { opacity: 0; transition: none; }
+/* Three groups on this screen, not one column of writing (Mike, 2026-09-21):
+     1. the name and the first paragraph, close enough to read as one thing;
+     2. the second paragraph, set well apart from them;
+     3. the invitation to scroll, at the foot of the room on the middle line (.pg-cue, further down).
+   The drawing of the name carries 7.5% of its own box as empty paper under the last stroke (12.6 px at the
+   opening size), so the margin here is small on purpose: the gap the eye sees is that empty paper plus this. */
+.pg-lead .pg-hero__intro--2 { margin-top: 56px; }
+
+/* the wide room: the words take the dark wall on the left, clear of the bottle, the lamp and the scent */
+@media (min-width: 761px) and (min-aspect-ratio: 95/100) {
+  .pg-lead h1.pg-hero__logo { --logo-h: 168px; }
+  /* the measure stops at 25rem for a reason, not for taste: at the full 60 syllables the paragraph runs four
+     lines, and any wider it reaches the bottle's stopper lying on the table. It is still inside the 45-75
+     characters a line that the reading rules ask for. */
+  .pg-lead .pg-hero__intro { margin-top: 2px; max-width: 25rem; }
+  /* this has to come after the rule above, not before it: both paragraphs carry .pg-hero__intro, so the two rules
+     weigh the same and the last one written wins. Put the other way round, the second paragraph sat as close to
+     the first as the first sits to the name, and the screen read as one block again. */
+  .pg-lead .pg-hero__intro--2 { margin-top: 56px; }
+  .pg-step--hero .pg-cue { color: var(--night-ink-2); }
+}
+.pg-hero__logo .pg-logo__art { height: 100%; }
+/* the opening words take the dark wall from the left edge to where the scent starts: wide enough that the line about
+   the atelier reads at 45–66 characters, which the reading rules ask for */
+.pg-lead { position: absolute; left: 2.5vw; top: 13vh; width: min(38vw, 34rem); min-width: 21rem; }
+/* On a wide screen the opening words are written straight on the dark wall, with no sheet of paper, so side
+   padding would only push them off their own left edge. On a phone they do stand on paper, and there the padding
+   stays (see the phone block: 28 px on the left, to keep the painted name's box on the sheet). */
+@media (min-width: 761px) and (min-aspect-ratio: 95/100) {
+  .pg:not(.pg-no3d) .pg-step--hero .pg-lead { padding-left: 0; padding-right: 0; }
+}
+/* the invitation to scroll: at the foot of the room, on the middle line of the screen. It is kept a clear 24 px
+   off the bottle and off the stopper lying on the table — both boxes measured from the picture, and the clearance
+   checked by page/qa/page-check.mjs. */
+.pg-cue { --edge: 8px; position: absolute; left: 50%; transform: translateX(-50%); bottom: 14px; padding: 5px 14px; font: 500 15px/1.3 var(--sans); letter-spacing: .02em; white-space: nowrap; }
+.pg-notice { --edge: 6px; position: absolute; left: 50%; top: 88px; transform: translateX(-50%); padding: 6px 14px; font: 500 14px/1.3 var(--sans); white-space: nowrap; }
+
+/* ---------------------------------------------------------------- the epigraph
+   Two lines of a real poem, the name of whoever wrote it, and in English one plain line saying what it means.
+   No frame and no sheet of its own: the poem is told apart by the air around it, the wider leading and the hanging
+   line. Each line of verse stays on one line — page.js steps the type down through --epi-fit until it fits, rather
+   than letting a sentence break in the middle. */
+.pg-epi { margin: 0; display: flow-root; }
+.pg-epi[hidden] { display: none; }
+.pg-epi__lines { margin: 0; font: italic 400 calc(var(--epi-size, 21px) * var(--epi-fit, 1))/1.9 var(--serif); letter-spacing: .012em; }
+/* A line of verse is kept on one line — but only once page.js has measured the type and found a size that fits
+   (.is-fit). Until then it wraps, so a long line can never make a phone lay the page out wider than its screen. */
+/* min-width 0 and the clip are what stop a long line of verse from making its column — and with it the whole page —
+   wider than the screen; page.js then steps the type down until the line really fits inside it. */
+.pg-epi, .pg-epi__lines { max-width: 100%; min-width: 0; }
+.pg-epi__line { display: block; max-width: 100%; min-width: 0; overflow: hidden; }
+.pg-epi__lines.is-fit .pg-epi__line { white-space: nowrap; }
+/* the two lines of a couplet stand level with each other: a hanging indent made it read as a wrapped paragraph */
+.pg-epi__line + .pg-epi__line { padding-left: 0; }
+/* whoever wrote it stands well under the verse, in the smallest type on the screen, held apart by air alone */
+.pg-epi__by { margin: 14px 0 0; font: 500 13px/1.45 var(--sans); letter-spacing: .06em; color: var(--ink-3); }
+/* the dash belongs to the page, not to the words (docs/content/chom-text-layout.md, epigraph rule 3), so it is drawn
+   here and never counted as a word */
+.pg-epi__by::before { content: "\2014\00a0"; }
+.pg-epi__gloss { margin: 4px 0 0; font: italic 400 14px/1.5 var(--serif); color: var(--ink-3); max-width: 42ch; }
+.pg-step[data-tone="night"] .pg-epi__by { color: var(--night-ink-2); }
+.pg-step[data-tone="night"] .pg-epi__gloss { color: var(--night-ink-2); }
+/* the opening room is dark and its words are written straight on it: the name under the verse takes the light ink
+   too, or it sinks into the wall (it is the smallest line on the screen, so it fails first) */
+@media (min-width: 761px) {
+  .pg:not(.pg-no3d) .pg-step--hero .pg-epi__by, .pg:not(.pg-no3d) .pg-step--hero .pg-epi__gloss { color: var(--night-ink); }
+}
+/* on a season card the verse is the opening line and the plain-English line is left off: the card stands in a
+   narrow band of sky or street, and every millimetre is measured against the people behind it */
+.pg-epi--card { --epi-size: 17px; margin-bottom: 7px; }
+/* where a season card carries a verse, the small "Spring · drizzle · February" line steps aside: the nav sub-label
+   and the bottle's notes already say it, and the card has to stay inside its band of free street */
+.pg-card:has(.pg-epi:not([hidden])) .pg-card__sub .pg-card__street ~ span { display: none; }
+.pg-card:has(.pg-epi:not([hidden])) .pg-card__street { padding-bottom: 2px; }
+.pg-epi--card .pg-epi__gloss { display: none; }
+.pg-epi--card .pg-epi__by { margin-top: 3px; font-size: 13px; }
+.pg-tail .pg-epi { --epi-size: 22px; margin-bottom: 14px; }
+
+/* ---------------------------------------------------------------- one title shape for the whole page
+   Every title is built the same way: the word large, a brush rule under it, then the small print. It sits on solid
+   painted paper, so the words never lie straight on the painting. Two shapes are on the table while Mike chooses
+   (root[data-head]): "left" keeps the word at the left edge of the sheet with a short rule; "center" puts the word
+   in the middle and draws the rule right across. The rule is a real brush from the scan, in the season's colour. */
+.pg-rule, .pg-card__h::after, .pg-tail :where(h2, h3)::after {
+  content: ""; display: block; height: 11px; width: 3.1em; max-width: 100%; margin: 12px 0 14px;
+  background: transparent;
+}
+.pg-card__h::after, .pg-tail :where(h2, h3)::after {
+  background: var(--rule, var(--ink-3));
+  -webkit-mask: url("kit/divider-ngan-1.svg") center / 100% 100% no-repeat;
+  mask: url("kit/divider-ngan-1.svg") center / 100% 100% no-repeat;
+}
+.pg[data-head="center"] .pg-card__head { text-align: center; }
+.pg[data-head="center"] .pg-card__h::after { width: 100%; margin-inline: auto; }
+.pg-tail :where(h2, h3)::after { height: 9px; width: 2.4em; margin: 10px 0 0; }
+/* no two rules are the same stroke, and a centred column gets its rule centred too */
+.pg-blend :where(h2, h3)::after, .pg-sampler :where(h2, h3)::after,
+.pg-card--ha .pg-card__h::after, .pg-card--dong .pg-card__h::after {
+  -webkit-mask-image: url("kit/divider-ngan-2.svg"); mask-image: url("kit/divider-ngan-2.svg");
+}
+.pg-order :where(h2, h3)::after, .pg-card--thu .pg-card__h::after {
+  -webkit-mask-image: url("kit/divider-ngan-3.svg"); mask-image: url("kit/divider-ngan-3.svg");
+}
+.pg-foot__in :where(h2, h3)::after { margin-inline: auto; }
+.pg-atelier { --rule: var(--c-xuan); }
+.pg-blend { --rule: var(--c-ha); }
+.pg-order { --rule: var(--c-thu); }
+.pg-sampler { --rule: var(--c-dong); }
+.pg-foot { --rule: var(--c-xuan); }
+.pg-card--xuan { --rule: var(--c-xuan); }
+.pg-card--ha { --rule: var(--c-ha); }
+.pg-card--thu { --rule: var(--c-thu); }
+.pg-card--dong { --rule: var(--c-dong); }
+/* on a night street the card is dark paper: the season's ink would sink into it, so the rule is mixed with light */
+.pg-step[data-tone="night"] .pg-card--thu { --rule: #93a7e6; }
+.pg-step[data-tone="night"] .pg-card--dong { --rule: #e89457; }
+
+/* ---------------------------------------------------------------- the season sheet: one shape, four places
+   Mike, 21/9: "Chỗ đứng được phép khác nhau theo mùa. Hình dáng thì không." Every season's sheet is built from this
+   block alone: one sheet of paper, the same ragged edge, the same width, the same type sizes, the same order of words
+   inside. A season may set two things for itself, where its sheet stands and the colour of its ink, and nothing else.
+   (Until 21/9 each season had been shrunk or split to squeeze into its own patch of street: spring's name was twice
+   the size of summer's, and winter and summer-on-a-phone came in two pieces.) page-check measures the rule: the four
+   sheets must come out one painted piece each, the same width and the same sizes.
+   Every sheet also starts below the bar. --pg-nav-bottom is measured by page.js from the bar's own items and
+   re-measured on resize; the floor adds the sheet's ragged edge and 12 px of air. Typing a `top` by hand is what put
+   four sheets under the bar. */
+.pg { --pg-nav-bottom: 88px; }
+.pg-card {
+  --edge: 14px; --floor: calc(var(--pg-nav-bottom) + var(--edge) + 12px);
+  position: absolute; box-sizing: border-box; display: flow-root;
+  top: var(--floor); width: min(27vw, 27rem); padding: 12px 18px 14px;
+}
+.pg-card__h { display: block; font: 500 clamp(40px, 3.2vw, 46px)/1.04 var(--serif); letter-spacing: -.015em; }
+.pg-card .pg-card__h::after { height: 7px; margin: 3px 0 6px; }
+/* The season's name is painted, not typed: the box is 1.534 of the letter height, so it reads at the size set above.
+   The drawing carries its own air (35 units over the letters, 27 under the baseline); that air is taken back with
+   negative margins so the sheet stays exactly as tall as a line of type would be. */
+.pg-card__h .pg-logo__art { height: 1.534em; max-width: 100%; margin: -0.26em 0 -0.2em; }
+/* the big word on the card takes the same season colour as the name on the bar */
+.pg-card--xuan { --pg-logo-ink: #8E1C3F; --pg-logo-accent: #66112B; }
+.pg-card--ha { --pg-logo-ink: #255539; --pg-logo-accent: #153221; }
+.pg-card--thu { --pg-logo-ink: #F0C765; --pg-logo-accent: #F5DEA8; }
+.pg-card--dong { --pg-logo-ink: #F4803F; --pg-logo-accent: #F6AD85; }
+/* the reading version has no street behind it: every card is on pale paper, so the name takes the reading ink */
+.pg-no3d .pg-card { --pg-logo-ink: #211A17; --pg-logo-accent: #C2185B; }
+.pg-card__street { display: block; font: 600 16px/1.35 var(--sans); letter-spacing: 0; }
+.pg-card__sub { padding-top: 0; font: italic 400 16px/1.4 var(--serif); color: var(--ink-2); }
+.pg-step[data-tone="night"] .pg-card__sub { color: var(--night-ink-2); }
+.pg-card__street + span { display: inline; }
+.pg-card__when { white-space: nowrap; }
+.pg-card__when::before { content: "\00a0\00b7\00a0"; font-style: normal; }
+.pg-card__body { clear: both; padding-top: 4px; }
+.pg-card .pg-epi--card { --epi-size: 15px; }
+.pg-card .pg-epi__lines { line-height: 1.55; }
+.pg-card__body .pg-body { font-size: 16px; }
+
+/* Where each sheet stands: the one thing a season sets for itself. Each place is a patch the season itself says is
+   free: seasons/<season>/keepout.json, `textBands` (clear of everything that must not be covered, by `clearance`, and
+   below the bar) and `cardSpots` (the flattest sheet-sized place in each). page-check reads the same file. Spring and
+   summer have no such band (`noRoom`): their places are Mike's own choice, below. */
+/* Spring and summer: the places Mike chose on 21/9 ("Hạ chọn A, xuân B"), out of the ones the season layer measured
+   on the running page (scratchpad/cho-dat-chu/), on the ground the people leave free to the right of them; what each
+   one costs, and what Mike accepted, is in page/qa/page-check.mjs MIKE_OK.
+   The right edge (Mike, 22/9: "2 bảng chữ của mùa xuân và hạ căn lại cho bằng mép phải của nút 'Mùi của riêng bạn'"):
+   the paper ends where the bar's last button ends. The bar stands --gutter in from the page's edge and its end tag has
+   12 px of padding; the button's torn edge reaches ~5 px past its box and a sheet's ~11 px, so the sheet's box stands
+   6 px further in. page/qa/right-edge.mjs measures the two papers on the picture (±2 px at 1280, 1440, 1920).
+   The left edge: moved with the right one, both sheets covered people (the flower seller, the tea woman's back), so
+   they became narrower instead (Sếp, 22/9). The left edge is tied to the person it must stay clear of, not to the
+   window: the picture keeps its height, so a thing at x in the season's 1440×900 frame stands on the page at
+   50% + (x − 720) / 900 × 100vh (the same carrying page-check does). A sheet is never wider than its usual width;
+   where the window is narrower than that allows, it narrows further and grows downward.
+   spring: the wall right of the selling group (seasons/xuan/keepout.json cumMuaBan, right edge x 1016), 24 px clear
+   of it (25 here: one to spare for rounding), 520 px down at 1440×900 (57.8%); at most the width Mike accepted on
+   21/9 (27vw − 25 px: the flower sellers leave 400 px of wall). */
+.pg-card--xuan {
+  top: calc(57.8vh + var(--edge)); right: calc(var(--gutter) + 18px); width: auto;
+  left: max(calc(50% + (1016 - 720) / 900 * 100vh + 25px + var(--edge)), calc(100% - var(--gutter) - 18px - min(27vw, 27rem) + 25px));
+}
+/* summer: the path right of the woman making tea (seasons/ha/keepout.json nguoiUopTra, right edge x 992), 8 px from her
+   box rather than 24 (Mike accepted it on 21/9; at her closest her back is 37 px away; 9 here, one to spare for
+   rounding), 559 px down at 1440×900 (62.1%); at most the usual width. */
+.pg-card--ha {
+  top: calc(62.1vh + var(--edge)); right: calc(var(--gutter) + 18px); width: auto;
+  left: max(calc(50% + (992 - 720) / 900 * 100vh + 9px + var(--edge)), calc(100% - var(--gutter) - 18px - min(27vw, 27rem)));
+}
+/* Where the window is narrow for its height (up to 3:2, or the compact bar up to 1080 px), the room right of the people
+   is narrow and the sheets grow tall; grown downward from their usual top they ran out of the window (22/9, 1024×768:
+   spring to y 801, summer to 778). So there they stand on their usual bottom instead (where it is at 1440×900) and
+   grow upward, over the wall and the path, which have nothing that must not be covered until well above them
+   (page/qa/right-edge.mjs checks the boxes at each size). */
+@media (min-width: 761px) and (min-aspect-ratio: 95/100) and (max-width: 1080px), (min-width: 761px) and (min-aspect-ratio: 95/100) and (max-aspect-ratio: 3/2) {
+  .pg-card--xuan { top: auto; bottom: calc(120 / 900 * 100vh); }
+  .pg-card--ha { top: auto; bottom: calc(82 / 900 * 100vh); }
+}
+/* autumn and winter stand at the top right, held off the window's right edge by 17 px (at 1440 this is exactly where
+   they stood when they were placed from the left, x 991; placed from the left they ran 8 px off a 1024 window). */
+/* autumn: the balconies at the top right — inside autumn's one band, [288, 80, 1152, 248] */
+.pg-card--thu { left: auto; right: calc(var(--edge) + 17px); }
+/* winter: the night sky right of the bridge and the deck under it — the top of winter's band A, [856, 80, 584, 464].
+   The season offered two places; this one was chosen by looking at both on the running page (page/DANG-LAM-DO.md):
+   the other, the wet ground at the lower left, puts a dark block beside the bottle at the height the eye looks for it,
+   and its band is only just deep enough (252 px for a 248 px sheet), so a shorter window pushes the sheet onto the
+   barge's path. Here it stands where autumn's does, and the band has 200 px to spare. */
+.pg-card--dong { left: auto; right: calc(var(--edge) + 17px); }
+
+/* "the bottle opens". Everything the page layer drew round the bottle is gone: the ring (Mike, 21/9 morning), then
+   the word beside it and the arrow that pointed at it (Mike, 21/9 evening: "giữ nguyên nét trắng outline này, chỉ
+   cần phóng to chai"). What is left of it here is the one thing that is not a drawing — the pointer says the bottle
+   can be pressed. The white line round the bottle is the core's, and it is the only mark a bottle wears. */
+.pg.pg-hot, .pg.pg-hot body { cursor: pointer; }
+
+/* The quiet stretch at the end of each season: no words, only the painting coming apart. Nothing is drawn here —
+   this stands over the middle of the picture so that what the eye stops at can be named for the reading tool. */
+
+/* ---------------------------------------------------------------- the bottle's notes (page.js: .pg-fcard)
+   The one screen where a visitor reads about a bottle. The old card was the core's own, inside the season: a white
+   rounded box, a rule above and below the three notes, a round X in the corner ("rat xau", Mike, 2026-09-18). This
+   one is the page's: painted paper laid on the scene, no frame, no rule, no round button anywhere; the cross is two
+   strokes of a brush. The three notes are the spine of the card, always one under the other, the middle one the
+   loudest -- never a row read across. Nothing sits over the bottle: the card keeps to the side the core's close-up
+   leaves free (a computer: the right of the screen; a phone: the band under the bottle). */
+.pg-fcard {
+  position: absolute; box-sizing: border-box; z-index: 3; pointer-events: auto;
+  --pc: var(--paper); --edge: 15px; color: var(--ink);
+  --pg-logo-ink: #211A17;
+  opacity: 0; transition: opacity .42s ease;
+}
+.pg-fcard.is-on { opacity: 1; }
+.pg-fcard[hidden] { display: none; }
+.pg-fcard[data-season="xuan"] { --sc: #8E1C3F; --stain: rgba(142, 28, 63, .26); --pg-logo-accent: #8E1C3F; }
+.pg-fcard[data-season="ha"] { --sc: #255539; --stain: rgba(37, 85, 57, .24); --pg-logo-accent: #255539; }
+.pg-fcard[data-season="thu"] { --sc: #34406e; --stain: rgba(52, 64, 110, .24); --pg-logo-accent: #34406e; }
+.pg-fcard[data-season="dong"] { --sc: #A3451B; --stain: rgba(163, 69, 27, .26); --pg-logo-accent: #A3451B; }
+.pg-fcard__h { margin: 0; display: block; }
+.pg-fcard__mark { display: block; }
+/* the painted season word carries its own air (35 units over the letters, 27 under the line): taken back with
+   negative margins so the word sits on the card as tall as a line of type would be */
+.pg-fcard__mark .pg-logo__art { height: 1.534em; max-width: 100%; margin: -.26em 0 -.2em; }
+.pg-fcard__sub { margin: 0; font: italic 400 19px/1.4 var(--serif); color: var(--ink-2); }
+.pg-fcard__opener { margin: 0; }
+.pg-fcard .pg-body { font: 400 16px/1.62 var(--sans); }
+.pg-fcard__notes { margin: 0; }
+.pg-fcard__lab { margin: 0; font: 600 13px/1.3 var(--sans); letter-spacing: .15em; text-transform: uppercase; color: var(--ink-3); }
+.pg-fcard__val { margin: 0; font: 400 24px/1.22 var(--serif); }
+.pg-fcard__row.is-heart .pg-fcard__val { color: var(--sc); }
+.pg-fcard__x {
+  position: absolute; top: 2px; right: 4px; width: 44px; height: 44px; padding: 0;
+  appearance: none; border: 0; background: transparent; color: var(--ink-3); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.pg-fcard__x:hover { color: var(--ink); }
+.pg-fcard__xmark { display: block; width: 21px; height: 21px; overflow: visible; }
+
+/* the blotter: a narrow strip, the three notes stepping down it as the scent opens out, the foot stained where
+   the paper was dipped (Mike chose this one of three, 2026-09-21; the other two are gone) */
+.pg-fcard {
+  right: 4.5vw; top: 50%; transform: translateY(-50%);
+  width: min(21rem, 23vw); padding: 26px 24px 34px;
+}
+/* the dipped end of the blotter. It is painted into the paper itself rather than laid on top, because the paper's
+   edge is a brush scan: a stain on its own box stops at a straight line 15 px inside the ragged edge, and that
+   line was plainly visible along the foot of the card. */
+.pg-fcard::before {
+  background:
+    radial-gradient(118% 46% at 50% 108%, var(--stain) 0%, var(--stain) 18%, transparent 62%),
+    var(--pc, var(--paper));
+}
+.pg-fcard__h { font-size: clamp(40px, 3vw, 48px); line-height: 1.04; }
+.pg-fcard__sub { margin-top: 8px; }
+.pg-fcard__opener { margin-top: 14px; }
+.pg-fcard__notes { margin-top: 34px; }
+.pg-fcard__row + .pg-fcard__row { margin-top: 22px; }
+.pg-fcard__row.is-heart { margin-left: 20px; }
+.pg-fcard__row.is-base { margin-left: 40px; }
+.pg-fcard__row.is-heart .pg-fcard__val { font-size: 33px; line-height: 1.16; }
+
+.pg-peelstop { position: absolute; left: 18%; right: 18%; top: 22%; height: 46%; pointer-events: none; }
+
+/* the words printed on the scene's bottle: kept at the bottle, without colour */
+.pg-engraved { position: absolute; margin: 0; text-align: center; font: 500 13px/1.2 var(--serif); color: transparent; user-select: none; transform: translateY(-50%); }
+.pg-engraved span { display: block; }
+
+/* season, step 2: where and a memory (+ Đông's note on agarwood) */
+.pg-stack { display: contents; }
+.pg-memory { position: absolute; width: min(31vw, 30rem); min-width: 24rem; }
+.pg-memory h3 { font: italic 400 24px/1.3 var(--serif); }
+/* the memory paragraph grew to 34-40 syllables when the words were rewritten, and at 19px it fell to 41 characters
+   a line over four lines - under the 45 the reading rules ask for. The sheet cannot grow (it sits in a measured
+   patch of street), so the type comes down instead. Measured with tools/qa/check-reading.mjs. */
+.pg-memory .pg-body { margin-top: 8px; font-family: var(--serif); font-size: 17px; line-height: 1.55; }
+.pg-stack--xuan .pg-memory, .pg-stack--dong .pg-memory { left: 3vw; bottom: 6vh; }
+/* summer's memory hangs in the sky at the top left: it starts below the bar the same way the season sheets do, from
+   the bar's measured bottom plus its own ragged edge and 12 px of air (a typed 88 px put it 4 px under the bar) */
+.pg-stack--ha .pg-memory { left: 3vw; top: calc(var(--pg-nav-bottom) + var(--edge) + 12px); }
+.pg-stack--thu .pg-memory { right: 4vw; bottom: 6vh; }
+.pg-notes { --edge: 12px; position: absolute; left: 3vw; top: max(12vh, 96px); padding: 12px 18px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 14rem; }
+.pg-notes__row { display: flex; flex-direction: column; }
+.pg-notes dt { font: 600 13px/1.3 var(--sans); letter-spacing: .12em; text-transform: uppercase; }
+.pg-notes dd { font: 400 21px/1.25 var(--serif); }
+.pg-notes .is-heart dd { font-size: 30px; line-height: 1.18; }
+
+/* season, step 3: the label before the painting peels */
+
+/* ------------------------------------------------------------------ the end part: paper over the last scene */
+.pg-tail {
+  position: relative; z-index: 31;
+  background-color: var(--paper);
+  background-image: url("../tex/linen.jpg");
+  background-size: 360px;
+  background-blend-mode: soft-light;
+  color: var(--ink);
+}
+.pg-tail::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -22px; height: 30px; background: var(--paper);
+  -webkit-mask: var(--pg-edge-t) center / 100% 100% no-repeat, linear-gradient(#000 0 0) bottom / 100% 40% no-repeat;
+  mask: var(--pg-edge-t) center / 100% 100% no-repeat, linear-gradient(#000 0 0) bottom / 100% 40% no-repeat;
+}
+/* one column that can never be wider than the section: without minmax(0, 1fr) a grid column grows to fit its widest
+   child, and on a phone that makes the whole page lay out wider than the screen */
+.pg-sec { box-sizing: border-box; min-height: var(--vh); padding: 108px var(--gutter) 56px; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; }
+.pg-sec h2 { margin: 0; font: 500 clamp(36px, 3.6vw, 54px)/1.12 var(--serif); letter-spacing: -.012em; }
+.pg-sec h3 { margin: 0; font: 500 clamp(26px, 2.3vw, 32px)/1.2 var(--serif); }
+.pg-sec p { margin: 0; }
+
+/* one screen of words at a time (page.js: the part filling the middle of the screen is lit). Only the words fade:
+   the paintings, the paper cards and the empty fields stay, so no screen is ever bare. */
+.pg-tail [data-unit] :where(h1, h2, h3, p, li, dt, dd, label:not(.pg-size), legend, output, button, a, .pg-labelword, .pg-size__box > span) {
+  transition: opacity .6s ease .35s;
+}
+.pg-tail [data-unit].pg-dim :where(h1, h2, h3, p, li, dt, dd, label:not(.pg-size), legend, output, button, a, .pg-labelword, .pg-size__box > span) {
+  opacity: 0; transition: opacity .35s ease;
+}
+
+/* the paper cards the words sit on (layout doc: every column of the end part is on a solid sheet); they stay when
+   the words fade, so no screen is ever bare */
+.pg-card-paper { --pc: var(--paper-2); --edge: 16px; box-sizing: border-box; }
+.pg-card-paper .pg-sum { --pc: var(--paper); }
+
+/* atelier */
+.pg-atelier { grid-template-columns: minmax(18rem, 32rem) minmax(20rem, 1fr); column-gap: clamp(32px, 6vw, 110px); align-items: stretch; align-content: stretch; }
+.pg-atelier__text { display: flex; flex-direction: column; justify-content: center; gap: 18px; padding: 30px 34px 34px; }
+.pg-facts { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.pg-facts li { position: relative; padding-left: 34px; font: 500 17px/1.5 var(--sans); }
+.pg-facts li::before {
+  content: ""; position: absolute; left: 0; top: .34em; width: 16px; height: 16px; background: var(--c-xuan);
+  -webkit-mask: url("kit/dot-nho.svg") center / 100% 100% no-repeat; mask: url("kit/dot-nho.svg") center / 100% 100% no-repeat;
+}
+.pg-facts li:nth-child(2)::before { background: var(--c-ha); }
+.pg-facts li:nth-child(3)::before { background: var(--c-dong); }
+.pg-atelier__figure { position: relative; margin: 0; display: flex; flex-direction: column; justify-content: center; }
+.pg-atelier__art { display: block; width: 100%; aspect-ratio: 4 / 3; max-height: 66vh; }
+
+/* blend */
+.pg-blend {
+  grid-template-columns: minmax(18rem, 28rem) 1fr;
+  grid-template-areas: "head result" "stage stage" "sliders sliders" "actions actions";
+  column-gap: clamp(32px, 5vw, 90px); row-gap: 14px; align-content: center;
+}
+.pg-blend__a, .pg-blend__b { display: contents; }
+.pg-blend__head { grid-area: head; display: flex; flex-direction: column; gap: 10px; align-self: start; }
+.pg-blend__hint { font-size: 17px; color: var(--ink-3); }
+.pg-blend__result { grid-area: result; align-self: center; justify-self: center; text-align: center; max-width: 44rem; min-height: 7em; display: flex; flex-direction: column; justify-content: center; gap: 8px; padding: 18px 34px 20px; }
+.pg-blend__line { font: 400 clamp(32px, 3.2vw, 46px)/1.18 var(--serif); text-wrap: balance; }
+.pg-blend__name { font-style: italic; color: var(--c-xuan); }
+.pg-blend[data-dom="ha"] .pg-blend__name { color: var(--c-ha); }
+.pg-blend[data-dom="thu"] .pg-blend__name { color: var(--c-thu); }
+.pg-blend[data-dom="dong"] .pg-blend__name { color: var(--c-dong); }
+.pg-blend__desc { max-width: 46ch; margin-inline: auto; }
+.pg-blend[data-kind="empty"] .pg-blend__line { font-size: clamp(26px, 2.4vw, 34px); color: var(--ink-2); }
+.pg-blend__stage { grid-area: stage; position: relative; }
+.pg-atelier__pic { position: relative; }
+.pg-labelword { position: absolute; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--serif); font-weight: 500; line-height: 1; color: transparent; user-select: none; pointer-events: none; white-space: nowrap; }
+.pg-labelword__caps { letter-spacing: .28em; }
+.pg-labelword[hidden] { display: none; }
+.pg-blend__art { display: block; width: 100%; height: clamp(180px, 34vh, 330px); }
+.pg-blend__sliders { grid-area: sliders; display: grid; grid-template-columns: repeat(4, 1fr); --edge: 12px; padding: 12px 0 4px; }
+.pg-slider { padding: 0 clamp(12px, 2.4vw, 40px); }
+.pg-slider__top { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.pg-slider label { font: 500 15px/1.3 var(--sans); }
+.pg-slider__val { font: 500 15px/1.3 var(--sans); font-variant-numeric: tabular-nums; color: var(--ink-2); }
+.pg-slider input[type="range"] {
+  --v: 25%;
+  -webkit-appearance: none; appearance: none; display: block; width: 100%; height: 44px; margin: 0; background: transparent; cursor: pointer;
+  touch-action: pan-y;
+}
+/* the groove is a dry brush stroke and the amount is the season's paint laid into it; the browser's own track and
+   its rounded ends are cleared away, and the bead you drag is a drop of lacquer */
+.pg-track { position: relative; }
+.pg-track::before, .pg-track::after {
+  content: ""; position: absolute; left: 0; top: 50%; height: 15px; transform: translateY(-50%); pointer-events: none;
+}
+.pg-track::before {
+  right: 0; background: var(--ink); opacity: .22;
+  -webkit-mask: url("kit/divider-vua-1.svg") center / 100% 100% no-repeat;
+  mask: url("kit/divider-vua-1.svg") center / 100% 100% no-repeat;
+}
+.pg-track::after {
+  width: var(--v, 25%); min-width: 0; background: var(--c);
+  -webkit-mask: url("kit/divider-vua-2.svg") left center / 100% 100% no-repeat;
+  mask: url("kit/divider-vua-2.svg") left center / 100% 100% no-repeat;
+}
+.pg-slider input[type="range"]::-webkit-slider-runnable-track { height: 15px; background: transparent; border: 0; }
+.pg-slider input[type="range"]::-moz-range-track { height: 15px; background: transparent; border: 0; }
+.pg-slider input[type="range"]::-moz-range-progress { height: 15px; background: transparent; }
+.pg-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none; width: 26px; height: 26px; margin-top: -6px; border: 0;
+  border-radius: 54% 46% 52% 48%; background: var(--ink);
+  -webkit-mask: url("kit/dot-vua.svg") center / 100% 100% no-repeat; mask: url("kit/dot-vua.svg") center / 100% 100% no-repeat;
+}
+.pg-slider input[type="range"]::-moz-range-thumb {
+  width: 24px; height: 24px; border: 0; border-radius: 54% 46% 52% 48%; background: var(--ink);
+  mask: url("kit/dot-vua.svg") center / 100% 100% no-repeat;
+}
+.pg-slider input[type="range"]:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; box-shadow: none; }
+.pg-blend__actions { grid-area: actions; display: flex; gap: 16px; justify-content: flex-end; align-items: center; flex-wrap: wrap; }
+
+/* order */
+.pg-order__form {
+  display: grid; justify-content: center; align-items: start;
+  grid-template-columns: minmax(17rem, 26rem) minmax(19rem, 30rem);
+  grid-template-areas: "a f1" "a f2";
+  column-gap: clamp(32px, 6vw, 96px); row-gap: 18px;
+  justify-self: center; padding: 34px clamp(24px, 3vw, 44px) 36px;
+}
+.pg-order__a { grid-area: a; display: flex; flex-direction: column; gap: 14px; }
+.pg-order__f1 { grid-area: f1; display: flex; flex-direction: column; gap: 16px; }
+.pg-order__f2 { grid-area: f2; display: flex; flex-direction: column; gap: 16px; }
+.pg-sum { --pc: var(--paper-2); --edge: 12px; margin-top: 10px; padding: 16px 18px 12px; display: flex; flex-direction: column; gap: 4px; }
+.pg-sum__label { font: 600 13px/1.3 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+.pg-sum__name { font: italic 500 30px/1.2 var(--serif); }
+.pg-sum__name.is-none { font: italic 400 22px/1.35 var(--serif); }
+.pg-sum__art { display: block; width: 100%; height: 118px; margin-top: 4px; }
+.pg-field { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; border: 0; min-width: 0; }
+.pg-field label, .pg-field legend { font: 500 15px/1.35 var(--sans); padding: 0; }
+/* Nothing on this page is drawn with a ruler (Mike, 2026-09-18): no hairlines, no rounded boxes, no shadows.
+   A field is a word written on a brush line; the line is the wrapper's, so each field can take a different stroke.
+   The one thing kept plain is the focus ring: a keyboard user has to see where they are. */
+.pg-ink { position: relative; display: block; }
+.pg-ink::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 12px; pointer-events: none;
+  background: var(--ink-2);
+  -webkit-mask: url("kit/input-underline-binhthuong.svg") center / 100% 100% no-repeat;
+  mask: url("kit/input-underline-binhthuong.svg") center / 100% 100% no-repeat;
+}
+.pg-ink:has(input:focus-visible)::after, .pg-ink:has(input:not(:placeholder-shown))::after {
+  background: var(--ink);
+  -webkit-mask-image: url("kit/input-underline-danggo.svg"); mask-image: url("kit/input-underline-danggo.svg");
+}
+.pg-ink:has(input[aria-invalid="true"])::after { background: var(--err); }
+.pg-field input[type="text"], .pg-field input[type="email"] {
+  box-sizing: border-box; width: 100%; min-height: 48px; padding: 10px 6px 14px;
+  font: 400 17px/1.3 var(--sans); color: var(--ink);
+  background: transparent; border: 0; border-radius: 0;
+}
+.pg-field input::placeholder { color: #7d6d65; opacity: 1; }
+.pg-field input:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; box-shadow: none; }
+.pg-field__hint { font: 400 14px/1.4 var(--sans); color: var(--ink-3); }
+.pg-field__err { position: relative; padding-left: 24px; font: 500 14px/1.4 var(--sans); color: var(--err); }
+.pg-field__err::before, .pg-news__msg.is-error::before {
+  content: ""; position: absolute; left: 0; top: .15em; width: 18px; height: 18px; background: var(--err);
+  -webkit-mask: url("kit/error.svg") center / 100% 100% no-repeat; mask: url("kit/error.svg") center / 100% 100% no-repeat;
+}
+/* a message that went through carries the hand-drawn tick */
+.pg-ok:not([hidden]), .pg-news__msg:not(.is-error):not(:empty) { position: relative; padding-left: 26px; }
+.pg-ok:not([hidden])::before, .pg-news__msg:not(.is-error):not(:empty)::before {
+  content: ""; position: absolute; left: 0; top: .15em; width: 19px; height: 19px; background: currentColor;
+  -webkit-mask: url("kit/tick.svg") center / 100% 100% no-repeat; mask: url("kit/tick.svg") center / 100% 100% no-repeat;
+}
+.pg-field__err[hidden] { display: none; }
+.pg-sizes__row { display: flex; gap: 14px; flex-wrap: wrap; margin-top: 4px; }
+.pg-size { position: relative; cursor: pointer; }
+.pg-size input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.pg-size__box { --pc: var(--field); --edge: 7px; display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 8px 18px; font: 500 16px/1.3 var(--sans); }
+.pg-size input:checked + .pg-size__box { --pc: var(--ink); color: var(--paper); }
+/* the one that is chosen carries a brush mark after the words (::before is the painted patch itself), so the
+   choice reads even where colour is hard to tell */
+.pg-size__box::after { content: ""; width: 0; height: 13px; background: currentColor; transition: width .18s ease; }
+.pg-size input:checked + .pg-size__box::after {
+  width: 15px; height: 15px;
+  -webkit-mask: url("kit/tick.svg") center / 100% 100% no-repeat; mask: url("kit/tick.svg") center / 100% 100% no-repeat;
+}
+.pg-size input:focus-visible + .pg-size__box { box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink); }
+.pg-order__send { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; margin-top: 6px; }
+.pg-demo { font: 400 14px/1.45 var(--sans); color: var(--ink-3); max-width: 34ch; }
+.pg-demo[hidden], .pg-ok[hidden] { display: none; }
+.pg-ok { font: 500 15px/1.45 var(--sans); color: var(--ink); max-width: 36ch; }
+
+/* sampler + delivery */
+.pg-sampler { grid-template-columns: minmax(18rem, 30rem) minmax(20rem, 32rem); justify-content: center; align-items: stretch; align-content: stretch; column-gap: clamp(40px, 7vw, 120px); }
+.pg-deliv { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 26px 30px 30px; align-self: stretch; }
+.pg-deliv__art { display: block; width: 100%; height: clamp(150px, 30vh, 280px); margin-bottom: 10px; }
+.pg-samp { --pc: var(--paper-2); --edge: 14px; padding: 26px 30px 30px; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 12px; }
+.pg-samp__art { display: block; width: 100%; height: clamp(150px, 30vh, 280px); margin-bottom: 10px; }
+.pg-samp .pg-ok { margin-top: 2px; }
+
+/* footer */
+.pg-foot { grid-template-rows: 1fr auto; align-content: stretch; padding-bottom: 28px; }
+.pg-foot__in { align-self: stretch; justify-self: center; width: min(34rem, 100%); display: flex; flex-direction: column; justify-content: center; gap: 14px; text-align: center; padding: 30px 34px 34px; }
+.pg-foot__art { display: block; width: min(220px, 50vw); aspect-ratio: 2 / 1; margin: 0 auto 10px; }
+.pg-news { margin-top: 10px; }
+.pg-news__row { display: flex; gap: 12px; }
+.pg-news__row .pg-ink { flex: 1; min-width: 0; }
+.pg-news input {
+  width: 100%; min-height: 48px; box-sizing: border-box; padding: 10px 6px 14px;
+  font: 400 17px/1.3 var(--sans); color: var(--ink); background: transparent; border: 0; border-radius: 0;
+}
+.pg-news input::placeholder { color: #7d6d65; opacity: 1; }
+.pg-news input:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; box-shadow: none; }
+.pg-news__msg { position: relative; min-height: 1.45em; margin-top: 10px !important; padding-left: 0; font: 500 15px/1.45 var(--sans); }
+.pg-news__msg.is-error { padding-left: 24px; }
+.pg-news__msg.is-error { color: var(--err); }
+.pg-foot__base { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding-top: 22px; }
+.pg-foot__base::before {
+  content: ""; position: absolute; left: 0; right: 0; top: 0; height: 12px; background: var(--ink); opacity: .34;
+  -webkit-mask: url("kit/divider-ratdai-1.svg") center / 100% 100% no-repeat;
+  mask: url("kit/divider-ratdai-1.svg") center / 100% 100% no-repeat;
+}
+.pg-foot__top { color: inherit; font: 500 15px/1.3 var(--sans); padding: 10px 0; }
+.pg-byline { font: 400 14px/1.4 var(--sans); color: var(--ink-3); }
+
+/* ------------------------------------------------------------------ phone */
+/* narrower than a laptop: the compact bar (brand, Blend yours, Menu) */
+@media (max-width: 1080px) {
+  .pg-nav__seasons, .pg-nav__link, .pg-nav__lang { display: none; }
+  .pg-nav__menu { display: inline-block; }
+  .pg-brand { gap: 8px; padding: 5px 10px 6px; }
+  .pg-brand.is-hero { transform: none; }
+  /* the compact bar carries the name, the season, one button and the menu */
+  .pg-brand__mark, .pg-brand__season { height: 28px; }
+}
+/* phones and portrait tablets: the end part stacks, one screen at a time */
+@media (max-width: 900px) {
+  .pg-atelier { grid-template-columns: 1fr; row-gap: 20px; align-items: start; align-content: center; }
+  .pg-sampler { align-items: start; align-content: center; }
+  .pg-foot__in { align-self: center; }
+  /* blend, first screen: the bottles first, the words under them (the heading sits in the middle of the screen);
+     the atelier keeps its words first and its picture last, so the screen after it never starts on bare paper */
+  .pg-blend__stage { order: -1; }
+  .pg-sec.pg-blend { display: block; padding: 0; min-height: 0; }
+  .pg-blend__a, .pg-blend__b { box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 16px; min-height: var(--vh); padding: 84px var(--gutter) 40px; max-width: 40rem; }
+  .pg-blend__result { min-height: 0; text-align: left; align-self: stretch; }
+  .pg-blend__desc { margin-inline: 0; }
+  .pg-blend__sliders { grid-template-columns: 1fr 1fr; column-gap: 28px; row-gap: 2px; }
+  .pg-slider { padding: 0; }
+  .pg-blend__actions { justify-content: flex-start; }
+  .pg-sec.pg-order { display: block; padding: 0; min-height: 0; }
+  .pg-order__form { display: block; max-width: 36rem; margin: 0 var(--gutter); padding: 0; }
+  /* On a phone each part of the order form owns a screen, so there is a tall stretch of empty paper between the
+     e-mail field and the size choice. Mike looked at it on 22/9 and said keep it ("giữ"): do not close the gap. */
+  .pg-order__a, .pg-order__f2 { box-sizing: border-box; padding: 84px 18px 16px; }
+  .pg-order__f1 { padding: 16px 18px 40px; }
+  .pg-order__f2 { display: flex; flex-direction: column; min-height: var(--vh); justify-content: flex-start; padding-top: 96px; padding-bottom: 40px; }
+  .pg-sampler { grid-template-columns: minmax(0, 36rem); row-gap: 36px; }
+  .pg-samp { order: -1; }
+}
+
+/* phones */
+@media (max-width: 760px) {
+  .pg-nav { padding-top: 10px; gap: 8px; }
+  .pg-nav__end { gap: 12px; padding: 5px 6px 5px 8px; }
+  /* on a phone the name, the season, the one button and the menu all have to fit across 390 px: the letters come
+     down to 20 px tall, still well over the 16 px the logo may not go below, and the button gives up some padding */
+  .pg-brand { gap: 6px; padding: 4px 8px 5px; }
+  .pg-brand__mark, .pg-brand__season { height: 26px; }
+  .pg-warm { height: 26px; }
+  .pg-nav__blend { font-size: 14px; padding: 8px 11px; min-height: 38px; }
+
+  .pg-sec { padding: 84px var(--gutter) 40px; }
+  .pg-atelier__art { max-height: 34vh; }
+  .pg-blend__line { font-size: 30px; }
+  .pg-blend__art { height: 30vh; }
+  .pg-blend__sliders { grid-template-columns: 1fr; row-gap: 2px; }
+  .pg-sum__art { height: 96px; }
+  .pg-card-paper { --edge: 10px; }
+  /* text-wrap: pretty earns its keep on a wide column, where it only tidies the rag. In a 300 px column on a phone
+     it does the opposite: to avoid a short last line it reflows the whole paragraph and adds one, then strands
+     nine characters on it anyway (measured on the atelier: 4 lines of 26 characters where 3 of 35 fit). Down here
+     the lines are filled greedily instead. */
+  .pg-tail :where(p, li) { text-wrap: wrap; }
+  .pg-atelier__text, .pg-deliv, .pg-foot__in { padding: 16px 14px 18px; }
+  .pg-blend__result { padding: 14px 18px 16px; }
+  .pg-blend__sliders { padding: 10px 16px 6px; }
+  .pg-samp { padding: 16px 14px 18px; }
+  /* 16 px in the tail on a phone, not 17: at 17 the atelier's paragraph ran four lines with four characters
+     stranded on the last, which the reading tool counts as a 26-character column. Measured, not guessed. */
+  .pg-tail .pg-body { font-size: 16px; }
+  .pg-samp__art { height: 124px; margin-bottom: 0; }
+  .pg-deliv { padding-top: 0; }
+  .pg-deliv__art { height: 104px; margin-bottom: 0; }
+  .pg-news__row { flex-direction: column; }
+}
+/* the words over the scene on a phone, and on any portrait screen (the core frames the scene differently there) */
+@media (max-width: 760px), (max-aspect-ratio: 95/100) {
+  .pg-panel { --edge: 12px; padding: 14px 14px 16px; }
+  .pg-panel h1 { font-size: 31px; }
+  .pg-panel h2 { font-size: 28px; }
+  .pg-step .pg-body { font-size: 16px; line-height: 1.55; }
+  /* the opening panel takes the whole phone width it can: the line about the four streets needs 32 characters a
+     line to count as a column and not a stripe */
+  /* the sheet has to end a clear 24 px above the bottle even when the writing runs to its full 45 syllables:
+     the bottle stands at 63% of the screen (measured off the picture, 21/9) */
+  /* the left padding is 28 px, not 14: the painted name is pulled 0.15 of its height to the left so its ink lines
+     up with the writing, and on a phone the words stand on a sheet of paper -- without the extra padding the
+     name's box would hang off the sheet onto the dark room (hero-read measured it there at 1.00:1). */
+  .pg-lead, .pg:not(.pg-no3d) .pg-step--hero .pg-lead { left: 12px; right: 12px; top: 78px; width: auto; min-width: 0; max-width: 34rem; padding: 14px 12px 16px 28px; }
+  .pg-hero__logo { height: 62px; }
+  /* the same two tiers on a phone: the name is still the largest thing on the screen, the writing under it */
+  .pg-lead .pg-hero__intro { font-size: 16px; line-height: 1.68; margin-top: 6px; }
+  .pg-lead .pg-hero__intro--2 { margin-top: 34px; }
+  .pg-lead h1.pg-hero__logo { --logo-h: 92px; }
+  .pg-cue { left: 50%; bottom: 2.2vh; }
+
+  /* The season sheet on a phone: the same one shape as on a computer, set smaller, full width between 16 px gutters.
+     Only where it stands differs by season. */
+  .pg-card { --edge: 10px; left: 16px; right: 16px; width: auto; max-width: 34rem; padding: 8px 14px 10px; }
+  .pg-card__h { font-size: 28px; }
+  .pg-card .pg-card__h::after { height: 6px; margin: 2px 0 4px; }
+  .pg-card__street { font-size: 15px; }
+  .pg-card__sub { font-size: 14px; }
+  .pg-card .pg-epi--card { --epi-size: 14px; margin-bottom: 3px; }
+  .pg-card .pg-epi__lines { line-height: 1.5; }
+  .pg-card .pg-epi__by { margin-top: 2px; font-size: 13px; }
+  .pg-card__body { padding-top: 2px; }
+  .pg-card__body .pg-body { font-size: 16px; line-height: 1.5; }
+  /* spring, autumn and winter: the band at the top, from the bar down. Winter's is over the bridge's steel and deck
+     (both may be covered), keepout.json band [0, 72, 390, 256]; it used to stand halfway down, on the tea stall's lamp */
+  .pg-card--xuan, .pg-card--thu, .pg-card--dong { top: var(--floor); bottom: auto; }
+  /* summer (A, Mike 21/9): the middle of the lake, 238 px down at 390×844 (28.2%). The lotus boat passes behind it
+     34 s in every 64, and it sits close to the sun, the pagoda and the tip of the tea woman's hat (MIKE_OK) */
+  .pg-card--ha { top: calc(28.2vh + var(--edge)); bottom: auto; }
+
+  /* the bottle's notes on a phone: the core stands the bottle in the top half and leaves the band underneath, so
+     the card is a block along the foot. The three structures keep their shapes; only the room changes. */
+  /* the blotter on a phone: the core stands the bottle in the top half and leaves the band underneath, so the
+     strip lies along the foot */
+  .pg-fcard {
+    left: 12px; right: 12px; bottom: 14px; top: auto; width: auto; transform: none;
+    --edge: 12px; padding: 18px 18px 20px;
+  }
+  .pg-fcard__sub { font-size: 17px; }
+  .pg-fcard .pg-body { font-size: 16px; line-height: 1.55; }
+  .pg-fcard__val { font-size: 22px; }
+  .pg-fcard__h { font-size: 36px; }
+  .pg-fcard__opener { margin-top: 12px; }
+  .pg-fcard__notes { margin-top: 20px; }
+  .pg-fcard__row + .pg-fcard__row { margin-top: 12px; }
+  .pg-fcard__row.is-heart { margin-left: 14px; }
+  .pg-fcard__row.is-base { margin-left: 28px; }
+  .pg-fcard__row.is-heart .pg-fcard__val { font-size: 27px; }
+
+  .pg-stack { display: flex; flex-direction: column; gap: 14px; position: absolute; left: 12px; right: 12px; bottom: 4vh; max-width: 34rem; }
+  .pg-stack > * { position: relative !important; left: auto !important; right: auto !important; top: auto !important; bottom: auto !important; width: auto !important; min-width: 0 !important; }
+  .pg-memory h3 { font-size: 21px; }
+  .pg-memory .pg-body { font-size: 18px; }
+  .pg-notes { align-self: flex-start; }
+
+}
+
+/* the order screen A on a phone: heading, card and the first two fields fill one screen */
+@media (max-width: 900px) {
+  .pg-order__a { min-height: calc(var(--vh) * 0.62); display: flex; flex-direction: column; justify-content: flex-end; }
+  .pg-order__f1 { min-height: calc(var(--vh) * 0.38); }
+}
+
+/* ------------------------------------------------------------------ no WebGL: the reading version
+   The scene words become a normal document; each step keeps a full screen so the reading load stays the same. */
+.pg-no3d .room, .pg-no3d #stage, .pg-no3d .veil { display: none !important; }
+.pg-no3d .pg-no3d-only { display: block !important; }
+.pg-no3d .pg-3d-only { display: none !important; }
+.pg-no3d .pg-over { position: relative; inset: auto; z-index: auto; pointer-events: auto; }
+.pg-no3d .pg-step { position: relative; inset: auto; min-height: var(--vh); opacity: 1; transition: none; overflow: hidden; }
+.pg-no3d .pg-step :where(h1, h2, h3, p, dt, dd) { transition: opacity .6s ease .35s; }
+.pg-no3d .pg-step.pg-dim :where(h1, h2, h3, p, dt, dd) { opacity: 0; transition: opacity .35s ease; }
+.pg-no3d .pg-step::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(170deg, var(--w1), var(--w2));
+}
+.pg-no3d .pg-step::after {
+  content: ""; position: absolute; left: 30%; right: -10%; top: 30%; height: 46%; background: var(--w3); opacity: .55;
+  -webkit-mask: var(--pg-stroke) center / 100% 100% no-repeat; mask: var(--pg-stroke) center / 100% 100% no-repeat;
+}
+.pg-no3d .pg-step > * { z-index: 1; }
+.pg-no3d .pg-scene { display: none; }
+.pg-no3d .pg-stack--ha .pg-memory { top: auto; bottom: 6vh; }
+.pg-no3d .pg-stack--thu .pg-notes { left: auto; right: 4vw; }
+.pg-no3d .pg-step--hero, .pg-no3d .pg-step--xuan { --w1: #f6dccb; --w2: #e9b9b0; --w3: #d86f8e; }
+.pg-no3d .pg-step--ha { --w1: #f0c9a6; --w2: #c9a7c1; --w3: #6f8d4b; }
+.pg-no3d .pg-step--thu { --w1: #1d2744; --w2: #34406e; --w3: #efe3c4; }
+.pg-no3d .pg-step--dong { --w1: #2b2a38; --w2: #4a3a3a; --w3: #cf5a26; }
+.pg-no3d .pg-tail::before { display: none; }
+.pg-no3d .pg-brand.is-hero { transform: none; }
+
+/* ------------------------------------------------------------------ calmer when asked */
+@media (prefers-reduced-motion: reduce) {
+  /* asked for less movement: words swap at once instead of fading */
+  .pg-tail [data-unit] *, .pg-no3d .pg-step * { transition: none !important; }
+  .pg-step, .pg-step.is-on, .pg-step.is-on.is-first { transition: none; }
+  .pg:not(.pg-no3d) .pg-step .pg-paint > *, .pg:not(.pg-no3d) .pg-step.is-set .pg-paint > * { transition: none; }
+  .pg-brand { transition-duration: .2s; }
+  /* the waiting screen shows the name already written, with the number beside it */
+  .pg-loader__wisp { display: none; }
+  .pg-loader .pg-net { stroke-dasharray: none !important; stroke-dashoffset: 0 !important; }
+  /* no thread of scent, and the season word appears written rather than being written */
+  .pg-wisp { display: none; }
+  .pg-logo__art.is-writing .pg-net { animation: none; stroke-dasharray: none; stroke-dashoffset: 0; }
+  .pg-logo__art.is-writing .pg-loang { animation: none; }
+  .pg-brand__season { transition: none; }
+}
