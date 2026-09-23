@@ -1,0 +1,384 @@
+/* Shocking Mike · chồng đĩa. Plain dark studio; open a record and the page takes its colour (Stripe Press). */
+
+:root {
+  --bg: #1c1b1f;
+  --bg-2: #252429;
+  --ink: #ece8e1;
+  --mute: #a9a49e;
+  --line: rgba(236, 232, 225, 0.16);
+  --line-2: rgba(236, 232, 225, 0.34);
+  --stone: #d5d0c3;
+  --ink-dark: #17161a;
+  --ultra-deep: #27358f;
+  --thermal: #eef0ec;
+  --rec-bg: #cdc7b8;
+  --rec-fg: #1d2766;
+  --rail-fg: var(--ink);
+  --serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+  --sans: 'Archivo', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Consolas, monospace;
+  --ease-out: cubic-bezier(0.16, 0.84, 0.3, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 400 17px/1.55 var(--serif); -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+button { font: inherit; color: inherit; cursor: pointer; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.sr-only {
+  position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+/* ---------- paint + stage ---------- */
+.paint { position: fixed; inset: 0; z-index: 0; background: var(--bg); display: none; }
+.paint__fill { position: absolute; inset: 0; background: var(--rec-bg); opacity: 0; transition: opacity 0.6s ease; will-change: opacity; }
+.is-bg .paint__fill { opacity: 1; }
+.gl { position: fixed; inset: 0; width: 100vw; height: 100vh; display: none; }
+.has-3d .paint { display: block; }
+.has-3d body { overflow: hidden; height: 100vh; overscroll-behavior: none; background: transparent; }
+.has-3d .gl { display: block; z-index: 1; touch-action: none; }
+
+/* ---------- the rail, left edge (logo, back, ticks, ?) ---------- */
+.rail { display: none; }
+.has-3d .rail { display: block; position: fixed; top: 0; bottom: 0; left: 0; width: 80px; z-index: 8; pointer-events: none; color: var(--rail-fg); transition: color 0.45s ease; }
+.is-bg { --rail-fg: var(--rec-fg); }
+.rail > * { pointer-events: auto; }
+.rail__mark { position: absolute; top: 18px; left: 18px; margin: 0; white-space: nowrap; font: inherit; }
+/* the label's mark takes you back to the start, from wherever you are */
+.rail__home {
+  display: flex; align-items: center; gap: 12px; padding: 6px 12px 6px 6px; border: 0; border-radius: 999px;
+  background: transparent; color: inherit; cursor: pointer; transition: background-color 0.2s ease;
+}
+.rail__home:hover { background: color-mix(in srgb, currentColor 14%, transparent); }
+.rail__home:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.rail__label { font: 600 19px/1.1 var(--serif); transition: opacity 0.35s ease; }
+.is-open .rail__label { opacity: 0; }
+.about__role { font: italic 400 16px/1.4 var(--serif); }
+.about__role span + span::before { content: ''; display: inline-block; width: 3px; height: 3px; border-radius: 50%; background: currentColor; margin: 0 8px; vertical-align: middle; }
+
+.rail__disc {
+  width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid currentColor; flex: none;
+  background: radial-gradient(circle, currentColor 0 1.6px, transparent 2.1px);
+  box-shadow: inset 0 0 0 5px transparent, inset 0 0 0 6.2px currentColor;
+}
+/* arrow above, ticks below, 24px between them — the arrow keeps its place even when it is not showing, so the
+   ticks never move and the two can never overlap */
+.rail__nav { position: absolute; left: 20px; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: flex-start; gap: 24px; }
+.rail__back {
+  width: 36px; height: 36px; padding: 0; flex: none;
+  display: grid; place-items: center; border: 0; background: none;
+  opacity: 0; pointer-events: none; transition: opacity 0.35s ease;
+}
+.is-open .rail__back { opacity: 1; pointer-events: auto; }
+.rail__ticks { display: flex; flex-direction: column; }
+.rail__ticks button { width: 44px; height: 18px; padding: 0; border: 0; background: none; display: flex; align-items: center; }
+.rail__ticks button::before {
+  content: ''; display: block; width: 14px; height: 1.5px; background: currentColor; opacity: 0.4;
+  transition: width 0.4s var(--ease-out), height 0.4s var(--ease-out), opacity 0.4s;
+}
+.rail__ticks button:hover::before { width: 20px; opacity: 0.8; }
+/* the record you are on: longer, thicker, full strength — it is how you know where you are */
+.rail__ticks button.is-on::before { width: 28px; height: 3px; opacity: 1; }
+.rail__help { position: absolute; left: 22px; bottom: 18px; width: 36px; height: 40px; padding: 0; border: 0; background: none; font: 400 28px/1 var(--serif); }
+/* top right: pricing + language */
+.top { position: fixed; top: 16px; right: 20px; z-index: 9; display: flex; align-items: center; gap: 6px; color: var(--rail-fg); transition: color 0.45s ease; }
+.top__link, .lang {
+  display: inline-flex; align-items: center; min-height: 40px; padding: 0 14px; border-radius: 999px;
+  font: 500 16px/1 var(--serif); color: inherit; text-decoration: none; background: none; border: 1px solid transparent;
+}
+.lang { border-color: color-mix(in srgb, currentColor 40%, transparent); }
+.top__link:hover { text-decoration: underline; text-underline-offset: 4px; }
+.lang:hover { border-color: currentColor; }
+html:not(.has-3d) .top { position: absolute; }
+.about {
+  position: fixed; left: 24px; bottom: 68px; z-index: 9; width: 280px; padding: 16px 18px 12px;
+  background: var(--bg-2); color: var(--ink); border: 1px solid var(--line); border-radius: 4px;
+  font: 400 16px/1.5 var(--serif); box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.6);
+}
+.about p { margin: 0 0 6px; }
+.about__by { font: 500 14px/1.4 var(--sans); color: var(--mute); margin-top: 10px !important; }
+
+/* ---------- captions beside the stack ---------- */
+.caps { display: none; }
+.has-3d .caps { display: block; position: fixed; inset: 0; z-index: 4; pointer-events: none; transition: opacity 0.3s ease; }
+.cap { position: absolute; left: 0; top: 0; padding-left: 8px; will-change: transform, opacity; }
+.cap__cat { margin: 0 0 6px; font: 400 14px/1 var(--mono); letter-spacing: 0.04em; color: var(--mute); }
+.cap__name { margin: 0; font: 600 26px/1.1 var(--serif); color: var(--ink); }
+.cap__meta { margin: 6px 0 0; font: italic 400 17px/1.3 var(--serif); color: var(--mute); }
+.is-open .caps { opacity: 0; }
+.hint { display: none; }
+.has-3d .hint {
+  display: block; position: fixed; left: 0; right: 0; bottom: 24px; z-index: 4; margin: 0; text-align: center;
+  font: 500 14px/1.4 var(--sans); letter-spacing: 0.02em; color: var(--mute); transition: opacity 1s ease;
+}
+.hint.is-gone, .is-open .hint { opacity: 0; }
+.hint__touch { display: none; }
+@media (hover: none) { .hint__desk { display: none; } .hint__touch { display: inline; } }
+
+/* ---------- the price flyer's words, laid on the unfolded sheet ---------- */
+.flyer { display: none; }
+.has-3d .flyer {
+  display: block; position: fixed; left: 0; top: 0; z-index: 3; transform-origin: 0 0;
+  color: #1c1b1f; text-decoration: none; opacity: 0; pointer-events: none;
+}
+.has-3d .flyer.is-on { pointer-events: auto; }
+/* the words are printed on the sheet itself; this is the link's hit area (and its words for screen readers) */
+.flyer__sheet { width: 480px; height: 660px; }
+.has-3d .flyer.is-on { cursor: pointer; }
+.flyer:focus-visible { outline: 2px solid var(--ink); outline-offset: 6px; }
+.in-flyer .caps { opacity: 0; }
+.in-flyer .rail__note { opacity: 0; }
+.rail__note { transition: opacity 0.35s ease; }
+/* leaving for the pricing page: everything goes to the plain dark ground first */
+.is-leaving .gl, .is-leaving .flyer, .is-leaving .rail, .is-leaving .top { opacity: 0 !important; transition: opacity 0.35s ease; }
+
+/* ---------- the record page (right column, Stripe Press) ---------- */
+.page { display: none; }
+.has-3d .page {
+  position: fixed; top: 0; bottom: 0; left: 56.6vw; width: min(520px, 36.5vw); z-index: 5;
+  display: block; overflow: hidden;
+  color: var(--rec-fg); visibility: hidden;
+  opacity: 0; transform: translate3d(0, 14px, 0); pointer-events: none;
+  transition: opacity 0.28s ease, transform 0.28s ease, visibility 0s linear 0.28s;
+}
+.has-3d .page.is-live { visibility: visible; transition: opacity 0.28s ease, transform 0.28s ease; }
+/* every record's words sit in the same place, one on top of the other; the one in hand is the one you see, and the
+   two beside it slide in and out with the sleeve. Each column scrolls itself only if its own words are taller than
+   the screen, so a wheel anywhere else always turns to the next record. */
+.page__inner { position: relative; height: 100%; }
+.page__rec {
+  position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center;
+  overflow-y: auto; scrollbar-width: none; overscroll-behavior: contain;
+  visibility: hidden; will-change: transform, opacity;
+}
+.page__rec::-webkit-scrollbar { display: none; }
+.page__rec.is-on { visibility: visible; }
+.page__title:focus { outline: none; }
+.has-3d .page.is-warm { opacity: 0.003; transform: none; transition: none; }
+.page::-webkit-scrollbar { display: none; }
+.has-3d .page.is-live.is-in { opacity: 1; transform: none; pointer-events: auto; transition: opacity 0.5s ease, transform 0.7s var(--ease-out); }
+.page__rec > * { flex: none; }
+.page__rec { padding: 96px 0 72px; }
+.page__cat { margin: 0 0 10px; font: 400 14px/1 var(--mono); letter-spacing: 0.04em; opacity: 0.8; }
+.page__title { margin: 0; font: 700 62px/0.98 var(--serif); letter-spacing: -0.028em; }
+.page__gloss { margin: 10px 0 0; font: italic 400 24px/1.3 var(--serif); }
+.page__rule, .listen .page__rule { width: 44px; height: 0; margin: 26px 0; border: 0; border-top: 1.5px solid currentColor; }
+.page__lead { margin: 0 0 14px; font: 400 19px/1.58 var(--serif); max-width: 30em; }
+/* a record still in its wrap: the write-up is on the sheet, under the plastic, and not for reading yet.
+   The sheet is a drawing on a canvas — there are no words in it to find. */
+.sealed {
+  position: relative; margin: 0 0 16px; max-width: 30em; border-radius: 3px; overflow: hidden;
+  box-shadow: 0 1px 2px color-mix(in srgb, currentColor 16%, transparent);
+}
+.sealed__sheet { display: block; width: 100%; height: auto; }
+.sealed::after {
+  content: ''; position: absolute; inset: 0; border-radius: 3px; pointer-events: none;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, currentColor 14%, transparent);
+}
+.page__lead--sealed { font-style: italic; opacity: 0.82; }
+.page__tracks { margin: 0 0 22px; }
+.page__tracks div { display: grid; grid-template-columns: 8.6em 1fr; gap: 12px; padding: 10px 0; border-top: 1px solid color-mix(in srgb, currentColor 28%, transparent); }
+.page__tracks div:last-child { border-bottom: 1px solid color-mix(in srgb, currentColor 28%, transparent); }
+.page__tracks dt { font: 700 14px/1.75 var(--sans); letter-spacing: 0.12em; text-transform: uppercase; }
+.page__tracks dd { margin: 0; font: 400 17px/1.55 var(--serif); }
+.page__listen { margin: 0; font: 400 17px/1.6 var(--serif); max-width: 32em; }
+.page__listen em { font-style: italic; }
+
+/* action rows: thin frame, label + price, an arrow cell at the end */
+.rows { list-style: none; margin: 32px 0 0; padding: 0; border: 1px solid currentColor; }
+.page__acts { margin-top: 30px; border: 1px solid currentColor; }
+.page__acts .rows { margin: 0; border: 0; border-top: 1px solid currentColor; }
+.more > summary { list-style: none; cursor: pointer; }
+.more > summary::-webkit-details-marker { display: none; }
+.more__sign { position: relative; width: 11px; height: 11px; display: block; }
+.more__sign::before, .more__sign::after { content: ''; position: absolute; left: 0; right: 0; top: 5px; height: 1.5px; background: currentColor; transition: transform 0.3s var(--ease-out); }
+.more__sign::after { transform: rotate(90deg); }
+.more[open] .more__sign::after { transform: rotate(0deg); }
+.more:not([open]) .page__tracks { display: none; }
+.more .page__tracks { margin: 0; padding: 4px 16px 12px; border-top: 1px solid color-mix(in srgb, currentColor 35%, transparent); }
+.more .page__tracks div:last-child { border-bottom: 0; }
+.more .page__tracks div:first-child { border-top: 0; }
+.rows li + li { border-top: 1px solid currentColor; }
+/* a row holds a label on the left and a note on the right. Vietnamese runs longer than English, so the row is
+   allowed to wrap and grow instead of letting the two ever run into each other. */
+.row {
+  width: 100%; min-height: 48px; margin: 0; padding: 8px 0 8px 16px; border: 0; background: transparent; color: inherit;
+  display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr) 48px; align-items: center; column-gap: 14px;
+  text-align: left; text-decoration: none;
+  transition: background-color 0.2s ease;
+}
+.row__label { font: 600 17px/1.3 var(--serif); letter-spacing: 0.01em; min-width: 0; overflow-wrap: break-word; }
+.row__price { margin-left: 0; font: 400 17px/1.3 var(--serif); min-width: 0; overflow-wrap: break-word; }
+.row__arrow { align-self: stretch; display: grid; place-items: center; border-left: 1px solid currentColor; }
+a.row:hover, button.row:hover { background: color-mix(in srgb, currentColor 9%, transparent); }
+.row--off { cursor: default; }
+.row--off .row__label { opacity: 0.7; }
+.row:focus-visible { outline-offset: -4px; }
+
+/* ---------- fallback list (no 3D) — also what screen readers read ---------- */
+.shelf { max-width: 720px; margin: 0 auto; padding: 32px 20px 64px; }
+.shelf__title { font: 600 34px/1.1 var(--serif); margin: 0 0 28px; }
+.shelf__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 22px; }
+.shelf__item { padding: 22px 0; border-top: 1px solid var(--line); }
+.shelf__item h2 { margin: 0; font: 600 28px/1.15 var(--serif); }
+.shelf__item h2 span { font: italic 400 19px var(--serif); color: var(--mute); margin-left: 6px; }
+.shelf__item p { margin: 8px 0 0; }
+.shelf__quote { font-style: italic; }
+.shelf__price b { font: 700 19px var(--sans); }
+.shelf__note { color: var(--mute); max-width: 36em; }
+.shelf__prices { margin-top: 36px; padding-top: 22px; border-top: 1px solid var(--line); }
+.shelf__prices h2 { margin: 0 0 10px; font: 600 28px/1.15 var(--serif); }
+.shelf__prices p { margin: 6px 0 0; }
+.shelf__cat { font: 400 14px var(--mono); color: var(--mute); margin: 0 0 4px !important; }
+.shelf__meta { font-style: italic; color: var(--mute); }
+.shelf__links a { margin-right: 18px; }
+.shelf__foot { margin-top: 24px; }
+.shelf__by { margin-top: 20px; color: var(--mute); }
+.shelf__by { font: 500 14px var(--sans); }
+/* with 3D the stack is the page: each record's words live in its own page (reached by the ticks, which are
+   buttons), so the list is not kept twice */
+.has-3d .shelf { display: none; }
+
+/* ---------- buttons (counter) ---------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1px solid transparent;
+  font: 600 16px/1 var(--sans); letter-spacing: 0.01em; text-decoration: none;
+  transition: background-color 0.25s, border-color 0.25s;
+}
+.btn--solid { background: var(--ink); color: var(--bg); }
+.btn--line { border-color: var(--line-2); background: transparent; }
+.btn--line:hover { border-color: currentColor; }
+.btn--text { background: none; border: 0; padding: 0 8px; text-decoration: underline; text-underline-offset: 4px; }
+
+/* ---------- "Nghe thử": the demo on the record's colour ---------- */
+.listen {
+  position: fixed; inset: 0; z-index: 40; overflow-y: auto;
+  background: var(--rec-bg); color: var(--rec-fg);
+  opacity: 0; transition: opacity 0.4s ease;
+}
+.listen.is-in { opacity: 1; }
+.listen__back {
+  position: fixed; left: 20px; top: calc(50% - 72px); width: 36px; height: 36px; padding: 0;
+  display: grid; place-items: center; border: 0; background: none; z-index: 2;
+}
+.listen__grid {
+  min-height: 100%; display: grid; grid-template-columns: 1fr min(520px, 36.5vw); column-gap: 0;
+  align-items: center; padding: 88px calc(100vw - 56.6vw - min(520px, 36.5vw)) 64px 7.5vw;
+}
+.listen__demo { margin: 0 4.5vw 0 0; transform: translate3d(0, 16px, 0); transition: transform 0.7s var(--ease-out); }
+.listen.is-in .listen__demo { transform: none; }
+.screen {
+  aspect-ratio: 16 / 10; border-radius: 6px; overflow: hidden; background: #0d0d0f;
+  box-shadow: 0 34px 60px -30px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.18);
+}
+.screen video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.screen--soon { display: grid; place-items: center; background: color-mix(in srgb, var(--rec-fg) 7%, var(--rec-bg)); border: 1px solid color-mix(in srgb, var(--rec-fg) 35%, transparent); box-shadow: none; }
+.screen--soon p { margin: 0; text-align: center; font: italic 400 19px/1.3 var(--serif); }
+.screen--soon span { display: block; font: italic 500 56px/1 var(--serif); margin-bottom: 10px; }
+.listen__title { margin: 0; font: 600 50px/1.04 var(--serif); letter-spacing: -0.015em; }
+.listen__for { margin: 8px 0 0; font: italic 400 22px/1.3 var(--serif); }
+.listen__body { margin: 0; font: 400 19px/1.6 var(--serif); }
+
+/* ---------- phone ---------- */
+@media (max-width: 720px) {
+  .rail__mark { top: 12px; left: 8px; }
+  .rail__home { padding: 8px 12px; }
+
+  .top { top: 10px; right: 10px; gap: 0; }
+  .top__link { padding: 0 10px; }
+  .lang { padding: 0 12px; }
+  .is-open .top { display: none; }
+  .rail__ticks { display: none; }
+  .rail__nav { position: static; transform: none; }
+  .rail__back { position: fixed; left: auto; right: 12px; top: 12px; }
+  .rail__help { left: 14px; bottom: 12px; }
+  .is-open .rail__help { display: none; }
+  .flyer__sheet { width: 330px; height: 640px; }
+  /* a phone screen holds at most two blocks of text: the sheet keeps names and prices, the full page has the rest */
+  .about { left: 16px; right: 16px; width: auto; bottom: 60px; }
+  .hint { bottom: 22px; }
+  .has-3d .page { top: 49vh; left: 0; right: 0; width: auto; padding: 0 20px; }
+  .page__rec { padding: 18px 0 40px; justify-content: flex-start; }
+  .page__title { font-size: 42px; }
+  .page__gloss { font-size: 20px; }
+  .page__rule, .listen .page__rule { margin: 18px 0; }
+  .page__lead { font-size: 19px; }
+  .page__tracks div { grid-template-columns: 7.4em 1fr; }
+  .listen__grid { display: block; padding: 64px 20px 40px; }
+  .listen__demo { margin: 0 0 28px; }
+  .listen__back { left: auto; right: 12px; top: 12px; }
+  .listen__title { font-size: 40px; }
+}
+
+/* a short screen: the ticks tighten up rather than crowd the arrow */
+@media (max-height: 640px) {
+  .rail__ticks button { height: 13px; }
+  .rail__nav { gap: 24px; }
+}
+
+/* motion always plays (Mike, Rhumb Line): no reduced-motion branch here */
+
+/* ---------- the wait: a label coming up to 33⅓ rpm, then handed to the mark in the corner ---------- */
+.load { display: none; }
+.js .load { display: grid; place-items: center; position: fixed; inset: 0; z-index: 60; color: var(--ink); }
+/* the dark backing is its own layer: it can clear while the platter is still flying, so the shop appears
+   behind the record instead of after it */
+.load__bg {
+  position: absolute; inset: 0;
+  /* the shop before the lamps are up: dark, but plainly a room, and always dimmer than the shop itself */
+  background:
+    radial-gradient(ellipse 60% 44% at 50% 43%, rgba(255, 233, 204, 0.1) 0%, rgba(255, 226, 190, 0) 70%),
+    radial-gradient(ellipse 130% 95% at 50% 36%, #4a3d33 0%, #2c241d 54%, #1a1512 100%);
+  transition: opacity 0.42s ease;
+}
+.load.is-going .load__bg { opacity: 0; }
+.load.is-going { pointer-events: none; }
+.load.is-gone .load__flight { opacity: 0; transition: opacity 0.22s ease; }
+.load__mid { position: relative; display: grid; justify-items: center; gap: 40px; padding: 24px; }
+/* the platter is the thing you are waiting on, so it is the size of a record held up to the light */
+.load__flight { position: relative; width: min(28vh, 62vw, 340px); height: min(28vh, 62vw, 340px); min-width: 150px; min-height: 150px; will-change: transform; }
+/* the platter: black vinyl, grooves, a paper label and the spindle hole */
+.load__disc {
+  position: relative; width: 100%; height: 100%; border-radius: 50%; will-change: transform;
+  background:
+    repeating-radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0 1px, rgba(255, 255, 255, 0) 1px 6px),
+    radial-gradient(circle at 50% 50%, #443f3a 0 30%, #201e22 31% 92%, #322f35 100%);
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7), 0 26px 60px rgba(0, 0, 0, 0.5);
+}
+.load__paper {
+  position: absolute; inset: 29%; border-radius: 50%;
+  background: radial-gradient(circle at 38% 32%, #f2ece0 0%, #ddd6c6 76%, #cdc5b3 100%);
+  color: #1c1b1f; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.16);
+}
+/* the name sits under the spindle hole, the way it is printed on a real label */
+.load__smr { position: absolute; top: 62%; left: 50%; transform: translateX(-50%); font: 600 11px/1 var(--mono); letter-spacing: 0.24em; padding-left: 0.24em; white-space: nowrap; }
+.load__hole {
+  position: absolute; left: 50%; top: 50%; width: 11px; height: 11px; margin: -5.5px 0 0 -5.5px;
+  border-radius: 50%; background: #100e0c; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+/* a still gleam the grooves turn under, so the spin reads even on a small screen */
+.load__flight::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+  background: linear-gradient(118deg, rgba(255, 246, 232, 0.3) 0%, rgba(255, 255, 255, 0) 40%, rgba(255, 255, 255, 0) 60%, rgba(255, 246, 232, 0.14) 100%);
+  mix-blend-mode: screen;
+}
+.load__words { display: grid; justify-items: center; gap: 10px; transition: opacity 0.2s ease; }
+.load.is-going .load__words { opacity: 0; }
+.load.is-going .load__flight::after { opacity: 0; transition: opacity 0.2s ease; }
+.load__line { margin: 0; font: 400 20px/1.45 var(--serif); color: var(--ink); text-align: center; letter-spacing: 0.005em; }
+.load__read { margin: 0; font: 500 14px/1 var(--mono); letter-spacing: 0.11em; color: #b4aca2; }
+.load__rpm { color: var(--ink); font-variant-numeric: tabular-nums; }
+.load__pct { margin-left: 14px; font-variant-numeric: tabular-nums; }
+html[lang="vi"] .load__line [lang="en"], html[lang="en"] .load__line [lang="vi"] { display: none; }
+/* the mark in the corner stays away until the platter lands on it */
+.is-loading .rail__disc { opacity: 0; }
+.rail__disc { transition: opacity 0.3s ease; }
+@media (max-width: 600px) {
+  .load__mid { gap: 30px; }
+  .load__line { font-size: 17px; }
+  .load__read { font-size: 13px; }
+}
