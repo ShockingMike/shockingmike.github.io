@@ -47,7 +47,7 @@ function row({ label, price = '', attrs = '', tag = 'button', off = false }) {
   return `<li><button class="row" type="button" ${attrs}>${inner}</button></li>`;
 }
 
-function pricingHref(rec) { return rec.pick ? `pricing/?pick=${rec.pick}` : 'pricing/'; }
+function pricingHref(rec) { return rec.pick ? `bang-gia/?pick=${rec.pick}` : 'bang-gia/'; }
 
 function rowsFor(rec, t, { inPreview = false } = {}) {
   const c = t.records[rec.id];
@@ -158,7 +158,7 @@ function placeFlyer(f, portrait) {
 }
 
 /* the flyer leads to the pricing page: the page goes dark, then the next one opens on the same dark */
-function toPricing(href = 'pricing/') {
+function toPricing(href = 'bang-gia/') {
   if (document.body.classList.contains('is-leaving')) return;
   document.body.classList.add('is-leaving');
   setTimeout(() => { location.href = href; }, 380);
@@ -181,8 +181,8 @@ function renderShelf() {
   $('#shelfPrices').innerHTML = `<h2>${esc(t.ui.flyer.title)}</h2>
     ${PLAN_ORDER.map((id) => `<p><b>${esc(P.plans[id].name)}</b> ${esc(P.plans[id].price)} · ${esc(P.plans[id].for)}</p>`).join('')}
     <p><b>${esc(P.care.name)}</b> ${esc(P.care.price)}</p>
-    <p><a href="pricing/">${esc(t.ui.flyer.more)} ↗</a></p>`;
-  $('.shelf__foot').innerHTML = `<a href="pricing/">${esc(t.ui.pricing)}</a> · <a href="mailto:${t.ui.email}">${esc(t.ui.email)}</a>`;
+    <p><a href="bang-gia/">${esc(t.ui.flyer.more)} ↗</a></p>`;
+  $('.shelf__foot').innerHTML = `<a href="bang-gia/">${esc(t.ui.pricing)}</a> · <a href="mailto:${t.ui.email}">${esc(t.ui.email)}</a>`;
 }
 
 let lastTick = -1;

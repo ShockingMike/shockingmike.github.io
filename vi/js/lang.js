@@ -1,8 +1,8 @@
-/* lang.js — this copy of the site speaks English and nothing else.
+/* lang.js — this copy of the site speaks Vietnamese and nothing else.
    Written by build.mjs; the two-language version lives in the source folder. */
 import { COPY } from './copy.js';
 
-export const LANG = 'en';
+export const LANG = 'vi';
 export function getLang() { return LANG; }
 export function setLang() { /* there is nothing to switch to */ }
 export function applyDocLang() { document.documentElement.lang = LANG; }

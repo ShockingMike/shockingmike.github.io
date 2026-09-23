@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="vi" class="no-js"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bảng giá · Shocking Mike</title>
+<meta name="description" content="Landing page cho thương hiệu, do Shocking Mike tự thiết kế và tự code. Ba gói giá rõ ràng từ 12 triệu đồng, trả lời trong 2 ngày làm việc.">
+<meta name="theme-color" content="#1c1b1f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231c1b1f'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%23ece8e1' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='none' stroke='%23ece8e1' stroke-width='1.6'/%3E%3Ccircle cx='16' cy='16' r='1.3' fill='%23ece8e1'/%3E%3C/svg%3E">
+<script>document.documentElement.classList.replace('no-js', 'js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=JetBrains+Mono:wght@400;500;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..500&amp;family=Playfair+Display:ital,wght@0,400..900;1,400..700&amp;display=swap">
+<link rel="stylesheet" href="pricing.css">
+</head>
+<body>
+<header class="bar">
+  <a class="bar__back" href="../">
+    <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true"><path d="M17 10H4M9 4.5 3.5 10 9 15.5" fill="none" stroke="currentColor" stroke-width="2"></path></svg>
+    <span data-t="pricing.back">Về trang portfolio</span>
+  </a>
+  <p class="bar__name"><a class="bar__home" href="../" data-t-label="pricing.back" aria-label="Về trang portfolio"><span class="bar__disc" aria-hidden="true"></span>Shocking Mike</a></p>
+</header>
+
+<!-- The front page of a broadsheet. Everything below is written from js/copy.js; the text in the HTML is
+     the English copy, complete with every price, so a visitor without JavaScript reads the same sheet. -->
+<main class="sheet" id="sheet">
+
+  <header class="mast">
+    <div class="mast__rule" aria-hidden="true"></div>
+    <h1 class="hero__title">Bảng giá</h1>
+    <div class="mast__rule mast__rule--do" aria-hidden="true"></div>
+    <p class="mast__line" id="heroLabel"><span>Shocking Mike Records</span><span>2026</span><span>N° 01</span></p>
+  </header>
+
+  <section class="opening">
+    <p class="hero__lead">Mình là Mike, tự thiết kế và tự code landing page cho thương hiệu. Giá gói nào cũng ghi hết ở đây, khỏi phải nhắn hỏi. Còn nếu bạn nhắn, mình trả lời trong 2 ngày làm việc.</p>
+    <p class="note" id="heroNote">Giá trọn gói, tính theo phạm vi công việc ghi trong báo giá. Gói nào cũng chạy tốt trên điện thoại.</p>
+  </section>
+
+  <!-- the index strip: every price at a glance, one straight column of figures -->
+  <section class="glance">
+    <span class="k glance__k" id="glanceK" data-entry="">Giá</span>
+    <ol class="summary" id="summary"><li><a class="sum" href="#plan-standard" data-go="plan-standard"><span class="sum__n">01</span><span class="sum__name">Tiêu chuẩn</span><span class="sum__time">2–3 tuần</span><span class="sum__price">12–20 triệu đồng</span></a></li><li><a class="sum" href="#plan-advanced" data-go="plan-advanced"><span class="sum__n">02</span><span class="sum__name">Nâng cao</span><span class="sum__time">4–6 tuần</span><span class="sum__price">Từ 40 triệu đồng</span></a></li><li><a class="sum" href="#plan-custom" data-go="plan-custom"><span class="sum__n">03</span><span class="sum__name">Đặt riêng</span><span class="sum__time">6–10 tuần</span><span class="sum__price">Từ 80 triệu đồng</span></a></li></ol>
+    <span class="k glance__k" id="glanceAddK" data-entry="">Chăm sóc hằng tháng · Viết nội dung</span>
+    <ol class="summary" id="summaryAdd"><li><a class="sum sum--add" href="#care" data-go="care"><span class="sum__n">04</span><span class="sum__name">Chăm sóc hằng tháng</span><span class="sum__time"></span><span class="sum__price">2–4 triệu đồng/tháng</span></a></li><li><a class="sum sum--add" href="#addon" data-go="addon"><span class="sum__n">05</span><span class="sum__name">Viết nội dung</span><span class="sum__time"></span><span class="sum__price">Báo giá riêng</span></a></li></ol>
+  </section>
+
+  <section class="sect" id="sect-plans">
+    <div class="sect__head"><h2 class="k" id="plansK">01 — Các gói</h2></div>
+    <ol class="plans" id="plans"><li><article class="plan" id="plan-standard" data-plan="standard">
+      <div class="plan__head">
+      <div><span class="plan__n">01</span><h3 class="plan__name">Tiêu chuẩn</h3></div>
+      <div><span class="k plan__kprice">Giá</span><p class="plan__price">12–20 triệu đồng</p></div>
+    </div>
+      <p class="plan__for">Cần một trang chỉn chu lên mạng sớm, có một chỗ khiến khách dừng lại nghịch thử.</p>
+      <div class="plan__body">
+        <figure class="shot">
+          <a href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener"><img src="../media/kern-society.jpg" width="960" height="600" alt="Kern Society"></a>
+          <figcaption class="k shot__cap">Trang mẫu · <a href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener">Kern Society</a></figcaption>
+        </figure>
+        <div class="col"><span class="k">Gồm</span><ul class="plan__list"><li>Một landing page bán hàng</li><li>Điểm nhấn tương tác làm riêng</li><li>Cảnh 3D đầu trang hoặc hiệu ứng cuộn</li></ul></div>
+        <div class="col"><span class="k">Thời gian</span><p>2–3 tuần</p></div>
+      </div>
+      <button class="row" type="button" data-pick="standard"><span class="row__label">Chọn gói Tiêu chuẩn</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
+    </article></li><li><article class="plan" id="plan-advanced" data-plan="advanced">
+      <div class="plan__head">
+      <div><span class="plan__n">02</span><h3 class="plan__name">Nâng cao</h3></div>
+      <div><span class="k plan__kprice">Giá</span><p class="plan__price">Từ 40 triệu đồng</p></div>
+    </div>
+      <p class="plan__for">Muốn khách ở lại trang và đi xem một vòng.</p>
+      <div class="plan__body">
+        <figure class="shot">
+          <a href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener"><img src="../media/rhumb-line.jpg" width="960" height="600" alt="Rhumb Line" loading="lazy"></a>
+          <figcaption class="k shot__cap">Trang mẫu · <a href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener">Rhumb Line</a></figcaption>
+        </figure>
+        <div class="col"><span class="k">Gồm</span><ul class="plan__list"><li>Trang 3D để khách tự khám phá</li><li>Câu chuyện thương hiệu dẫn dắt</li><li>Âm thanh, ánh sáng nếu hợp</li></ul></div>
+        <div class="col"><span class="k">Thời gian</span><p>4–6 tuần</p></div>
+      </div>
+      <button class="row" type="button" data-pick="advanced"><span class="row__label">Chọn gói Nâng cao</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
+    </article></li><li><article class="plan" id="plan-custom" data-plan="custom">
+      <div class="plan__head">
+      <div><span class="plan__n">03</span><h3 class="plan__name">Đặt riêng</h3></div>
+      <div><span class="k plan__kprice">Giá</span><p class="plan__price">Từ 80 triệu đồng</p></div>
+    </div>
+      <p class="plan__for">Muốn cả một thế giới dựng quanh thương hiệu, không món nào lấy từ hàng có sẵn. <span class="plan__note">Mình chỉ nhận mỗi lúc một dự án loại này.</span></p>
+      <div class="plan__body">
+        <figure class="shot">
+          <a href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener"><img src="../media/chom.jpg" width="960" height="600" alt="Chớm" loading="lazy"></a>
+          <figcaption class="k shot__cap">Trang mẫu · <a href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener">Chớm</a></figcaption>
+        </figure>
+        <div class="col"><span class="k">Gồm</span><ul class="plan__list"><li>Thế giới thương hiệu dựng từ đầu</li><li>Câu chuyện, hình ảnh, chuyển động</li><li>3D, âm thanh, ánh sáng khi cần</li></ul></div>
+        <div class="col"><span class="k">Thời gian</span><p>6–10 tuần</p></div>
+      </div>
+      <button class="row" type="button" data-pick="custom"><span class="row__label">Chọn gói Đặt riêng</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
+    </article></li></ol>
+  </section>
+
+  <section class="sect" id="sect-extras">
+    <div class="sect__head"><h2 class="k" id="extrasK">02 — Chăm sóc hằng tháng · Viết nội dung</h2></div>
+    <ol class="extras" id="extras">
+    <li><article class="plan plan--add" id="care">
+      <div class="plan__head">
+      <div><span class="plan__n">04</span><h3 class="plan__name">Chăm sóc hằng tháng</h3></div>
+      <div><span class="k plan__kprice">Giá</span><p class="plan__price">2–4 triệu đồng/tháng</p></div>
+    </div>
+      <p class="plan__for">Sau khi trang lên mạng, mình vẫn lo cho nó chạy ổn và luôn mới. Gói nào cũng thêm được.</p>
+      <div class="plan__body">
+        <div class="col"><span class="k">Gồm</span><ul class="plan__list"><li>Cập nhật nội dung, thay ảnh</li><li>Làm trang khuyến mãi theo mùa</li><li>Theo dõi, giữ trang chạy ổn định</li></ul></div>
+        <div class="col"><span class="k">Giá</span><p>Mức cụ thể tuỳ khối lượng việc mỗi tháng.</p></div>
+      </div>
+      <button class="row" type="button" data-pick="care"><span class="row__label">Thêm chăm sóc hằng tháng</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
+    </article></li>
+    <li><article class="plan plan--add" id="addon">
+      <div class="plan__head">
+      <div><span class="plan__n">05</span><h3 class="plan__name">Viết nội dung</h3></div>
+      <div><span class="k plan__kprice">Giá</span><p class="plan__price">Báo giá riêng</p></div>
+    </div>
+      <p class="plan__for">Chưa có sẵn chữ cho trang thì mình viết giúp.</p>
+      <button class="row" type="button" data-pick="copy"><span class="row__label">Thêm viết nội dung</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
+    </article></li></ol>
+  </section>
+
+  <section class="sect block" id="process"><div class="sect__head"><h2 class="k">03 — Quy trình làm việc</h2></div><ol class="steps"><li><span class="steps__n">01</span><p>Bạn gửi email cho mình: thương hiệu, trang hiện có, thời hạn và ngân sách.</p></li><li><span class="steps__n" data-entry="">02</span><p>Trong 2 ngày làm việc, mình gửi báo giá trọn gói, ghi rõ những việc sẽ làm.</p></li><li><span class="steps__n" data-entry="">03</span><p>Bạn đặt cọc 50%. Mình phác phần đầu trang để bạn duyệt, rồi mới dựng. Sửa tối đa 2 vòng.</p></li><li><span class="steps__n">04</span><p>Thanh toán 50% còn lại khi trang lên mạng, trên tên miền và tài khoản của bạn.</p></li></ol></section>
+
+  <section class="sect block" id="faq"><div class="sect__head"><h2 class="k">04 — Câu hỏi thường gặp</h2></div><div class="faq"><details class="qa"><summary><span class="qa__k">Q1</span><span class="qa__q">Cần chuẩn bị gì trước khi bắt đầu?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Tên thương hiệu, sản phẩm muốn giới thiệu, chữ và ảnh đang có, cùng vài trang web bạn thích. Còn thiếu gì, mình sẽ nói rõ.</p></details><details class="qa"><summary><span class="qa__k">Q2</span><span class="qa__q">Sau khi bàn giao, có sửa trang được nữa không?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Có. Sửa lỗi miễn phí trong 30 ngày sau khi bàn giao. Sau đó, gói chăm sóc hằng tháng lo việc cập nhật chữ, ảnh, trang khuyến mãi.</p></details><details class="qa"><summary><span class="qa__k">Q3</span><span class="qa__q">Trang có chạy tốt và nhanh trên điện thoại không?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Có. Trang nào mình cũng thử trên điện thoại và màn hình lớn trước khi bàn giao. Trang 3D cần vài giây để tải trên điện thoại, nên có màn chờ hiện đúng phần trăm đã tải.</p></details></div></section>
+
+  <section class="sect block" id="terms"><details class="qa qa--terms"><summary><h2 class="k">05 — Điều khoản</h2><i class="qa__sign" aria-hidden="true"></i></summary>
+    <ul class="terms"><li><span>Bạn cung cấp nội dung chữ và hình ảnh. Cần viết hộ thì mình báo giá thêm.</span></li><li><span>Toàn bộ trang và mã nguồn thuộc về bạn.</span></li><li><span>Sửa quá 2 vòng thì mình báo giá trước khi làm.</span></li><li><span>Khách trong nước thanh toán bằng chuyển khoản, khách nước ngoài qua PayPal.</span></li><li><span>Trao đổi qua email shockingmikedesign@gmail.com, cần thì hẹn gọi.</span></li></ul></details></section>
+
+  <section class="sect block" id="contact"><div class="sect__head"><h2 class="k">06 — Chưa chắc gói nào hợp?</h2></div><div class="closing">
+       <div>
+         <p class="block__text">Bạn cứ gửi ngân sách và điều trang cần làm được. Mình sẽ gợi ý gói hợp, kể cả khi gói nhỏ hơn là đủ.</p>
+         <p class="block__mail"><a href="mailto:shockingmikedesign@gmail.com?subject=H%E1%BB%8Fi%20v%E1%BB%81%20landing%20page%20cho%20%5Bt%C3%AAn%20th%C6%B0%C6%A1ng%20hi%E1%BB%87u%5D&amp;body=Ch%C3%A0o%20Mike%2C%0D%0A%0D%0ATh%C6%B0%C6%A1ng%20hi%E1%BB%87u%3A%0D%0ATrang%20hi%E1%BB%87n%20c%C3%B3%20(website%2C%20fanpage%2C%20Shopee%E2%80%A6)%3A%0D%0AC%E1%BA%A7n%20xong%20tr%C6%B0%E1%BB%9Bc%3A%0D%0ANg%C3%A2n%20s%C3%A1ch%3A%0D%0AM%C3%ACnh%20c%E1%BA%A7n%20trang%20l%C3%A0m%20%C4%91%C6%B0%E1%BB%A3c%20g%C3%AC%3A%0D%0A%0D%0A%5BT%C3%AAn%20b%E1%BA%A1n%5D">shockingmikedesign@gmail.com</a></p>
+       </div>
+     </div></section>
+
+  <p class="sheet__by">Designed &amp; built by Shocking Mike</p>
+</main>
+
+<!-- the project form sits on a small receipt printer; "Create estimate" prints the preliminary estimate -->
+<aside class="counter" id="counter" role="dialog" aria-modal="true" aria-labelledby="formTitle" hidden="">
+  <div class="counter__bar"><p class="counter__label" aria-hidden="true">Shocking Mike</p><button class="counter__close" id="counterClose" type="button" data-t="pricing.button.close">Đóng</button></div>
+  <div class="counter__area" id="counterArea">
+    <form class="slip" id="slip" autocomplete="off" novalidate="" onsubmit="return false">
+    <p class="slip__head"><span>Shocking Mike Records</span><span class="mono">BÁO GIÁ SƠ BỘ</span></p>
+    <h2 class="slip__title" id="formTitle">Thông tin dự án</h2>
+    <p class="slip__intro">Điền vài thông tin để tạo báo giá sơ bộ, rồi gửi cho mình.</p>
+    <fieldset class="slip__records">
+      <legend class="slip__label">Gói đã chọn <span>bắt buộc</span></legend>
+      <label><input type="radio" name="plan" value="standard"><span class="slip__name">Tiêu chuẩn</span><span class="slip__price">12–20 triệu đồng</span></label><label><input type="radio" name="plan" value="advanced"><span class="slip__name">Nâng cao</span><span class="slip__price">Từ 40 triệu đồng</span></label><label><input type="radio" name="plan" value="custom"><span class="slip__name">Đặt riêng</span><span class="slip__price">Từ 80 triệu đồng</span></label>
+    </fieldset>
+    <div class="slip__row">
+      <span class="slip__label" id="careLabel">Chăm sóc hằng tháng</span>
+      <div class="stepper" role="group" aria-labelledby="careLabel">
+        <button type="button" id="careMinus" aria-label="−1" disabled="">−</button>
+        <output id="careN" aria-live="polite">Không cần</output>
+        <button type="button" id="carePlus" aria-label="+1">+</button>
+      </div>
+      <span class="slip__price" id="carePrice">2–4 triệu đồng/tháng</span>
+      <small class="slip__hint">Mức cụ thể tuỳ khối lượng việc mỗi tháng.</small>
+    </div>
+    <label class="slip__row slip__toggle">
+      <span class="slip__label">Cần mình viết nội dung</span>
+      <input type="checkbox" id="copyToggle"><span class="switch" aria-hidden="true"></span>
+      <span class="slip__price">báo giá riêng</span>
+    </label>
+    <fieldset class="slip__notes">
+      <label><span>Tên thương hiệu <em>bắt buộc</em></span><input name="brand" maxlength="80" placeholder="Và sản phẩm bạn bán" aria-required="true"></label><label><span>Trang hiện có</span><input name="site" maxlength="80" placeholder="Website, fanpage, Shopee… (nếu có)"></label><label><span>Cần xong trước</span><input name="deadline" maxlength="80" placeholder="Để trống nếu chưa có hạn"></label><label><span>Ngân sách dự kiến</span><input name="budget" maxlength="80" placeholder="Ví dụ: 15–20 triệu"></label>
+    </fieldset>
+    <p class="slip__total"><span>Tổng tạm tính</span><b id="slipTotal">—</b></p>
+    <p class="slip__msg" id="slipMsg" role="alert"></p></form>
+    <div class="paper" id="paper" hidden=""><div class="paper__roll" id="roll"></div></div>
+  </div>
+  <div class="printer">
+    <div class="printer__lip" aria-hidden="true"><i class="printer__slot"></i></div>
+    <div class="printer__face">
+      <span class="printer__brand" aria-hidden="true">SM · TM-7</span>
+      <i class="printer__led" aria-hidden="true"></i>
+      <button class="printer__key" id="printBtn" type="button" data-t="pricing.form.submit">Tạo báo giá sơ bộ</button>
+    </div>
+  </div>
+  <div class="counter__actions" id="actions" hidden="">
+    <a class="btn btn--solid" id="send" href="mailto:shockingmikedesign@gmail.com" data-t="pricing.button.send">Gửi yêu cầu cho Mike</a>
+    <p class="counter__hint" id="sendHint" data-t="pricing.send.hint">Nút này mở ứng dụng email của bạn, có sẵn báo giá trong thư.</p>
+    <p class="counter__hint counter__hint--warn" id="sendFallback" hidden="" data-t="pricing.send.fallback">Không mở được email? Chép báo giá và gửi tới shockingmikedesign@gmail.com.</p>
+    <button class="btn btn--line" id="copyBtn" type="button" data-t="pricing.button.copy">Chép báo giá</button>
+    <button class="btn btn--line" id="printPdf" type="button" data-t="pricing.button.print">In hoặc lưu PDF</button>
+    <button class="btn btn--text" id="again" type="button" data-t="pricing.button.edit">Sửa thông tin</button>
+  </div>
+</aside>
+
+<p class="sr-only" id="live" aria-live="polite"></p>
+<script type="module" src="pricing.js"></script>
+
+
+</body></html>

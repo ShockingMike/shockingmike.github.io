@@ -12,26 +12,26 @@ export const PLAN_ORDER = ['standard', 'advanced', 'custom'];
 export const PACKAGES = {
   standard: {
     id: 'standard',
+     vnd: [12e6, 20e6], 
     
-     usd: [1500, 2500], 
     exampleUrl: 'https://shockingmike.github.io/kern-society/', theme: { bg: '#e8e4da', fg: '#161616' }
   },
   advanced: {
     id: 'advanced',
+     vnd: [40e6, null], 
     
-     usd: [5000, null], 
     exampleUrl: 'https://shockingmike.github.io/rhumb-line/', theme: { bg: '#1e2a35', fg: '#ecdcbc' }
   },
   custom: {
     id: 'custom',
+     vnd: [80e6, null], 
     
-     usd: [10000, null], 
     exampleUrl: 'https://shockingmike.github.io/chom/', theme: { bg: '#e6d3c8', fg: '#3a2030' }
   },
   care: {
     id: 'care',
+     vnd: [2e6, 4e6], 
     
-     usd: [300, 600], 
     max: 12, theme: { bg: '#b6ade0', fg: '#29213f' }
   }
 };
@@ -41,14 +41,14 @@ const P = (lang) => (COPY[lang] || COPY.en).pricing;
 
 /* ---------- money, written the way this copy's language writes it ---------- */
 function money(lang, n) {
-     // dots between thousands
-   if (lang === 'en') return `$${n.toLocaleString('en-US')}`; 
+   if (lang === 'vi') return n.toLocaleString('de-DE');     // dots between thousands
+  
   return String(n);
 }
 /* the mark after the figure, if that language writes one */
 const UNIT = {
+   vi: ' đ', 
   
-   en: '', 
 };
 export function rangeText(lang, lo, hi) {
   const E = P(lang).estimate;

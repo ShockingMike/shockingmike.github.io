@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="vi" class="no-js"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Shocking Mike · Design Engineer ở Việt Nam</title>
+<meta name="description" content="Những trang web mình tự thiết kế, tự code, xếp thành một chồng đĩa. Rút đĩa nào ra cũng có chuyện để kể.">
+<meta name="theme-color" content="#1c1b1f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231c1b1f'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%23ece8e1' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='none' stroke='%23ece8e1' stroke-width='1.6'/%3E%3Ccircle cx='16' cy='16' r='1.3' fill='%23ece8e1'/%3E%3C/svg%3E">
+<script>document.documentElement.classList.replace('no-js', 'js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=JetBrains+Mono:wght@400;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..500&amp;display=swap" media="all" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=JetBrains+Mono:wght@400;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..500&amp;display=swap"></noscript>
+<link rel="stylesheet" href="style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.min.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"
+  }
+}
+</script>
+</head>
+<body>
+<!-- The wait: a record label coming up to 33⅓ turns a minute. It is plain HTML and CSS, so it is on screen
+     before a single script has run; with JavaScript switched off it never appears at all. -->
+<div class="load" id="load">
+  <div class="load__bg" aria-hidden="true"></div>
+  <div class="load__mid">
+    <div class="load__flight">
+      <div class="load__disc" id="loadDisc" aria-hidden="true">
+        <span class="load__paper"><span class="load__smr">SMR</span></span>
+        <span class="load__hole"></span>
+      </div>
+    </div>
+    <div class="load__words">
+      <p class="load__line"><span lang="en">Getting the record up to speed</span><span lang="vi">Đang quay đĩa cho đủ tốc độ</span></p>
+      <p class="load__read" aria-hidden="true"><span class="load__rpm" id="loadRpm">4.0</span> <span class="load__unit">/ <span id="loadTop">33,3</span> rpm</span> <span class="load__pct" id="loadPct">0%</span></p>
+    </div>
+  </div>
+  <p class="sr-only" id="loadLive" role="status" aria-live="polite"></p>
+</div>
+<div class="paint" aria-hidden="true"><div class="paint__fill"></div></div>
+<canvas class="gl" id="gl" aria-hidden="true"></canvas>
+
+<header class="rail" id="rail">
+  <!-- the label's mark: a heading and the way back to the start. data-entry marks it as something the eye lands on. -->
+  <h1 class="rail__mark" data-entry="">
+    <button class="rail__home" id="home" type="button" data-t-label="ui.home" aria-label="Về màn đầu">
+      <span class="rail__disc" aria-hidden="true"></span>
+      <span class="rail__label" data-t="brand.name">Shocking Mike</span>
+    </button>
+  </h1>
+  <!-- the arrow and the ticks are one column with a fixed gap, so they can never run into each other -->
+  <div class="rail__nav">
+    <button class="rail__back" id="back" type="button" data-t-label="ui.back" aria-label="Cất đĩa">
+      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17 10H4M9 4.5 3.5 10 9 15.5" fill="none" stroke="currentColor" stroke-width="2"></path></svg>
+    </button>
+    <nav class="rail__ticks" id="ticks" aria-label="Shocking Mike Records"></nav>
+  </div>
+  <button class="rail__help" id="help" type="button" aria-expanded="false" aria-controls="about" data-t-label="ui.helpLabel" aria-label="Cách xem">?</button>
+</header>
+<div class="top">
+  <a class="top__link" href="bang-gia/" data-t="ui.pricing">Bảng giá</a>
+</div>
+<div class="about" id="about" hidden="">
+  <p class="about__role" id="role"><span>Tự thiết kế, tự code web</span><span>Việt Nam</span></p>
+  <p data-t="ui.help">Mỗi đĩa là một trang web mình làm. Chọn đĩa nào là đọc được chuyện đĩa ấy.</p>
+  <p data-t="brand.note">Thiết kế với code đều một tay mình làm, từ đầu tới cuối. Không dùng mẫu dựng sẵn.</p>
+  <p><a href="bang-gia/" data-t="ui.pricing">Bảng giá</a> · <a href="mailto:shockingmikedesign@gmail.com">shockingmikedesign@gmail.com</a></p>
+  <p class="about__by">Designed &amp; built by Shocking Mike</p>
+</div>
+
+
+<!-- the price flyer at the end of the stack: its words, laid on the paper once it has unfolded -->
+<a class="flyer" id="flyer" href="bang-gia/" data-t-label="ui.flyer.open" aria-label="Mở trang bảng giá">
+  <div class="flyer__sheet" id="flyerSheet"></div>
+</a>
+
+<section class="page" id="page" aria-label="Open record">
+  <div class="page__inner" id="pageInner"></div>
+</section>
+
+<!-- Without 3D (or without JS) this list is the page. With 3D it stays for screen readers. -->
+<main class="shelf" id="shelf">
+  <h1 class="shelf__title">Shocking Mike <span>Tự thiết kế, tự code web · Việt Nam</span></h1>
+  <p class="shelf__note">Thiết kế với code đều một tay mình làm, từ đầu tới cuối. Không dùng mẫu dựng sẵn.</p>
+  <ol class="shelf__list" id="shelfList"><li class="shelf__item"><p class="shelf__cat">SMR 001</p><h2>Kern Society <span>Xưởng font độc lập</span></h2>
+      <p>Font thì phải cho người ta nghịch mới bán được. Nên cái tên to đùng trên cùng chính là đồ chơi: chuột tới gần là chữ đậm lên, giãn ra.</p><p>Khó nhất là cho từng chữ to ra mà cả dòng không tràn khỏi màn hình. Còn font là font thật, miễn phí, mình chỉ đổi tên; bấm nút dùng thử là lộ.</p><p class="shelf__meta">Đã phát hành</p><p class="shelf__links"><a href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener">Vào xem ↗</a> <a href="bang-gia/?pick=standard">Muốn một trang như thế này? Xem bảng giá ↗</a></p></li><li class="shelf__item"><p class="shelf__cat">SMR 002</p><h2>Rhumb Line <span>Lò rang cà phê</span></h2>
+      <p>Hãng cà phê nào cũng kể mình đi xa tìm hạt. Hãng này đi thật, bằng tàu; bạn ngồi bên bàn trong khoang, cùng gom cho đủ sáu loại.</p><p>Mình thích nhất tách cà phê: tàu nghiêng thì nó sóng sánh theo, chậm nửa nhịp, như nước thật. Còn tiếng biển thì không thu âm, máy tạo ra ngay lúc bạn nghe.</p><p class="shelf__meta">Đã phát hành</p><p class="shelf__links"><a href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener">Vào xem ↗</a> <a href="bang-gia/?pick=advanced">Muốn một trang 3D như thế này? Xem bảng giá ↗</a></p></li><li class="shelf__item"><p class="shelf__cat">SMR 003</p><h2>Chớm <span>Xưởng hương Hà Nội</span></h2>
+      <p>Nói là bán nước hoa, chứ thật ra Chớm bán lại cho người Hà Nội một mẩu tuổi thơ của chính họ; cái chai chỉ là cách giao hàng.</p><p>Phố dựng 3D, tô bằng nét cọ thật quét vào máy. Khó nhất lại là cái chai: viền dày hơn chẳng giúp nó nổi lên bao nhiêu, làm thẫm chỗ nó đứng thì được.</p><p class="shelf__meta">Đã phát hành</p><p class="shelf__links"><a href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener">Vào xem ↗</a> <a href="bang-gia/?pick=custom">Muốn một trang làm riêng như thế này? Xem bảng giá ↗</a></p></li><li class="shelf__item"><p class="shelf__cat">SMR 004</p><h2>Studio Kōzō <span>Văn phòng kiến trúc</span></h2>
+      <p class="shelf__meta">Sắp phát hành</p><p class="shelf__links"><a href="bang-gia/">Muốn một trang như thế này? Xem bảng giá ↗</a></p></li><li class="shelf__item"><p class="shelf__cat">SMR 005</p><h2>Hadal <span>Viện hải dương học</span></h2>
+      <p class="shelf__meta">Sắp phát hành</p><p class="shelf__links"><a href="bang-gia/">Muốn một trang như thế này? Xem bảng giá ↗</a></p></li><li class="shelf__item"><p class="shelf__cat">SMR 006</p><h2>Perihelion <span>Du lịch vũ trụ</span></h2>
+      <p class="shelf__meta">Sắp phát hành</p><p class="shelf__links"><a href="bang-gia/">Muốn một trang như thế này? Xem bảng giá ↗</a></p></li></ol>
+  <section class="shelf__prices" id="shelfPrices"><h2>Bảng giá</h2>
+    <p><b>Tiêu chuẩn</b> 12–20 triệu đồng · Cần một trang chỉn chu lên mạng sớm, có một chỗ khiến khách dừng lại nghịch thử.</p><p><b>Nâng cao</b> Từ 40 triệu đồng · Muốn khách ở lại trang và đi xem một vòng.</p><p><b>Đặt riêng</b> Từ 80 triệu đồng · Muốn cả một thế giới dựng quanh thương hiệu, không món nào lấy từ hàng có sẵn.</p>
+    <p><b>Chăm sóc hằng tháng</b> 2–4 triệu đồng/tháng</p>
+    <p><a href="bang-gia/">Xem bảng giá đầy đủ ↗</a></p></section>
+  <p class="shelf__foot"><a href="bang-gia/">Bảng giá</a> · <a href="mailto:shockingmikedesign@gmail.com">shockingmikedesign@gmail.com</a></p>
+  <p class="shelf__by">Designed &amp; built by Shocking Mike</p>
+</main>
+
+<!-- "Watch preview": the demo on the record's colour -->
+<section class="listen" id="listen" role="dialog" aria-modal="true" aria-labelledby="listenTitle" hidden="">
+  <button class="listen__back" id="listenBack" type="button" data-t-label="ui.back" aria-label="Cất đĩa">
+    <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17 10H4M9 4.5 3.5 10 9 15.5" fill="none" stroke="currentColor" stroke-width="2"></path></svg>
+  </button>
+  <div class="listen__grid">
+    <figure class="listen__demo" id="listenDemo"></figure>
+    <div class="listen__text">
+      <h2 class="listen__title" id="listenTitle"></h2>
+      <p class="listen__for" id="listenFor"></p>
+      <hr class="page__rule">
+      <p class="listen__body" id="listenBody"></p>
+      <ul class="rows" id="listenRows"></ul>
+    </div>
+  </div>
+</section>
+
+<p class="sr-only" id="live" aria-live="polite"></p>
+<script type="module" src="js/main.js"></script>
+
+
+</body></html>

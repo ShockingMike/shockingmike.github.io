@@ -560,8 +560,8 @@ function houseBand(ctx, S, rec) {
 /* The words on a sealed record's sticker come from the page (rec.soon). This is only the net underneath, for
    a tool that paints a cover without the page's words; each published copy keeps just its own line. */
 const SOON = {
-   en: 'Coming soon', 
   
+   vi: 'Sắp phát hành', 
 };
 export const soonLabel = (rec) => String((rec && rec.soon) || Object.values(SOON)[0] || '');
 

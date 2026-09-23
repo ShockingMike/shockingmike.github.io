@@ -1,24 +1,16 @@
 <!doctype html>
-<html lang="en" class="no-js">
-<head>
+<html lang="en" class="no-js"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Shocking Mike · Design Engineer</title>
 <meta name="description" content="Sites I designed and coded myself, stacked like records. Pull one out and it tells you how it was made.">
 <meta name="theme-color" content="#1c1b1f">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231c1b1f'/%3E%3Ccircle cx='16' cy='16' r='11' fill='none' stroke='%23ece8e1' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='4.5' fill='none' stroke='%23ece8e1' stroke-width='1.6'/%3E%3Ccircle cx='16' cy='16' r='1.3' fill='%23ece8e1'/%3E%3C/svg%3E">
-<script>
-  document.documentElement.classList.replace('no-js', 'js');
-  try {
-    var q = new URLSearchParams(location.search).get('lang');
-    var l = (q === 'vi' || q === 'en') ? q : localStorage.getItem('smr-lang');
-    if (l === 'vi' || l === 'en') document.documentElement.lang = l;
-  } catch (e) {}
-</script>
+<script>document.documentElement.classList.replace('no-js', 'js');</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=JetBrains+Mono:wght@400;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..500&amp;display=swap" media="print" onload="this.media='all'">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin="">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=JetBrains+Mono:wght@400;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..500&amp;display=swap" media="all" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&amp;family=JetBrains+Mono:wght@400;600&amp;family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..500&amp;display=swap"></noscript>
 <link rel="stylesheet" href="style.css">
 <script type="importmap">
@@ -54,7 +46,7 @@
 
 <header class="rail" id="rail">
   <!-- the label's mark: a heading and the way back to the start. data-entry marks it as something the eye lands on. -->
-  <h1 class="rail__mark" data-entry>
+  <h1 class="rail__mark" data-entry="">
     <button class="rail__home" id="home" type="button" data-t-label="ui.home" aria-label="Back to the start">
       <span class="rail__disc" aria-hidden="true"></span>
       <span class="rail__label" data-t="brand.name">Shocking Mike</span>
@@ -63,7 +55,7 @@
   <!-- the arrow and the ticks are one column with a fixed gap, so they can never run into each other -->
   <div class="rail__nav">
     <button class="rail__back" id="back" type="button" data-t-label="ui.back" aria-label="Put it back">
-      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17 10H4M9 4.5 3.5 10 9 15.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+      <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17 10H4M9 4.5 3.5 10 9 15.5" fill="none" stroke="currentColor" stroke-width="2"></path></svg>
     </button>
     <nav class="rail__ticks" id="ticks" aria-label="Shocking Mike Records"></nav>
   </div>
@@ -71,19 +63,18 @@
 </header>
 <div class="top">
   <a class="top__link" href="pricing/" data-t="ui.pricing">Prices</a>
-  <button class="lang" id="lang" type="button" data-t="ui.langToggle" data-t-label="ui.langToggleAria" aria-label="Read this page in Vietnamese">Tiếng Việt</button>
 </div>
-<div class="about" id="about" hidden>
+<div class="about" id="about" hidden="">
   <p class="about__role" id="role"><span>Design Engineer in Vietnam</span></p>
   <p data-t="ui.help">Every record here is a site I made. Pick one to read how it came together.</p>
-  <p data-t="brand.note">Design and code are both mine, start to finish. No templates, no page builders.</p>
+  <p data-t="brand.note">Design and code are both mine, start to finish, without templates or page builders.</p>
   <p><a href="pricing/" data-t="ui.pricing">Prices</a> · <a href="mailto:shockingmikedesign@gmail.com">shockingmikedesign@gmail.com</a></p>
   <p class="about__by">Designed &amp; built by Shocking Mike</p>
 </div>
 
 
 <!-- the price flyer at the end of the stack: its words, laid on the paper once it has unfolded -->
-<a class="flyer" id="flyer" href="pricing/" aria-label="Prices">
+<a class="flyer" id="flyer" href="pricing/" data-t-label="ui.flyer.open" aria-label="Open the pricing page">
   <div class="flyer__sheet" id="flyerSheet"></div>
 </a>
 
@@ -94,37 +85,26 @@
 <!-- Without 3D (or without JS) this list is the page. With 3D it stays for screen readers. -->
 <main class="shelf" id="shelf">
   <h1 class="shelf__title">Shocking Mike <span>Design Engineer in Vietnam</span></h1>
-  <p class="shelf__note">Design and code are both mine, start to finish. No templates, no page builders.</p>
-  <ol class="shelf__list" id="shelfList">
-    <li class="shelf__item"><p class="shelf__cat">SMR 001</p><h2>Kern Society <span>Independent type foundry</span></h2>
-      <p>Fonts sell when you get to play with them. So the name on the front page is the demo: letters thicken and stretch as your cursor gets close.</p>
-      <p class="shelf__links"><a href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener">Visit the site ↗</a> <a href="pricing/?pick=standard">Want a page like this? See pricing ↗</a></p></li>
-    <li class="shelf__item"><p class="shelf__cat">SMR 002</p><h2>Rhumb Line <span>Coffee roasters</span></h2>
-      <p>Coffee brands love to say they travel for their beans. This one actually sails. You sit at the desk in the ship’s cabin and help fill a six-slot sample chest.</p>
-      <p class="shelf__links"><a href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener">Visit the site ↗</a> <a href="pricing/?pick=advanced">Want a 3D page like this? See pricing ↗</a></p></li>
-    <li class="shelf__item"><p class="shelf__cat">SMR 003</p><h2>Chớm <span>Hanoi perfumery</span></h2>
-      <p>Officially, it sells perfume. Really, it sells people in Hanoi back a piece of their childhood; the bottle is just the delivery. Out soon.</p>
-      <p class="shelf__links"><a href="pricing/?pick=custom">Want a fully custom page like this? See pricing ↗</a></p></li>
-    <li class="shelf__item"><p class="shelf__cat">SMR 004</p><h2>Studio Kōzō <span>Architecture studio</span></h2><p>Coming soon.</p></li>
-    <li class="shelf__item"><p class="shelf__cat">SMR 005</p><h2>Hadal <span>Oceanography institute</span></h2><p>Coming soon.</p></li>
-    <li class="shelf__item"><p class="shelf__cat">SMR 006</p><h2>Perihelion <span>Space travel</span></h2><p>Coming soon.</p></li>
-  </ol>
-  <section class="shelf__prices" id="shelfPrices">
-    <h2>Prices</h2>
-    <p><b>Standard</b> $1,500–2,500 · For brands that need a polished page live in a few weeks.</p>
-    <p><b>Advanced</b> From $5,000 · For brands that want visitors to stay longer.</p>
-    <p><b>Custom</b> From $10,000 · For brands that want everything made just for them.</p>
+  <p class="shelf__note">Design and code are both mine, start to finish, without templates or page builders.</p>
+  <ol class="shelf__list" id="shelfList"><li class="shelf__item"><p class="shelf__cat">SMR 001</p><h2>Kern Society <span>Independent type foundry</span></h2>
+      <p>Fonts sell when you get to play with them. So the name at the top of the page is the demo: letters thicken and stretch as your cursor gets close.</p><p>The fonts are real and free. I only gave them new names, and the Trial fonts button gives the game away.</p><p class="shelf__meta">Out now</p><p class="shelf__links"><a href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener">Visit the site ↗</a> <a href="pricing/?pick=standard">Want a page like this? See prices ↗</a></p></li><li class="shelf__item"><p class="shelf__cat">SMR 002</p><h2>Rhumb Line <span>Coffee roasters</span></h2>
+      <p>Coffee brands love to say they travel for their beans. This one actually sails. You sit at the desk in the ship’s cabin and help fill a six-slot sample chest.</p><p>The coffee in the cup is a tiny physics sim, so it sloshes a beat behind the ship.</p><p class="shelf__meta">Out now</p><p class="shelf__links"><a href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener">Visit the site ↗</a> <a href="pricing/?pick=advanced">Want a 3D page like this? See prices ↗</a></p></li><li class="shelf__item"><p class="shelf__cat">SMR 003</p><h2>Chớm <span>Hanoi perfumery</span></h2>
+      <p>Officially, it sells perfume. Really, it sells people in Hanoi back a piece of their childhood; the bottle is just the delivery.</p><p>The streets are 3D, painted with scanned brush strokes. The bottle kept vanishing into the painting. A thicker outline barely helped; darkening whatever it stood on did.</p><p class="shelf__meta">Out now</p><p class="shelf__links"><a href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener">Visit (in Vietnamese) ↗</a> <a href="pricing/?pick=custom">Want a fully custom page like this? See prices ↗</a></p></li><li class="shelf__item"><p class="shelf__cat">SMR 004</p><h2>Studio Kōzō <span>Architecture studio</span></h2>
+      <p class="shelf__meta">Coming soon</p><p class="shelf__links"><a href="pricing/">Want a page like this? See prices ↗</a></p></li><li class="shelf__item"><p class="shelf__cat">SMR 005</p><h2>Hadal <span>Oceanography institute</span></h2>
+      <p class="shelf__meta">Coming soon</p><p class="shelf__links"><a href="pricing/">Want a page like this? See prices ↗</a></p></li><li class="shelf__item"><p class="shelf__cat">SMR 006</p><h2>Perihelion <span>Space travel</span></h2>
+      <p class="shelf__meta">Coming soon</p><p class="shelf__links"><a href="pricing/">Want a page like this? See prices ↗</a></p></li></ol>
+  <section class="shelf__prices" id="shelfPrices"><h2>Prices</h2>
+    <p><b>Standard</b> $1,500–2,500 · You need a sharp page live soon, with one moment people stop to play with.</p><p><b>Advanced</b> From $5,000 · You want people to stay on the page and look around.</p><p><b>Custom</b> From $10,000 · You want a world built around your brand, with nothing taken off the shelf.</p>
     <p><b>Monthly care</b> $300–600/month</p>
-    <p><a href="pricing/">See full pricing ↗</a></p>
-  </section>
+    <p><a href="pricing/">See all prices ↗</a></p></section>
   <p class="shelf__foot"><a href="pricing/">Prices</a> · <a href="mailto:shockingmikedesign@gmail.com">shockingmikedesign@gmail.com</a></p>
   <p class="shelf__by">Designed &amp; built by Shocking Mike</p>
 </main>
 
 <!-- "Watch preview": the demo on the record's colour -->
-<section class="listen" id="listen" role="dialog" aria-modal="true" aria-labelledby="listenTitle" hidden>
+<section class="listen" id="listen" role="dialog" aria-modal="true" aria-labelledby="listenTitle" hidden="">
   <button class="listen__back" id="listenBack" type="button" data-t-label="ui.back" aria-label="Put it back">
-    <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17 10H4M9 4.5 3.5 10 9 15.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+    <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true"><path d="M17 10H4M9 4.5 3.5 10 9 15.5" fill="none" stroke="currentColor" stroke-width="2"></path></svg>
   </button>
   <div class="listen__grid">
     <figure class="listen__demo" id="listenDemo"></figure>
@@ -140,5 +120,6 @@
 
 <p class="sr-only" id="live" aria-live="polite"></p>
 <script type="module" src="js/main.js"></script>
-</body>
-</html>
+
+
+</body></html>
