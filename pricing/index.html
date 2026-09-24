@@ -37,95 +37,139 @@
     <p class="note" id="heroNote">Your quote is a fixed price for the scope it sets out. Every package works smoothly on phones.</p>
   </section>
 
-  <!-- the index strip: every price at a glance, one straight column of figures -->
-  <section class="glance">
-    <span class="k glance__k" id="glanceK" data-entry="">Price</span>
-    <ol class="summary" id="summary"><li><a class="sum" href="#plan-standard" data-go="plan-standard"><span class="sum__n">01</span><span class="sum__name">Standard</span><span class="sum__time">2–3 weeks</span><span class="sum__price">$1,500–2,500</span></a></li><li><a class="sum" href="#plan-advanced" data-go="plan-advanced"><span class="sum__n">02</span><span class="sum__name">Advanced</span><span class="sum__time">4–6 weeks</span><span class="sum__price">From $5,000</span></a></li><li><a class="sum" href="#plan-custom" data-go="plan-custom"><span class="sum__n">03</span><span class="sum__name">Custom</span><span class="sum__time">6–10 weeks</span><span class="sum__price">From $10,000</span></a></li></ol>
-    <span class="k glance__k" id="glanceAddK" data-entry="">Monthly care · Copywriting</span>
-    <ol class="summary" id="summaryAdd"><li><a class="sum sum--add" href="#care" data-go="care"><span class="sum__n">04</span><span class="sum__name">Monthly care</span><span class="sum__time"></span><span class="sum__price">$300–600/month</span></a></li><li><a class="sum sum--add" href="#addon" data-go="addon"><span class="sum__n">05</span><span class="sum__name">Copywriting</span><span class="sum__time"></span><span class="sum__price">Quoted separately</span></a></li></ol>
-  </section>
+  <!-- the three packages side by side: a table of figures, set the way a newspaper sets one -->
+  <section class="compare" id="compare" aria-labelledby="cmpCap">
+    <h2 class="sr-only" id="cmpCap">The three packages side by side</h2>
+    <div class="cards"><article class="card" data-plan="standard">
+      <div class="card__head"><h3 class="card__name">Standard</h3></div>
+      <p class="card__price"><b>$1,500–2,500</b></p>
+      <p class="card__time">2–3 weeks</p>
+      <p class="card__fit">A clean, clear page to run ads to or send to customers</p>
+      <ul class="card__list"><li class="card__lead"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>One memorable moment</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Up to 6 sections</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>2 rounds of revisions</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>30 days of free bug fixes</span></li></ul>
+      <div class="card__foot"><a class="row row--line" href="#plan-standard" data-go="plan-standard"><span class="row__label">See details</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></a></div>
+    </article><article class="card is-pick" data-plan="advanced">
+      <div class="card__head"><h3 class="card__name">Advanced</h3><span class="card__tag">What I recommend</span></div>
+      <p class="card__price">From <b>$5,000</b></p>
+      <p class="card__time">4–6 weeks</p>
+      <p class="card__fit">A story worth hearing, and visitors who stay to explore</p>
+      <ul class="card__list"><li class="card__lead"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>A place to explore</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Up to 10 sections</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Story planned with you</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>3 rounds of revisions</span></li></ul>
+      <div class="card__foot"><a class="row" href="#plan-advanced" data-go="plan-advanced"><span class="row__label">See details</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></a></div>
+    </article><article class="card" data-plan="custom">
+      <div class="card__head"><h3 class="card__name">Custom</h3></div>
+      <p class="card__price">From <b>$10,000</b></p>
+      <p class="card__time">6–10 weeks</p>
+      <p class="card__fit">A big picture no template can hold</p>
+      <ul class="card__list"><li class="card__lead"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>A world</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Own art direction</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>4 rounds of revisions</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>60 days of free bug fixes</span></li></ul>
+      <div class="card__foot"><a class="row row--line" href="#plan-custom" data-go="plan-custom"><span class="row__label">See details</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></a></div>
+    </article></div>
+    <div class="cmpwrap">
+      <h2 class="cmp__title" id="cmpTitle">Compare packages</h2>
+      <div class="cmp__tabs" role="group" aria-label="Compare packages"><button class="cmp__tab" type="button" data-show="standard" aria-pressed="false"><span class="cmp__tabname">Standard</span><span class="cmp__tabprice">$1,500–2,500</span></button><button class="cmp__tab" type="button" data-show="advanced" aria-pressed="true"><span class="cmp__tabname">Advanced</span><span class="cmp__tabprice">From $5,000</span></button><button class="cmp__tab" type="button" data-show="custom" aria-pressed="false"><span class="cmp__tabname">Custom</span><span class="cmp__tabprice">From $10,000</span></button></div>
+      <table class="cmp" data-show="advanced" aria-labelledby="cmpTitle">
+        <colgroup><col class="cmp__labcol"><col><col><col></colgroup>
+        <thead><tr><td class="cmp__corner"></td><th class="cmp__c" data-plan="standard" scope="col"><span class="cmp__name">Standard</span><span class="cmp__price">$1,500–2,500</span><a class="cmp__go" href="#plan-standard" data-go="plan-standard">See details<span aria-hidden="true"> →</span></a></th><th class="cmp__c" data-plan="advanced" scope="col"><span class="cmp__name">Advanced</span><span class="cmp__price">From $5,000</span><a class="cmp__go" href="#plan-advanced" data-go="plan-advanced">See details<span aria-hidden="true"> →</span></a></th><th class="cmp__c" data-plan="custom" scope="col"><span class="cmp__name">Custom</span><span class="cmp__price">From $10,000</span><a class="cmp__go" href="#plan-custom" data-go="plan-custom">See details<span aria-hidden="true"> →</span></a></th></tr></thead>
+        <tbody><tr class="cmp__group"><th scope="rowgroup" class="cmp__gname" colspan="4" data-entry=""><span class="cmp__t">The page</span></th></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Experience</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">One memorable moment</span></td><td class="cmp__c" data-plan="advanced"><span class="cmp__t">A place to explore</span></td><td class="cmp__c" data-plan="custom"><span class="cmp__t">A world</span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Sections</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">up to 6</span></td><td class="cmp__c" data-plan="advanced"><span class="cmp__t">up to 10</span></td><td class="cmp__c" data-plan="custom"><span class="cmp__t">as the story needs</span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Sample page</span></th><td class="cmp__c" data-plan="standard"><a href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener">Kern Society</a></td><td class="cmp__c" data-plan="advanced"><a href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener">Rhumb Line</a></td><td class="cmp__c" data-plan="custom"><a href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener">Chớm</a></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Loading screen with real progress</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Background sound, with a mute button</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">when needed</span></td><td class="cmp__c" data-plan="advanced"><span class="cmp__t">where it fits</span></td><td class="cmp__c" data-plan="custom"><span class="cmp__t">where it fits</span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Own art direction</span></th><td class="cmp__c" data-plan="standard"><span class="sr-only">not included</span></td><td class="cmp__c" data-plan="advanced"><span class="sr-only">not included</span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr></tbody><tbody><tr class="cmp__group"><th scope="rowgroup" class="cmp__gname" colspan="4" data-entry=""><span class="cmp__t">How we work</span></th></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Story planned with you</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">a sketch of the opening to approve</span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Rounds of revisions</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">2</span></td><td class="cmp__c" data-plan="advanced"><span class="cmp__t">3</span></td><td class="cmp__c" data-plan="custom"><span class="cmp__t">4</span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Free bug fixes after launch</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">30 days</span></td><td class="cmp__c" data-plan="advanced"><span class="cmp__t">30 days</span></td><td class="cmp__c" data-plan="custom"><span class="cmp__t">60 days</span></td></tr></tbody><tbody><tr class="cmp__group"><th scope="rowgroup" class="cmp__gname" colspan="4" data-entry=""><span class="cmp__t">Every package</span></th></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Designed from scratch, no templates</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Works on phone, tablet and desktop</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">A lighter version for older phones</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Gentle motion across the page</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">A contact or order form that reaches your inbox</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Basic SEO and a proper image when shared</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Your own domain, free hosting, visitor stats</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Every account in your name</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Full source code handed over</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="included"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr></tbody>
+      </table>
+    </div>
+    <div class="addons">
+      <article class="addon-box">
+      <h3 class="addon-box__name">Monthly care</h3>
+      <p class="addon-box__price">$300–600/month</p>
+      <p class="addon-box__text">Text and photo updates, seasonal sections, and keeping the page running well as browsers change. We agree the scope together.</p>
+      <a class="addon-box__go" href="#care" data-go="care">See details<span aria-hidden="true"> →</span></a>
+    </article>
+      <article class="addon-box">
+      <h3 class="addon-box__name">Copywriting</h3>
+      <p class="addon-box__price">Quoted separately</p>
+      <p class="addon-box__text">No words for the page yet? I can write them. <span class="addon-box__note">You provide the text</span></p>
+      <a class="addon-box__go" href="#addon" data-go="addon">See details<span aria-hidden="true"> →</span></a>
+    </article>
+    </div></section>
 
   <section class="sect" id="sect-plans">
     <div class="sect__head"><h2 class="k" id="plansK">01 — Packages</h2></div>
-    <ol class="plans" id="plans"><li><article class="plan" id="plan-standard" data-plan="standard">
+    <ol class="plans" id="plans"><li><article class="plan plan--pkg" id="plan-standard" data-plan="standard">
       <div class="plan__head">
-      <div><span class="plan__n">01</span><h3 class="plan__name">Standard</h3></div>
-      <div><span class="k plan__kprice">Price</span><p class="plan__price">$1,500–2,500</p></div>
-    </div>
-      <p class="plan__for">You need a sharp page live soon, with one moment people stop to play with.</p>
-      <div class="plan__body">
-        <figure class="shot">
-          <a href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener"><img src="../media/kern-society.jpg" width="960" height="600" alt="Kern Society"></a>
-          <figcaption class="k shot__cap">Sample page · <a href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener">Kern Society</a></figcaption>
-        </figure>
-        <div class="col"><span class="k">Includes</span><ul class="plan__list"><li>One landing page built to sell</li><li>One custom interactive highlight</li><li>A 3D opening scene or scroll effect</li></ul></div>
-        <div class="col"><span class="k">Timeline</span><p>2–3 weeks</p></div>
+        <span class="plan__n">01</span>
+        <div class="plan__title"><h3 class="plan__name">Standard</h3></div>
+        <p class="plan__price"><b>$1,500–2,500</b></p>
       </div>
-      <button class="row" type="button" data-pick="standard"><span class="row__label">Choose Standard</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
-    </article></li><li><article class="plan" id="plan-advanced" data-plan="advanced">
+      <figure class="shot">
+      <div class="browser">
+        <div class="browser__bar" aria-hidden="true"><i></i><i></i><i></i><span class="browser__url">shockingmike.github.io/kern-society</span></div>
+        <div class="browser__view" data-film="../media/kern-society.mp4"><img src="../media/kern-society.jpg" width="960" height="600" alt="Kern Society · Sample page" loading="lazy" decoding="async"></div>
+      </div>
+    </figure>
+      <div class="plan__body">
+        <p class="k plan__kicker" data-entry="">One memorable moment</p>
+        <p class="plan__for">If you just need a clean, clear page to run ads to or send to customers, this is enough. I won’t suggest paying for more than you need.</p>
+        <ul class="facts"><li><b>2–3</b><span>weeks</span></li><li><b>6</b><span>sections at most</span></li><li><b>2</b><span>rounds of revisions</span></li><li><b>30</b><span>days of free bug fixes</span></li></ul>
+        <div class="plan__acts"><button class="row" type="button" data-pick="standard"><span class="row__label">Choose Standard</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button><a class="row row--ink" href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener"><span class="row__label">See sample page</span><span class="row__arrow"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></a></div>
+      </div>
+    </article></li><li><article class="plan plan--pkg plan--flip" id="plan-advanced" data-plan="advanced">
       <div class="plan__head">
-      <div><span class="plan__n">02</span><h3 class="plan__name">Advanced</h3></div>
-      <div><span class="k plan__kprice">Price</span><p class="plan__price">From $5,000</p></div>
-    </div>
-      <p class="plan__for">You want people to stay on the page and look around.</p>
-      <div class="plan__body">
-        <figure class="shot">
-          <a href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener"><img src="../media/rhumb-line.jpg" width="960" height="600" alt="Rhumb Line" loading="lazy"></a>
-          <figcaption class="k shot__cap">Sample page · <a href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener">Rhumb Line</a></figcaption>
-        </figure>
-        <div class="col"><span class="k">Includes</span><ul class="plan__list"><li>A 3D page visitors can explore</li><li>Your brand story guides the way</li><li>Sound and lighting where they fit</li></ul></div>
-        <div class="col"><span class="k">Timeline</span><p>4–6 weeks</p></div>
+        <span class="plan__n">02</span>
+        <div class="plan__title"><h3 class="plan__name">Advanced</h3><span class="card__tag">What I recommend</span></div>
+        <p class="plan__price">From <b>$5,000</b></p>
       </div>
-      <button class="row" type="button" data-pick="advanced"><span class="row__label">Choose Advanced</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
-    </article></li><li><article class="plan" id="plan-custom" data-plan="custom">
+      <figure class="shot">
+      <div class="browser">
+        <div class="browser__bar" aria-hidden="true"><i></i><i></i><i></i><span class="browser__url">shockingmike.github.io/rhumb-line</span></div>
+        <div class="browser__view" data-film="../media/rhumb-line.mp4"><img src="../media/rhumb-line.jpg" width="960" height="600" alt="Rhumb Line · Sample page" loading="lazy" decoding="async"></div>
+      </div>
+    </figure>
+      <div class="plan__body">
+        <p class="k plan__kicker" data-entry="">A place to explore</p>
+        <p class="plan__for">If your brand has a story worth hearing — what makes you different, why you’re worth more — an ordinary scrolling page runs out of room to tell it. This package turns that story into a place visitors step into, explore, and remember. It’s the one I recommend for most brands.</p>
+        <ul class="facts"><li><b>4–6</b><span>weeks</span></li><li><b>10</b><span>sections at most</span></li><li><b>3</b><span>rounds of revisions</span></li><li><b>30</b><span>days of free bug fixes</span></li></ul>
+        <div class="plan__acts"><button class="row" type="button" data-pick="advanced"><span class="row__label">Choose Advanced</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button><a class="row row--ink" href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener"><span class="row__label">See sample page</span><span class="row__arrow"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></a></div>
+      </div>
+    </article></li><li><article class="plan plan--pkg" id="plan-custom" data-plan="custom">
       <div class="plan__head">
-      <div><span class="plan__n">03</span><h3 class="plan__name">Custom</h3></div>
-      <div><span class="k plan__kprice">Price</span><p class="plan__price">From $10,000</p></div>
-    </div>
-      <p class="plan__for">You want a world built around your brand, with nothing taken off the shelf. <span class="plan__note">I take one of these at a time.</span></p>
-      <div class="plan__body">
-        <figure class="shot">
-          <a href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener"><img src="../media/chom.jpg" width="960" height="600" alt="Chớm" loading="lazy"></a>
-          <figcaption class="k shot__cap">Sample page · <a href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener">Chớm</a></figcaption>
-        </figure>
-        <div class="col"><span class="k">Includes</span><ul class="plan__list"><li>A brand world built from scratch</li><li>Story, visuals and motion</li><li>3D, sound and lighting as needed</li></ul></div>
-        <div class="col"><span class="k">Timeline</span><p>6–10 weeks</p></div>
+        <span class="plan__n">03</span>
+        <div class="plan__title"><h3 class="plan__name">Custom</h3></div>
+        <p class="plan__price">From <b>$10,000</b></p>
       </div>
-      <button class="row" type="button" data-pick="custom"><span class="row__label">Choose Custom</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
+      <figure class="shot">
+      <div class="browser">
+        <div class="browser__bar" aria-hidden="true"><i></i><i></i><i></i><span class="browser__url">shockingmike.github.io/chom</span></div>
+        <div class="browser__view browser__view--trim" data-film="../media/chom.mp4"><img src="../media/chom.jpg" width="960" height="600" alt="Chớm · Sample page" loading="lazy" decoding="async"></div>
+      </div>
+    </figure>
+      <div class="plan__body">
+        <p class="k plan__kicker" data-entry="">A world</p>
+        <p class="plan__for">For when you have a big picture in mind that no template can hold. It doesn’t stop at one space: the visual style, every scene, every movement is made for your brand alone, joined into one complete story. I work with you from the first idea until it looks the way you pictured it.</p>
+        <ul class="facts"><li><b>6–10</b><span>weeks</span></li><li><b>4</b><span>rounds of revisions</span></li><li><b>60</b><span>days of free bug fixes</span></li></ul>
+        <div class="plan__acts"><button class="row" type="button" data-pick="custom"><span class="row__label">Choose Custom</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button><a class="row row--ink" href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener"><span class="row__label">See sample page</span><span class="row__arrow"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></a></div>
+      </div>
     </article></li></ol>
+    <!-- what every package has, said once under all three -->
+    <div class="shared" id="shared"><h3 class="k shared__k">Not included (quoted separately)</h3>
+    <ul class="shared__nots"><li>online checkout</li><li>a blog or self-editing system</li><li>extra pages</li><li>extra languages</li><li>photography</li><li>logo and brand identity</li><li>the domain and third-party fees</li></ul>
+    <p class="shared__fine">You provide the text. Copywriting is quoted separately.</p></div>
   </section>
 
   <section class="sect" id="sect-extras">
     <div class="sect__head"><h2 class="k" id="extrasK">02 — Monthly care · Copywriting</h2></div>
-    <ol class="extras" id="extras">
-    <li><article class="plan plan--add" id="care">
-      <div class="plan__head">
-      <div><span class="plan__n">04</span><h3 class="plan__name">Monthly care</h3></div>
-      <div><span class="k plan__kprice">Price</span><p class="plan__price">$300–600/month</p></div>
-    </div>
-      <p class="plan__for">After launch, I keep the page up to date and running. Add it to any package.</p>
-      <div class="plan__body">
-        <div class="col"><span class="k">Includes</span><ul class="plan__list"><li>Text updates and photo swaps</li><li>Seasonal promotion pages</li><li>Monitoring to keep the page running</li></ul></div>
-        <div class="col"><span class="k">Price</span><p>The exact rate depends on how much work each month needs.</p></div>
-      </div>
-      <button class="row" type="button" data-pick="care"><span class="row__label">Add monthly care</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
-    </article></li>
-    <li><article class="plan plan--add" id="addon">
-      <div class="plan__head">
-      <div><span class="plan__n">05</span><h3 class="plan__name">Copywriting</h3></div>
-      <div><span class="k plan__kprice">Price</span><p class="plan__price">Quoted separately</p></div>
-    </div>
+    <ol class="extras" id="extras"><li><article class="plan plan--add" id="care">
+      <h3 class="plan__name">Monthly care</h3>
+      <p class="plan__price"><b>$300–600</b>/month</p>
+      <p class="plan__for">Text and photo updates, seasonal sections, and keeping the page running well as browsers change. We agree the scope together.</p>
+      <div class="plan__acts"><button class="row" type="button" data-pick="care"><span class="row__label">Add monthly care</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button></div>
+    </article></li><li><article class="plan plan--add" id="addon">
+      <h3 class="plan__name">Copywriting</h3>
+      <p class="plan__price plan__price--word">Quoted separately</p>
       <p class="plan__for">No words for the page yet? I can write them.</p>
-      <button class="row" type="button" data-pick="copy"><span class="row__label">Add copywriting</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
+      <div class="plan__acts"><button class="row" type="button" data-pick="copy"><span class="row__label">Add copywriting</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button></div>
     </article></li></ol>
   </section>
 
-  <section class="sect block" id="process"><div class="sect__head"><h2 class="k">03 — How it works</h2></div><ol class="steps"><li><span class="steps__n">01</span><p>You email me your brand, current website, deadline and budget.</p></li><li><span class="steps__n" data-entry="">02</span><p>Within 2 working days, I send a fixed quote with exactly what’s included.</p></li><li><span class="steps__n" data-entry="">03</span><p>You pay 50% upfront. I sketch the opening section for approval, then build. Up to 2 rounds of changes.</p></li><li><span class="steps__n">04</span><p>The page goes live on your domain and account; you pay the other 50%.</p></li></ol></section>
+  <section class="sect block" id="process"><div class="sect__head"><h2 class="k">03 — How it works</h2></div><ol class="steps"><li><span class="steps__n">01</span><p>You email me your brand, current website, deadline and budget.</p></li><li><span class="steps__n" data-entry="">02</span><p>Within 2 working days, I send a fixed quote with exactly what’s included.</p></li><li><span class="steps__n" data-entry="">03</span><p>You pay 50% upfront. I sketch the opening section for approval, then build. The number of revision rounds depends on the package.</p></li><li><span class="steps__n">04</span><p>The page goes live on your domain and account; you pay the other 50%.</p></li></ol></section>
 
-  <section class="sect block" id="faq"><div class="sect__head"><h2 class="k">04 — Common questions</h2></div><div class="faq"><details class="qa"><summary><span class="qa__k">Q1</span><span class="qa__q">What do I need to prepare?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Your brand name, the product to feature, any text and photos you have, and a few websites you like. I’ll tell you if anything’s missing.</p></details><details class="qa"><summary><span class="qa__k">Q2</span><span class="qa__q">Can the page be changed after handover?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Yes. Free bug fixes for 30 days after launch. After that, monthly care covers updates and seasonal pages.</p></details><details class="qa"><summary><span class="qa__k">Q3</span><span class="qa__q">Will it work well and load fast on phones?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Yes. I test every page on phones and large monitors before handover. 3D pages take a few seconds to load on a phone, so they open with a loading screen that shows real progress.</p></details></div></section>
+  <section class="sect block" id="faq"><div class="sect__head"><h2 class="k">04 — Common questions</h2></div><div class="faq"><details class="qa"><summary><span class="qa__k">Q1</span><span class="qa__q">What do I need to prepare?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Your brand name, the product to feature, any text and photos you have, and a few websites you like. I’ll tell you if anything’s missing.</p></details><details class="qa"><summary><span class="qa__k">Q2</span><span class="qa__q">Can the page be changed after handover?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Yes. Free bug fixes for 30 or 60 days after launch, depending on the package. After that, monthly care covers updates and seasonal pages.</p></details><details class="qa"><summary><span class="qa__k">Q3</span><span class="qa__q">Will it work well and load fast on phones?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Yes. I test every page on phones and large monitors before handover. 3D pages take a few seconds to load on a phone, so they open with a loading screen that shows real progress.</p></details></div></section>
 
   <section class="sect block" id="terms"><details class="qa qa--terms"><summary><h2 class="k">05 — Terms</h2><i class="qa__sign" aria-hidden="true"></i></summary>
-    <ul class="terms"><li><span>You provide the text and images. Copywriting is quoted separately.</span></li><li><span>The finished page and all its source code belong to you.</span></li><li><span>Changes beyond 2 rounds are quoted before any work begins.</span></li><li><span>Payment by bank transfer in Vietnam, or PayPal from abroad.</span></li><li><span>We work over email at shockingmikedesign@gmail.com, with calls when needed.</span></li></ul></details></section>
+    <ul class="terms"><li><span>You provide the text and images. Copywriting is quoted separately.</span></li><li><span>The finished page and all its source code belong to you.</span></li><li><span>Changes beyond your package’s rounds of revisions are quoted before any work begins.</span></li><li><span>Payment by bank transfer in Vietnam, or PayPal from abroad.</span></li><li><span>We work over email at shockingmikedesign@gmail.com, with calls when needed.</span></li></ul></details></section>
 
   <section class="sect block" id="contact"><div class="sect__head"><h2 class="k">06 — Not sure which package fits?</h2></div><div class="closing">
        <div>
@@ -157,7 +201,6 @@
         <button type="button" id="carePlus" aria-label="+1">+</button>
       </div>
       <span class="slip__price" id="carePrice">$300–600/month</span>
-      <small class="slip__hint">The exact rate depends on how much work each month needs.</small>
     </div>
     <label class="slip__row slip__toggle">
       <span class="slip__label">I need copywriting</span>

@@ -414,8 +414,11 @@ async function boot() {
     const P = t.pricing;
     return [l, { eyebrow: t.ui.flyer.eyebrow, title: t.ui.flyer.title, more: t.ui.flyer.more, year: '2026',
       labels: { plan: P.label.plan, care: P.care.name, timeline: P.label.timeline, example: P.label.example },
-      rows: PLAN_ORDER.map((id) => ({ name: P.plans[id].name, for: P.plans[id].for, price: P.plans[id].price, timeline: P.plans[id].timeline, example: P.plans[id].example })),
-      care: { name: P.care.name, price: P.care.price, for: P.care.description } }];
+      // a flyer has room for one line a package: the first thing each one includes is what it is, in a few words
+      rows: PLAN_ORDER.map((id) => ({ name: P.plans[id].name, for: P.plans[id].includes[0], price: P.plans[id].price, timeline: P.plans[id].timeline, example: P.plans[id].example })),
+      // and one line for care too: the first sentence of its description, what the care is (the second is how
+      // the scope gets agreed, which belongs on the pricing page, not squeezed under a price)
+      care: { name: P.care.name, price: P.care.price, for: P.care.description.split(/(?<=\.)\s/)[0] } }];
   }));
   stage = await mod.createStage({ canvas: $('#gl'), records, images, credits, flyerPrint, onFrame, onState, onCue, onFlyer: () => toPricing(), onStep: (n) => load.step(n) });
   clearTimeout(guard);

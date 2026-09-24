@@ -917,6 +917,13 @@ function wrapLines(ctx, text, maxW) {
   const words = text.split(/\s+/); const lines = []; let line = '';
   for (const wd of words) { const cand = line ? `${line} ${wd}` : wd; if (ctx.measureText(cand).width > maxW && line) { lines.push(line); line = wd; } else line = cand; }
   if (line) lines.push(line);
+  // no word left alone on the last line: the one before it comes down to keep it company
+  const n = lines.length;
+  if (n >= 2 && !/\s/.test(lines[n - 1]) && /\s/.test(lines[n - 2])) {
+    const cut = lines[n - 2].lastIndexOf(' ');
+    const moved = `${lines[n - 2].slice(cut + 1)} ${lines[n - 1]}`;
+    if (ctx.measureText(moved).width <= maxW) { lines[n - 1] = moved; lines[n - 2] = lines[n - 2].slice(0, cut); }
+  }
   return lines;
 }
 
@@ -998,8 +1005,8 @@ export function flyerPanelPrinted(W, H, k, n, print) {
       ctx.fillText(row.price, R, yName);
       ctx.textAlign = 'left';
     }
-    // the line about who it is for: it is never cut off. It wraps, and if the wrap does not fit the space left on
-    // the panel, the type steps down until every word is on the sheet.
+    // the one line under the name — what the package is: it is never cut off. It wraps, and if the wrap does not
+    // fit the space left on the panel, the type steps down until every word is on the sheet.
     const room = (Hu - 34) - (yName + 20);
     let fp = Hu > 150 ? 17 : 15;
     let lines2 = [];

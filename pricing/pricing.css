@@ -99,29 +99,77 @@ body { animation: pageIn 0.45s ease both; }
 .hero__lead { margin: 0; max-width: 30em; font: 400 22px/1.5 var(--serif); }
 .note { margin: 0; padding-left: var(--gut); border-left: 1px solid var(--rule); font: 400 16.5px/1.6 var(--serif); color: var(--ink-soft); }
 
-/* ---------- the index strip: every price at a glance, one straight column of figures ---------- */
-.glance { margin: 34px 0 0; }
 .k { font: 600 13px/1.5 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft); }
-.glance__k { display: block; margin: 0 0 7px; }
-.summary { list-style: none; margin: 0; padding: 0; border-top: 2px solid var(--ink-p); }
-.summary li { border-bottom: 1px solid var(--rule); }
-.summary + .glance__k { margin-top: 22px; }
-.sum {
-  display: grid; grid-template-columns: 44px minmax(0, 1fr) 160px 300px; align-items: baseline; gap: 0 22px;
-  padding: 11px 0 13px; color: inherit; text-decoration: none; transition: background-color 0.2s ease;
+
+/* ---------- the three packages: cards, the full comparison, two add-on boxes ---------- */
+.compare { margin: 46px 0 0; }
+/* the cards: one mould, a 1px rule round each, square corners, a 20px gutter */
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+.card { display: flex; flex-direction: column; min-width: 0; padding: 26px 26px 28px; border: 1px solid var(--rule-2); background: var(--paper-2); }
+.card__head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.card__name { margin: 0; font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1.1; letter-spacing: -0.015em; }
+.card__tag { font: 600 13px/1 var(--sans); letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-p); padding: 5px 8px 4px; border: 1px solid var(--ink-p); border-radius: 2px; }
+/* the price is the biggest thing on the card; the words round the figure are small and quiet */
+.card__price { margin: 18px 0 0; font: 400 17px/1.1 var(--serif); color: var(--ink-soft); }
+.card__price b { font-family: var(--display); font-weight: 700; font-size: 44px; line-height: 1; letter-spacing: -0.02em; color: var(--do); font-variant-numeric: lining-nums; }
+.card__time { margin: 10px 0 0; font: 500 13px/1.4 var(--mono); letter-spacing: 0.04em; color: var(--ink-soft); }
+.card__fit { margin: 12px 0 0; min-height: 3em; font: italic 400 16.5px/1.5 var(--serif); }   /* two lines kept, so the lists of the three cards start level */
+.card__list { margin: 20px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--rule-2); }
+.card__list li { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: baseline; padding: 8px 0 9px; border-bottom: 1px solid var(--rule); font: 400 16.5px/1.45 var(--serif); }
+.card__list li svg { position: relative; top: 1px; color: var(--ink-p); }
+.card__lead span { font-style: italic; }
+.card__foot { margin-top: auto; padding-top: 24px; }
+.card__foot .row { margin: 0; width: 100%; justify-content: center; }
+.row.row--line { background: transparent; color: var(--do); box-shadow: inset 0 0 0 1.5px var(--do); }
+.row.row--line:hover { background: rgba(168, 52, 28, 0.07); }
+
+/* the full comparison: its own heading, a head that stays put while the table scrolls past */
+.cmpwrap { margin: 64px 0 0; }
+.cmp__title { margin: 0 0 18px; font-family: var(--display); font-weight: 700; font-size: 34px; line-height: 1.1; letter-spacing: -0.015em; }
+.cmp { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; font-variant-numeric: lining-nums tabular-nums; }
+.cmp__labcol { width: 34%; }
+.cmp th, .cmp td { padding: 0; vertical-align: middle; text-align: left; font-weight: 400; }
+.cmp thead > tr > * { position: sticky; top: 0; z-index: 2; background: var(--paper); border-top: 2px solid var(--ink-p); border-bottom: 1px solid var(--ink-p); padding: 14px 16px 14px; vertical-align: bottom; }
+.cmp thead .cmp__c { text-align: center; border-left: 1px solid var(--rule); }
+.cmp__name { display: block; font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1.15; }
+.cmp__price { display: block; margin-top: 4px; font-family: var(--display); font-weight: 700; font-size: 16px; line-height: 1.2; color: var(--do); }
+.cmp__go { display: inline-block; margin-top: 9px; font: 600 13px/1.4 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-p); text-decoration: none; border-bottom: 1px solid currentColor; }
+.cmp__go:hover { color: var(--do); }
+/* groups: a name in small capitals on its own line */
+.cmp .cmp__gname { padding: 30px 0 10px; border-bottom: 1px solid var(--rule-2); font: 600 13px/1.5 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft); }
+/* rows: even height, a hairline under each, thin rules between the package columns */
+.cmp tbody tr:not(.cmp__group) > * { height: 48px; padding: 9px 16px 10px; border-bottom: 1px solid var(--rule); font: 400 16.5px/1.4 var(--serif); }
+.cmp tbody tr:not(.cmp__group) > .cmp__label { padding-left: 0; }
+.cmp td.cmp__c { text-align: center; border-left: 1px solid var(--rule); }
+.cmp__c a { color: inherit; text-underline-offset: 3px; }
+.tick { display: inline-block; line-height: 1; vertical-align: -1px; color: var(--ink-p); }
+.cmp__note { display: block; margin-top: 3px; font: italic 400 14px/1.35 var(--serif); color: var(--ink-soft); }
+.cmp__tabs { display: none; }
+/* while the order form covers the page, nothing behind it needs to stay pinned */
+.has-counter .cmp thead > tr > *, .has-counter .cmp__tabs { position: static; }
+
+/* care and copywriting: two small boxes of one mould under the table */
+.addons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin: 56px 0 0; }
+.addon-box { padding: 24px 26px 26px; border: 1px solid var(--rule-2); background: var(--paper-2); }
+.addon-box__name { margin: 0; font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1.15; }
+.addon-box__price { margin: 8px 0 0; font-family: var(--display); font-weight: 700; font-size: 20px; line-height: 1.2; color: var(--do); }
+.addon-box__text { margin: 12px 0 0; max-width: 36em; font: 400 16.5px/1.55 var(--serif); }
+.addon-box__note { color: var(--ink-soft); }
+.addon-box__go { display: inline-block; margin-top: 16px; font: 600 13px/1.4 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-p); text-decoration: none; border-bottom: 1px solid currentColor; }
+.addon-box__go:hover { color: var(--do); }
+
+/* narrower than three cards can hold: the cards stack, the recommended one first */
+@media (max-width: 980px) {
+  .cards { grid-template-columns: minmax(0, 1fr); }
+  .card.is-pick { order: -1; }
+  .card__fit { min-height: 0; }
 }
-.sum:hover { background: rgba(23, 21, 15, 0.05); }
-.sum:focus-visible { outline-offset: -3px; }
-.sum__n { font: 500 13px/1.5 var(--mono); letter-spacing: 0.06em; color: var(--ink-soft); }
-.sum__name { font-family: var(--display); font-weight: 700; font-size: 25px; line-height: 1.2; letter-spacing: -0.015em; }
-.sum__time { font: 400 15px/1.5 var(--sans); color: var(--ink-soft); white-space: nowrap; }
-.sum__price { justify-self: end; text-align: right; font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1.2; letter-spacing: -0.02em; color: var(--do); font-variant-numeric: tabular-nums; white-space: nowrap; }
-.sum--add .sum__time { visibility: hidden; }
 
 /* ---------- section head ---------- */
 .sect { padding-top: 62px; }
 /* các phần cuối: giãn đúng chỗ nào một màn hình sắp quá tải chữ */
 @media (min-width: 701px) {
+  #sect-extras { padding-top: 150px; }
   #process { padding-top: 160px; }
   #faq { padding-top: 185px; }
   #terms { padding-top: 56px; }
@@ -131,32 +179,71 @@ body { animation: pageIn 0.45s ease both; }
 .sect__head .k { flex: 0 1 auto; min-width: 0; }
 .sect__head::after { content: ''; flex: 1 1 auto; height: 1px; background: var(--rule-2); }
 
-/* ---------- one package = one story across the whole sheet ---------- */
+/* ---------- one package = one block: the sample page running beside the words (s2-luat.txt) ----------
+   The frame takes 56% of the sheet's width and swaps sides from one package to the next. Beside it, top to
+   bottom: number, name (+ the small tag on the recommended one), price, the experience in small capitals,
+   Mike's paragraph, a row of big figures, two buttons. On a narrow sheet the frame moves between the price
+   and the paragraph, so a visitor meets the name, the price, then the page itself. */
 .plans, .extras { list-style: none; margin: 0; padding: 0; }
-.plans > li + li, .extras > li + li { margin-top: 50px; }
-.plan { padding: 20px 0 0; border-top: 2px solid var(--ink-p); scroll-margin-top: 88px; }
+.plans > li + li { margin-top: 96px; }
+.plan { padding: 30px 0 0; border-top: 2px solid var(--ink-p); scroll-margin-top: 88px; }
 .plan.is-picked { background: rgba(23, 21, 15, 0.045); box-shadow: 0 0 0 16px rgba(23, 21, 15, 0.045); }
-.plan__head { display: grid; grid-template-columns: minmax(0, 1fr) 360px; align-items: baseline; column-gap: var(--gut); }
-.plan__head > * { min-width: 0; }
-.plan__n { display: block; font: 500 13px/1.5 var(--mono); letter-spacing: 0.08em; color: var(--ink-soft); margin-bottom: 4px; }
-.plan__name { margin: 0; font-family: var(--display); font-weight: 900; font-size: clamp(44px, 6.6vw, 96px); line-height: 0.95; letter-spacing: -0.035em; }
-.plan__kprice { display: block; text-align: right; margin-bottom: 5px; }
-.plan__price { margin: 0; text-align: right; font-family: var(--display); font-weight: 700; font-size: 48px; line-height: 1.05; letter-spacing: -0.025em; color: var(--do); font-variant-numeric: tabular-nums; }
-.plan__for { margin: 14px 0 0; max-width: 30em; font: italic 400 21px/1.5 var(--serif); }
-.plan__note { font-style: normal; color: var(--ink-soft); }
+.plan--pkg {
+  display: grid; column-gap: 64px;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+  grid-template-rows: 1fr auto auto 1fr;
+  grid-template-areas: "shot ." "shot head" "shot body" "shot .";
+}
+.plan--flip { grid-template-columns: minmax(0, 1fr) minmax(0, 1.45fr); grid-template-areas: ". shot" "head shot" "body shot" ". shot"; }
+.plan--pkg > * { min-width: 0; }
+.plan__head { grid-area: head; }
+.plan__body { grid-area: body; }
+.plan__n { display: block; margin-bottom: 8px; font: 500 13px/1.5 var(--mono); letter-spacing: 0.08em; color: var(--ink-soft); }
+.plan__title { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 14px; }
+.plan__name { margin: 0; font-family: var(--display); font-weight: 900; font-size: 56px; line-height: 1; letter-spacing: -0.03em; }
+/* the price: the figures big in the second ink, the words round them small and quiet (as on the cards) */
+.plan__price { margin: 14px 0 0; font: 400 17px/1.1 var(--serif); color: var(--ink-soft); }
+.plan__price b { font-family: var(--display); font-weight: 700; font-size: 44px; line-height: 1; letter-spacing: -0.02em; color: var(--do); font-variant-numeric: lining-nums; }
+.plan__price--word { font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1.15; color: var(--do); }
+.plan__kicker { margin: 26px 0 0; color: var(--ink-p); }
+.plan__for { margin: 10px 0 0; max-width: 31em; font: 400 18.5px/1.55 var(--serif); text-wrap: pretty; }
+.plan__note { color: var(--ink-soft); }
+/* the figures: printed big in ink, a small label under each; three or four across */
+.facts { margin: 26px 0 0; padding: 16px 0 0; list-style: none; border-top: 1px solid var(--rule-2);
+  display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); column-gap: 18px; }
+.facts li { display: flex; flex-direction: column; gap: 6px; }
+.facts b { font-family: var(--display); font-weight: 700; font-size: 38px; line-height: 1; letter-spacing: -0.02em; color: var(--ink-p); font-variant-numeric: lining-nums tabular-nums; white-space: nowrap; }
+.facts span { font: 600 13px/1.3 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-soft); text-wrap: balance; }
+.plan__acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+/* two buttons side by side in the text column: a little tighter than the order line elsewhere, so they fit on one line */
+.plan__acts .row { margin: 0; gap: 8px; padding: 0 18px; font-size: 13.5px; letter-spacing: 0.06em; }
+.row.row--ink { background: transparent; color: var(--ink-p); box-shadow: inset 0 0 0 1.5px var(--ink-p); }
+.row.row--ink:hover { background: rgba(23, 21, 15, 0.06); }
 
-/* the columns of the story: the picture with its caption, the particulars beside it */
-.plan__body { display: grid; grid-template-columns: 400px minmax(0, 1fr) 230px; column-gap: var(--gut); align-items: start; margin: 22px 0 0; padding-top: 18px; border-top: 1px solid var(--rule-2); }
-.plan__body > * { min-width: 0; }
-.shot { margin: 0; display: block; }
-.shot img { display: block; width: 100%; height: auto; background: var(--paper-2); border: 1px solid rgba(0, 0, 0, 0.18); }
-.shot__cap { margin: 9px 0 0; display: block; }
-.shot__cap a { text-underline-offset: 3px; }
-.col > .k { display: block; padding-bottom: 7px; border-bottom: 1px solid var(--ink-p); margin-bottom: 11px; }
-.plan__list { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
-.plan__list li { position: relative; padding-left: 20px; font: 400 17px/1.5 var(--serif); }
-.plan__list li::before { content: ''; position: absolute; left: 1px; top: 0.72em; width: 11px; height: 1.5px; background: currentColor; opacity: 0.55; }
-.col p { margin: 0; font: 400 17px/1.5 var(--serif); }
+/* the sample page in a thin browser frame: one hairline round it, three rings and the address in the bar */
+.shot { grid-area: shot; align-self: center; margin: 0; }
+.browser { border: 1px solid var(--ink-p); background: var(--paper-2); }
+.browser__bar { position: relative; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-bottom: 1px solid var(--ink-p); }
+.browser__bar i { flex: none; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--rule-2); }
+.browser__url { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font: 500 13px/1 var(--mono); letter-spacing: 0.02em; color: var(--ink-soft); white-space: nowrap; }
+.browser__view { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #111; }
+.browser__view img, .browser__view video { position: absolute; inset: 0; display: block; width: 100%; height: 100%; object-fit: cover; }
+/* the video waits, invisible, over the still until its first frame is actually playing */
+.browser__view video { opacity: 0; transition: opacity 0.45s ease; }
+.browser__view video.is-live { opacity: 1; }
+/* the Chom recording carries a 12px strip of the browser's scroll bar at its right edge: scaled just past it */
+.browser__view--trim img, .browser__view--trim video { transform: scale(1.0127); transform-origin: 0 0; }
+
+/* what no package covers: the small print under the three blocks. A hairline, not the heavy rule a package
+   stands under, so it reads as the small print of all three rather than a fourth package. */
+.shared { margin: 64px 0 0; padding-top: 16px; border-top: 1px solid var(--rule-2); max-width: 46em; }
+.shared__k { margin: 0 0 6px; }
+.shared__fine { margin: 10px 0 0; font: 400 16.5px/1.6 var(--serif); color: var(--ink-soft); }
+/* what is not included: a real list, set as one run of words with dots between, the way it reads aloud */
+.shared__nots { margin: 2px 0 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; column-gap: 9px;
+  font: 400 16.5px/1.6 var(--serif); color: var(--ink-soft); }
+/* the dot trails each word rather than leading the next, so a line never starts with one */
+.shared__nots li:not(:last-child)::after { content: '·'; margin-left: 9px; }
 
 /* the order line at the foot of the story: the one button, in the second ink */
 .row {
@@ -168,9 +255,15 @@ body { animation: pageIn 0.45s ease both; }
 .row:hover { background: #8d2b16; }
 .row:focus-visible { outline-color: var(--ink-p); }
 .row__arrow { display: grid; place-items: center; }
-.plan--add .plan__name { font-size: clamp(32px, 4vw, 54px); }
-.plan--add .plan__price { font-size: 38px; }
-.plan--add .plan__body { grid-template-columns: minmax(0, 1fr) 230px; }
+/* care and copywriting: the same words and buttons as a package, smaller, no picture, side by side */
+.extras { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 64px; align-items: stretch; }
+.extras > li { display: flex; }
+.plan--add { flex: 1; display: flex; flex-direction: column; }
+.plan--add .plan__name { font-size: 40px; }
+.plan--add .plan__price { margin-top: 12px; }
+.plan--add .plan__price b { font-size: 34px; }
+.plan--add .plan__for { margin-top: 14px; }
+.plan--add .plan__acts { margin-top: auto; padding-top: 24px; }
 
 /* ---------- the back of the sheet: short items, small type, hairlines ---------- */
 .steps { margin: 0; padding: 0; list-style: none; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--gut); }
@@ -338,15 +431,20 @@ body { animation: pageIn 0.45s ease both; }
 @media (max-width: 1180px) {
   :root { --pad: 52px; --gut: 34px; }
   .sheet { margin: 14px 18px 36px; }
-  .plan__body { grid-template-columns: 320px minmax(0, 1fr) 200px; }
-  .plan__head { grid-template-columns: minmax(0, 1fr) 300px; }
-  .sum { grid-template-columns: 38px minmax(0, 1fr) 130px 250px; }
-  .sum__price { font-size: 27px; }
-  .plan__price { font-size: 42px; }
+  .plan--pkg { column-gap: 44px; }
+  .plan__name { font-size: 50px; }
+  /* a narrower column beside the frame: the figures two by two */
+  .facts { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 16px; }
+}
+/* too narrow for the frame and the words side by side: name and price, then the page, then the words */
+@media (max-width: 980px) {
+  .plan--pkg, .plan--flip { grid-template-columns: minmax(0, 1fr); grid-template-rows: none; grid-template-areas: "head" "shot" "body"; }
+  .plan--pkg .shot { margin-top: 24px; }
+  .plan__kicker { margin-top: 24px; }
+  .facts { grid-auto-flow: column; grid-template-columns: none; max-width: 40em; }
+  .plans > li + li { margin-top: 80px; }
 }
 @media (max-width: 900px) {
-  .plan__body { grid-template-columns: 300px minmax(0, 1fr); row-gap: 26px; }
-  .plan__body .col:last-child { grid-column: 2; }
   .steps { grid-template-columns: minmax(0, 1fr); }
   .steps li:nth-child(-n+2) { border-top: 1px solid var(--rule); padding-top: 20px; }
   .steps li:first-child { border-top: 0; padding-top: 0; }
@@ -358,6 +456,7 @@ body { animation: pageIn 0.45s ease both; }
 
 /* ---------- phone ---------- */
 @media (max-width: 700px) {
+
   :root { --pad: 20px; --gut: 20px; }
   .bar { padding: 10px 12px; grid-template-columns: auto 1fr auto; gap: 8px; }
   .bar__name { visibility: hidden; }
@@ -370,29 +469,31 @@ body { animation: pageIn 0.45s ease both; }
   .hero__lead { font-size: 18.5px; max-width: none; }
   .note { font-size: 16.5px; }
 
-  .glance { margin-top: 150px; }
   #sect-extras { padding-top: 230px; }
   #process { padding-top: 150px; }
   #faq { padding-top: 200px; }
   #terms { padding-top: 60px; }
   #contact { padding-top: 280px; }
-  .sum { grid-template-columns: 30px minmax(0, 1fr); grid-template-areas: "n name" ". time" ". price"; row-gap: 2px; column-gap: 12px; padding: 12px 0 14px; }
-  .sum__n { grid-area: n; }
-  .sum__name { grid-area: name; justify-self: start; font-size: 21px; }
-  .sum__time { grid-area: time; justify-self: start; }
-  .sum__price { grid-area: price; justify-self: start; text-align: left; font-size: 27px; margin-top: 2px; }
-  .sum--add .sum__time { display: none; }
 
   .sect { padding-top: 46px; }
-  .plans > li + li { margin-top: 18px; }
-  .extras > li + li { margin-top: 180px; }
-  .plan__head { grid-template-columns: minmax(0, 1fr); row-gap: 8px; }
-  .plan__kprice { text-align: left; margin-bottom: 2px; }
-  .plan__price { text-align: left; font-size: 34px; }
-  .plan--add .plan__price { font-size: 30px; }
-  .plan__for { font-size: 18px; max-width: none; }
-  .plan__body { grid-template-columns: minmax(0, 1fr); row-gap: 22px; }
-  .plan__body .col:last-child { grid-column: auto; }
+  .plans > li + li { margin-top: 64px; }
+  .plan { padding-top: 22px; }
+  .plan__name { font-size: 42px; }
+  .plan__price b { font-size: 36px; }
+  .plan--add .plan__name { font-size: 32px; }
+  .plan--add .plan__for { font-size: 17px; }
+  /* the small print gets its own screen, apart from the last package's paragraph */
+  .shared { margin-top: 150px; }
+  .plan--add .plan__price b { font-size: 30px; }
+  .plan__for { font-size: 18px; max-width: none; text-wrap: wrap; }
+  .plan--pkg .shot { margin-top: 20px; }
+  /* a phone: the figures two by two, the two buttons one under the other at full width */
+  .facts { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 16px; }
+  .facts b { font-size: 34px; }
+  .browser__bar { height: 30px; }
+  .browser__bar i { display: none; }
+  .plan__acts { flex-direction: column; gap: 10px; margin-top: 24px; }
+  .extras { grid-template-columns: minmax(0, 1fr); row-gap: 64px; }
   .row { width: 100%; justify-content: space-between; margin-top: 20px; }
 
   .steps li { grid-template-columns: 64px minmax(0, 1fr); column-gap: 14px; padding: 100px 0 102px; }
@@ -413,6 +514,32 @@ body { animation: pageIn 0.45s ease both; }
   .slip__notes label { grid-template-columns: 1fr; gap: 2px; }
   .paper { width: calc(100% - 12px); }
   .printer { margin: 0 10px; }
+  /* a phone: the cards stack (the recommended one first); the table shows one package at a time, chosen with
+     the three buttons over it, which stay at the top while the table scrolls past. Without JavaScript all three
+     columns stay. */
+  .cmp__tabs { position: sticky; top: 0; z-index: 3; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--paper); border-top: 2px solid var(--ink-p); }
+  .cmp__tab { appearance: none; margin: 0; border: 0; border-bottom: 1px solid var(--ink-p); background: none; color: var(--ink-soft);
+    padding: 10px 8px 11px; text-align: left; font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; }
+  .cmp__tab[aria-pressed="true"] { color: var(--ink-p); box-shadow: inset 0 -3px 0 var(--ink-p); }
+  .cmp__tabname { font-family: var(--display); font-weight: 700; font-size: 17px; line-height: 1.15; }
+  .cmp__tabprice { margin-top: 4px; font-family: var(--display); font-weight: 700; font-size: 14px; line-height: 1.2; color: var(--do); }
+  .js .cmp thead { display: none; }
+  .js .cmp { table-layout: auto; }
+  .js .cmp col { display: none; }
+  .js .cmp .cmp__label { width: 50%; }
+  .js .cmp .cmp__c { display: none; width: 50%; border-left: 0; }
+  .js .cmp[data-show="standard"] .cmp__c[data-plan="standard"],
+  .js .cmp[data-show="advanced"] .cmp__c[data-plan="advanced"],
+  .js .cmp[data-show="custom"] .cmp__c[data-plan="custom"] { display: table-cell; }
+  .cmp tbody tr:not(.cmp__group) > * { height: 46px; padding: 9px 10px 10px; font-size: 16px; }
+  .cmp .cmp__gname { padding-top: 24px; }
+  .cmp__title { font-size: 28px; }
+  .card { padding: 22px 20px 24px; }
+  .card__price b { font-size: 40px; }
+  .addons { grid-template-columns: minmax(0, 1fr); }
+  /* on a phone the two boxes become two ruled entries at full width, so their sentence has room to run */
+  .addon-box { padding: 18px 0 20px; border-width: 2px 0 0; border-color: var(--ink-p); background: none; }
+  .addons { gap: 28px; }
 }
 /* print or save as PDF: only the estimate */
 @media print {

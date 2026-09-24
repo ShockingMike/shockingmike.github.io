@@ -37,95 +37,139 @@
     <p class="note" id="heroNote">Giá trọn gói, tính theo phạm vi công việc ghi trong báo giá. Gói nào cũng chạy tốt trên điện thoại.</p>
   </section>
 
-  <!-- the index strip: every price at a glance, one straight column of figures -->
-  <section class="glance">
-    <span class="k glance__k" id="glanceK" data-entry="">Giá</span>
-    <ol class="summary" id="summary"><li><a class="sum" href="#plan-standard" data-go="plan-standard"><span class="sum__n">01</span><span class="sum__name">Tiêu chuẩn</span><span class="sum__time">2–3 tuần</span><span class="sum__price">12–20 triệu đồng</span></a></li><li><a class="sum" href="#plan-advanced" data-go="plan-advanced"><span class="sum__n">02</span><span class="sum__name">Nâng cao</span><span class="sum__time">4–6 tuần</span><span class="sum__price">Từ 40 triệu đồng</span></a></li><li><a class="sum" href="#plan-custom" data-go="plan-custom"><span class="sum__n">03</span><span class="sum__name">Đặt riêng</span><span class="sum__time">6–10 tuần</span><span class="sum__price">Từ 80 triệu đồng</span></a></li></ol>
-    <span class="k glance__k" id="glanceAddK" data-entry="">Chăm sóc hằng tháng · Viết nội dung</span>
-    <ol class="summary" id="summaryAdd"><li><a class="sum sum--add" href="#care" data-go="care"><span class="sum__n">04</span><span class="sum__name">Chăm sóc hằng tháng</span><span class="sum__time"></span><span class="sum__price">2–4 triệu đồng/tháng</span></a></li><li><a class="sum sum--add" href="#addon" data-go="addon"><span class="sum__n">05</span><span class="sum__name">Viết nội dung</span><span class="sum__time"></span><span class="sum__price">Báo giá riêng</span></a></li></ol>
-  </section>
+  <!-- the three packages side by side: a table of figures, set the way a newspaper sets one -->
+  <section class="compare" id="compare" aria-labelledby="cmpCap">
+    <h2 class="sr-only" id="cmpCap">Ba gói đặt cạnh nhau</h2>
+    <div class="cards"><article class="card" data-plan="standard">
+      <div class="card__head"><h3 class="card__name">Tiêu chuẩn</h3></div>
+      <p class="card__price"><b>12–20</b> triệu đồng</p>
+      <p class="card__time">2–3 tuần</p>
+      <p class="card__fit">Cần một trang đẹp, rõ ràng để chạy quảng cáo hay gửi khách</p>
+      <ul class="card__list"><li class="card__lead"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Một khoảnh khắc đáng nhớ</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Tối đa 6 mục</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>2 vòng sửa</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Sửa lỗi miễn phí 30 ngày</span></li></ul>
+      <div class="card__foot"><a class="row row--line" href="#plan-standard" data-go="plan-standard"><span class="row__label">Xem chi tiết</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></a></div>
+    </article><article class="card is-pick" data-plan="advanced">
+      <div class="card__head"><h3 class="card__name">Nâng cao</h3><span class="card__tag">Gói mình khuyên</span></div>
+      <p class="card__price">Từ <b>40</b> triệu đồng</p>
+      <p class="card__time">4–6 tuần</p>
+      <p class="card__fit">Có câu chuyện đáng nghe, muốn khách ở lại khám phá</p>
+      <ul class="card__list"><li class="card__lead"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Một nơi để khám phá</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Tối đa 10 mục</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Lên kịch bản trang cùng bạn</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>3 vòng sửa</span></li></ul>
+      <div class="card__foot"><a class="row" href="#plan-advanced" data-go="plan-advanced"><span class="row__label">Xem chi tiết</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></a></div>
+    </article><article class="card" data-plan="custom">
+      <div class="card__head"><h3 class="card__name">Đặt riêng</h3></div>
+      <p class="card__price">Từ <b>80</b> triệu đồng</p>
+      <p class="card__time">6–10 tuần</p>
+      <p class="card__fit">Có hình dung lớn mà không khuôn nào chứa nổi</p>
+      <ul class="card__list"><li class="card__lead"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Một thế giới</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Chỉ đạo hình ảnh riêng</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>4 vòng sửa</span></li><li><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg><span>Sửa lỗi miễn phí 60 ngày</span></li></ul>
+      <div class="card__foot"><a class="row row--line" href="#plan-custom" data-go="plan-custom"><span class="row__label">Xem chi tiết</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></a></div>
+    </article></div>
+    <div class="cmpwrap">
+      <h2 class="cmp__title" id="cmpTitle">So sánh chi tiết</h2>
+      <div class="cmp__tabs" role="group" aria-label="So sánh chi tiết"><button class="cmp__tab" type="button" data-show="standard" aria-pressed="false"><span class="cmp__tabname">Tiêu chuẩn</span><span class="cmp__tabprice">12–20 triệu đồng</span></button><button class="cmp__tab" type="button" data-show="advanced" aria-pressed="true"><span class="cmp__tabname">Nâng cao</span><span class="cmp__tabprice">Từ 40 triệu đồng</span></button><button class="cmp__tab" type="button" data-show="custom" aria-pressed="false"><span class="cmp__tabname">Đặt riêng</span><span class="cmp__tabprice">Từ 80 triệu đồng</span></button></div>
+      <table class="cmp" data-show="advanced" aria-labelledby="cmpTitle">
+        <colgroup><col class="cmp__labcol"><col><col><col></colgroup>
+        <thead><tr><td class="cmp__corner"></td><th class="cmp__c" data-plan="standard" scope="col"><span class="cmp__name">Tiêu chuẩn</span><span class="cmp__price">12–20 triệu đồng</span><a class="cmp__go" href="#plan-standard" data-go="plan-standard">Xem chi tiết<span aria-hidden="true"> →</span></a></th><th class="cmp__c" data-plan="advanced" scope="col"><span class="cmp__name">Nâng cao</span><span class="cmp__price">Từ 40 triệu đồng</span><a class="cmp__go" href="#plan-advanced" data-go="plan-advanced">Xem chi tiết<span aria-hidden="true"> →</span></a></th><th class="cmp__c" data-plan="custom" scope="col"><span class="cmp__name">Đặt riêng</span><span class="cmp__price">Từ 80 triệu đồng</span><a class="cmp__go" href="#plan-custom" data-go="plan-custom">Xem chi tiết<span aria-hidden="true"> →</span></a></th></tr></thead>
+        <tbody><tr class="cmp__group"><th scope="rowgroup" class="cmp__gname" colspan="4" data-entry=""><span class="cmp__t">Trang</span></th></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Trải nghiệm</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">Một khoảnh khắc đáng nhớ</span></td><td class="cmp__c" data-plan="advanced"><span class="cmp__t">Một nơi để khám phá</span></td><td class="cmp__c" data-plan="custom"><span class="cmp__t">Một thế giới</span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Số mục</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">tối đa 6</span></td><td class="cmp__c" data-plan="advanced"><span class="cmp__t">tối đa 10</span></td><td class="cmp__c" data-plan="custom"><span class="cmp__t">theo kịch bản</span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Trang mẫu</span></th><td class="cmp__c" data-plan="standard"><a href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener">Kern Society</a></td><td class="cmp__c" data-plan="advanced"><a href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener">Rhumb Line</a></td><td class="cmp__c" data-plan="custom"><a href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener">Chớm</a></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Màn chờ theo tiến độ tải thật</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Âm thanh nền, có nút tắt</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">khi cần</span></td><td class="cmp__c" data-plan="advanced"><span class="cmp__t">khi hợp</span></td><td class="cmp__c" data-plan="custom"><span class="cmp__t">khi hợp</span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Chỉ đạo hình ảnh riêng</span></th><td class="cmp__c" data-plan="standard"><span class="sr-only">không có</span></td><td class="cmp__c" data-plan="advanced"><span class="sr-only">không có</span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr></tbody><tbody><tr class="cmp__group"><th scope="rowgroup" class="cmp__gname" colspan="4" data-entry=""><span class="cmp__t">Cách làm</span></th></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Lên kịch bản trang cùng bạn</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">phác phần đầu để duyệt</span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Vòng sửa</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">2</span></td><td class="cmp__c" data-plan="advanced"><span class="cmp__t">3</span></td><td class="cmp__c" data-plan="custom"><span class="cmp__t">4</span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Sửa lỗi miễn phí sau bàn giao</span></th><td class="cmp__c" data-plan="standard"><span class="cmp__t">30 ngày</span></td><td class="cmp__c" data-plan="advanced"><span class="cmp__t">30 ngày</span></td><td class="cmp__c" data-plan="custom"><span class="cmp__t">60 ngày</span></td></tr></tbody><tbody><tr class="cmp__group"><th scope="rowgroup" class="cmp__gname" colspan="4" data-entry=""><span class="cmp__t">Gói nào cũng có</span></th></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Thiết kế riêng, không dùng mẫu</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Chạy tốt trên điện thoại, máy tính bảng, máy tính</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Có bản nhẹ cho máy yếu</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Chuyển động nhẹ khắp trang</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Form liên hệ, đặt hàng gửi về email</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">SEO cơ bản và ảnh đẹp khi chia sẻ</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Chạy trên tên miền của bạn, host miễn phí, có thống kê truy cập</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Mọi tài khoản đứng tên bạn</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr><tr><th scope="row" class="cmp__label"><span class="cmp__t">Bàn giao toàn bộ mã nguồn</span></th><td class="cmp__c" data-plan="standard"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="advanced"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td><td class="cmp__c" data-plan="custom"><span class="tick" role="img" aria-label="có"><svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></td></tr></tbody>
+      </table>
+    </div>
+    <div class="addons">
+      <article class="addon-box">
+      <h3 class="addon-box__name">Chăm sóc hằng tháng</h3>
+      <p class="addon-box__price">2–4 triệu đồng/tháng</p>
+      <p class="addon-box__text">Cập nhật chữ và ảnh, thêm mục theo mùa, giữ trang chạy ổn khi trình duyệt thay đổi. Làm gì thì mình bàn theo nhu cầu của bạn.</p>
+      <a class="addon-box__go" href="#care" data-go="care">Xem chi tiết<span aria-hidden="true"> →</span></a>
+    </article>
+      <article class="addon-box">
+      <h3 class="addon-box__name">Viết nội dung</h3>
+      <p class="addon-box__price">Báo giá riêng</p>
+      <p class="addon-box__text">Chưa có sẵn chữ cho trang thì mình viết giúp. <span class="addon-box__note">Chữ trên trang do bạn gửi</span></p>
+      <a class="addon-box__go" href="#addon" data-go="addon">Xem chi tiết<span aria-hidden="true"> →</span></a>
+    </article>
+    </div></section>
 
   <section class="sect" id="sect-plans">
     <div class="sect__head"><h2 class="k" id="plansK">01 — Các gói</h2></div>
-    <ol class="plans" id="plans"><li><article class="plan" id="plan-standard" data-plan="standard">
+    <ol class="plans" id="plans"><li><article class="plan plan--pkg" id="plan-standard" data-plan="standard">
       <div class="plan__head">
-      <div><span class="plan__n">01</span><h3 class="plan__name">Tiêu chuẩn</h3></div>
-      <div><span class="k plan__kprice">Giá</span><p class="plan__price">12–20 triệu đồng</p></div>
-    </div>
-      <p class="plan__for">Cần một trang chỉn chu lên mạng sớm, có một chỗ khiến khách dừng lại nghịch thử.</p>
-      <div class="plan__body">
-        <figure class="shot">
-          <a href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener"><img src="../media/kern-society.jpg" width="960" height="600" alt="Kern Society"></a>
-          <figcaption class="k shot__cap">Trang mẫu · <a href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener">Kern Society</a></figcaption>
-        </figure>
-        <div class="col"><span class="k">Gồm</span><ul class="plan__list"><li>Một landing page bán hàng</li><li>Điểm nhấn tương tác làm riêng</li><li>Cảnh 3D đầu trang hoặc hiệu ứng cuộn</li></ul></div>
-        <div class="col"><span class="k">Thời gian</span><p>2–3 tuần</p></div>
+        <span class="plan__n">01</span>
+        <div class="plan__title"><h3 class="plan__name">Tiêu chuẩn</h3></div>
+        <p class="plan__price"><b>12–20</b> triệu đồng</p>
       </div>
-      <button class="row" type="button" data-pick="standard"><span class="row__label">Chọn gói Tiêu chuẩn</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
-    </article></li><li><article class="plan" id="plan-advanced" data-plan="advanced">
+      <figure class="shot">
+      <div class="browser">
+        <div class="browser__bar" aria-hidden="true"><i></i><i></i><i></i><span class="browser__url">shockingmike.github.io/kern-society</span></div>
+        <div class="browser__view" data-film="../media/kern-society.mp4"><img src="../media/kern-society.jpg" width="960" height="600" alt="Kern Society · Trang mẫu" loading="lazy" decoding="async"></div>
+      </div>
+    </figure>
+      <div class="plan__body">
+        <p class="k plan__kicker" data-entry="">Một khoảnh khắc đáng nhớ</p>
+        <p class="plan__for">Nếu bạn chỉ cần một trang đẹp, rõ ràng để chạy quảng cáo hay gửi cho khách, gói này là đủ. Mình không khuyên trả thêm khi chưa cần.</p>
+        <ul class="facts"><li><b>2–3</b><span>tuần</span></li><li><b>6</b><span>mục tối đa</span></li><li><b>2</b><span>vòng sửa</span></li><li><b>30</b><span>ngày sửa lỗi miễn phí</span></li></ul>
+        <div class="plan__acts"><button class="row" type="button" data-pick="standard"><span class="row__label">Chọn gói Tiêu chuẩn</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button><a class="row row--ink" href="https://shockingmike.github.io/kern-society/" target="_blank" rel="noopener"><span class="row__label">Xem trang mẫu</span><span class="row__arrow"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></a></div>
+      </div>
+    </article></li><li><article class="plan plan--pkg plan--flip" id="plan-advanced" data-plan="advanced">
       <div class="plan__head">
-      <div><span class="plan__n">02</span><h3 class="plan__name">Nâng cao</h3></div>
-      <div><span class="k plan__kprice">Giá</span><p class="plan__price">Từ 40 triệu đồng</p></div>
-    </div>
-      <p class="plan__for">Muốn khách ở lại trang và đi xem một vòng.</p>
-      <div class="plan__body">
-        <figure class="shot">
-          <a href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener"><img src="../media/rhumb-line.jpg" width="960" height="600" alt="Rhumb Line" loading="lazy"></a>
-          <figcaption class="k shot__cap">Trang mẫu · <a href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener">Rhumb Line</a></figcaption>
-        </figure>
-        <div class="col"><span class="k">Gồm</span><ul class="plan__list"><li>Trang 3D để khách tự khám phá</li><li>Câu chuyện thương hiệu dẫn dắt</li><li>Âm thanh, ánh sáng nếu hợp</li></ul></div>
-        <div class="col"><span class="k">Thời gian</span><p>4–6 tuần</p></div>
+        <span class="plan__n">02</span>
+        <div class="plan__title"><h3 class="plan__name">Nâng cao</h3><span class="card__tag">Gói mình khuyên</span></div>
+        <p class="plan__price">Từ <b>40</b> triệu đồng</p>
       </div>
-      <button class="row" type="button" data-pick="advanced"><span class="row__label">Chọn gói Nâng cao</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
-    </article></li><li><article class="plan" id="plan-custom" data-plan="custom">
+      <figure class="shot">
+      <div class="browser">
+        <div class="browser__bar" aria-hidden="true"><i></i><i></i><i></i><span class="browser__url">shockingmike.github.io/rhumb-line</span></div>
+        <div class="browser__view" data-film="../media/rhumb-line.mp4"><img src="../media/rhumb-line.jpg" width="960" height="600" alt="Rhumb Line · Trang mẫu" loading="lazy" decoding="async"></div>
+      </div>
+    </figure>
+      <div class="plan__body">
+        <p class="k plan__kicker" data-entry="">Một nơi để khám phá</p>
+        <p class="plan__for">Nếu thương hiệu của bạn có một câu chuyện đáng nghe — điều làm bạn khác, lý do bạn đáng giá hơn — thì một trang cuộn bình thường kể không hết. Gói này biến câu chuyện đó thành một nơi khách tự bước vào khám phá, và nhớ lâu. Đây là gói mình khuyên cho phần lớn thương hiệu.</p>
+        <ul class="facts"><li><b>4–6</b><span>tuần</span></li><li><b>10</b><span>mục tối đa</span></li><li><b>3</b><span>vòng sửa</span></li><li><b>30</b><span>ngày sửa lỗi miễn phí</span></li></ul>
+        <div class="plan__acts"><button class="row" type="button" data-pick="advanced"><span class="row__label">Chọn gói Nâng cao</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button><a class="row row--ink" href="https://shockingmike.github.io/rhumb-line/" target="_blank" rel="noopener"><span class="row__label">Xem trang mẫu</span><span class="row__arrow"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></a></div>
+      </div>
+    </article></li><li><article class="plan plan--pkg" id="plan-custom" data-plan="custom">
       <div class="plan__head">
-      <div><span class="plan__n">03</span><h3 class="plan__name">Đặt riêng</h3></div>
-      <div><span class="k plan__kprice">Giá</span><p class="plan__price">Từ 80 triệu đồng</p></div>
-    </div>
-      <p class="plan__for">Muốn cả một thế giới dựng quanh thương hiệu, không món nào lấy từ hàng có sẵn. <span class="plan__note">Mình chỉ nhận mỗi lúc một dự án loại này.</span></p>
-      <div class="plan__body">
-        <figure class="shot">
-          <a href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener"><img src="../media/chom.jpg" width="960" height="600" alt="Chớm" loading="lazy"></a>
-          <figcaption class="k shot__cap">Trang mẫu · <a href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener">Chớm</a></figcaption>
-        </figure>
-        <div class="col"><span class="k">Gồm</span><ul class="plan__list"><li>Thế giới thương hiệu dựng từ đầu</li><li>Câu chuyện, hình ảnh, chuyển động</li><li>3D, âm thanh, ánh sáng khi cần</li></ul></div>
-        <div class="col"><span class="k">Thời gian</span><p>6–10 tuần</p></div>
+        <span class="plan__n">03</span>
+        <div class="plan__title"><h3 class="plan__name">Đặt riêng</h3></div>
+        <p class="plan__price">Từ <b>80</b> triệu đồng</p>
       </div>
-      <button class="row" type="button" data-pick="custom"><span class="row__label">Chọn gói Đặt riêng</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
+      <figure class="shot">
+      <div class="browser">
+        <div class="browser__bar" aria-hidden="true"><i></i><i></i><i></i><span class="browser__url">shockingmike.github.io/chom</span></div>
+        <div class="browser__view browser__view--trim" data-film="../media/chom.mp4"><img src="../media/chom.jpg" width="960" height="600" alt="Chớm · Trang mẫu" loading="lazy" decoding="async"></div>
+      </div>
+    </figure>
+      <div class="plan__body">
+        <p class="k plan__kicker" data-entry="">Một thế giới</p>
+        <p class="plan__for">Dành cho khi bạn có một hình dung lớn mà không khuôn nào chứa nổi. Không dừng ở một không gian: phong cách hình ảnh, từng cảnh, từng chuyển động đều làm riêng cho thương hiệu bạn, nối thành một câu chuyện trọn vẹn. Mình đi cùng bạn từ lúc còn là ý tưởng tới khi nó đúng như bạn hình dung.</p>
+        <ul class="facts"><li><b>6–10</b><span>tuần</span></li><li><b>4</b><span>vòng sửa</span></li><li><b>60</b><span>ngày sửa lỗi miễn phí</span></li></ul>
+        <div class="plan__acts"><button class="row" type="button" data-pick="custom"><span class="row__label">Chọn gói Đặt riêng</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button><a class="row row--ink" href="https://shockingmike.github.io/chom/" target="_blank" rel="noopener"><span class="row__label">Xem trang mẫu</span><span class="row__arrow"><svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.7"></path></svg></span></a></div>
+      </div>
     </article></li></ol>
+    <!-- what every package has, said once under all three -->
+    <div class="shared" id="shared"><h3 class="k shared__k">Không bao gồm (báo giá riêng)</h3>
+    <ul class="shared__nots"><li>bán hàng có giỏ hàng và thanh toán</li><li>blog hay hệ thống tự sửa nội dung</li><li>thêm trang</li><li>thêm ngôn ngữ</li><li>chụp ảnh</li><li>logo, nhận diện thương hiệu</li><li>tên miền và phí dịch vụ bên ngoài</li></ul>
+    <p class="shared__fine">Chữ trên trang do bạn gửi; cần viết hộ thì báo giá riêng.</p></div>
   </section>
 
   <section class="sect" id="sect-extras">
     <div class="sect__head"><h2 class="k" id="extrasK">02 — Chăm sóc hằng tháng · Viết nội dung</h2></div>
-    <ol class="extras" id="extras">
-    <li><article class="plan plan--add" id="care">
-      <div class="plan__head">
-      <div><span class="plan__n">04</span><h3 class="plan__name">Chăm sóc hằng tháng</h3></div>
-      <div><span class="k plan__kprice">Giá</span><p class="plan__price">2–4 triệu đồng/tháng</p></div>
-    </div>
-      <p class="plan__for">Sau khi trang lên mạng, mình vẫn lo cho nó chạy ổn và luôn mới. Gói nào cũng thêm được.</p>
-      <div class="plan__body">
-        <div class="col"><span class="k">Gồm</span><ul class="plan__list"><li>Cập nhật nội dung, thay ảnh</li><li>Làm trang khuyến mãi theo mùa</li><li>Theo dõi, giữ trang chạy ổn định</li></ul></div>
-        <div class="col"><span class="k">Giá</span><p>Mức cụ thể tuỳ khối lượng việc mỗi tháng.</p></div>
-      </div>
-      <button class="row" type="button" data-pick="care"><span class="row__label">Thêm chăm sóc hằng tháng</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
-    </article></li>
-    <li><article class="plan plan--add" id="addon">
-      <div class="plan__head">
-      <div><span class="plan__n">05</span><h3 class="plan__name">Viết nội dung</h3></div>
-      <div><span class="k plan__kprice">Giá</span><p class="plan__price">Báo giá riêng</p></div>
-    </div>
+    <ol class="extras" id="extras"><li><article class="plan plan--add" id="care">
+      <h3 class="plan__name">Chăm sóc hằng tháng</h3>
+      <p class="plan__price"><b>2–4</b> triệu đồng/tháng</p>
+      <p class="plan__for">Cập nhật chữ và ảnh, thêm mục theo mùa, giữ trang chạy ổn khi trình duyệt thay đổi. Làm gì thì mình bàn theo nhu cầu của bạn.</p>
+      <div class="plan__acts"><button class="row" type="button" data-pick="care"><span class="row__label">Thêm chăm sóc hằng tháng</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button></div>
+    </article></li><li><article class="plan plan--add" id="addon">
+      <h3 class="plan__name">Viết nội dung</h3>
+      <p class="plan__price plan__price--word">Báo giá riêng</p>
       <p class="plan__for">Chưa có sẵn chữ cho trang thì mình viết giúp.</p>
-      <button class="row" type="button" data-pick="copy"><span class="row__label">Thêm viết nội dung</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button>
+      <div class="plan__acts"><button class="row" type="button" data-pick="copy"><span class="row__label">Thêm viết nội dung</span><span class="row__arrow"><svg viewBox="0 0 14 12" width="14" height="12" aria-hidden="true"><path d="M1 6h11M8 1.5 12.5 6 8 10.5" fill="none" stroke="currentColor" stroke-width="1.8"></path></svg></span></button></div>
     </article></li></ol>
   </section>
 
-  <section class="sect block" id="process"><div class="sect__head"><h2 class="k">03 — Quy trình làm việc</h2></div><ol class="steps"><li><span class="steps__n">01</span><p>Bạn gửi email cho mình: thương hiệu, trang hiện có, thời hạn và ngân sách.</p></li><li><span class="steps__n" data-entry="">02</span><p>Trong 2 ngày làm việc, mình gửi báo giá trọn gói, ghi rõ những việc sẽ làm.</p></li><li><span class="steps__n" data-entry="">03</span><p>Bạn đặt cọc 50%. Mình phác phần đầu trang để bạn duyệt, rồi mới dựng. Sửa tối đa 2 vòng.</p></li><li><span class="steps__n">04</span><p>Thanh toán 50% còn lại khi trang lên mạng, trên tên miền và tài khoản của bạn.</p></li></ol></section>
+  <section class="sect block" id="process"><div class="sect__head"><h2 class="k">03 — Quy trình làm việc</h2></div><ol class="steps"><li><span class="steps__n">01</span><p>Bạn gửi email cho mình: thương hiệu, trang hiện có, thời hạn và ngân sách.</p></li><li><span class="steps__n" data-entry="">02</span><p>Trong 2 ngày làm việc, mình gửi báo giá trọn gói, ghi rõ những việc sẽ làm.</p></li><li><span class="steps__n" data-entry="">03</span><p>Bạn đặt cọc 50%. Mình phác phần đầu trang để bạn duyệt, rồi mới dựng. Số vòng sửa theo gói.</p></li><li><span class="steps__n">04</span><p>Thanh toán 50% còn lại khi trang lên mạng, trên tên miền và tài khoản của bạn.</p></li></ol></section>
 
-  <section class="sect block" id="faq"><div class="sect__head"><h2 class="k">04 — Câu hỏi thường gặp</h2></div><div class="faq"><details class="qa"><summary><span class="qa__k">Q1</span><span class="qa__q">Cần chuẩn bị gì trước khi bắt đầu?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Tên thương hiệu, sản phẩm muốn giới thiệu, chữ và ảnh đang có, cùng vài trang web bạn thích. Còn thiếu gì, mình sẽ nói rõ.</p></details><details class="qa"><summary><span class="qa__k">Q2</span><span class="qa__q">Sau khi bàn giao, có sửa trang được nữa không?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Có. Sửa lỗi miễn phí trong 30 ngày sau khi bàn giao. Sau đó, gói chăm sóc hằng tháng lo việc cập nhật chữ, ảnh, trang khuyến mãi.</p></details><details class="qa"><summary><span class="qa__k">Q3</span><span class="qa__q">Trang có chạy tốt và nhanh trên điện thoại không?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Có. Trang nào mình cũng thử trên điện thoại và màn hình lớn trước khi bàn giao. Trang 3D cần vài giây để tải trên điện thoại, nên có màn chờ hiện đúng phần trăm đã tải.</p></details></div></section>
+  <section class="sect block" id="faq"><div class="sect__head"><h2 class="k">04 — Câu hỏi thường gặp</h2></div><div class="faq"><details class="qa"><summary><span class="qa__k">Q1</span><span class="qa__q">Cần chuẩn bị gì trước khi bắt đầu?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Tên thương hiệu, sản phẩm muốn giới thiệu, chữ và ảnh đang có, cùng vài trang web bạn thích. Còn thiếu gì, mình sẽ nói rõ.</p></details><details class="qa"><summary><span class="qa__k">Q2</span><span class="qa__q">Sau khi bàn giao, có sửa trang được nữa không?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Có. Sửa lỗi miễn phí 30 hoặc 60 ngày sau khi bàn giao, tuỳ gói. Sau đó, gói chăm sóc hằng tháng lo việc cập nhật chữ, ảnh, trang khuyến mãi.</p></details><details class="qa"><summary><span class="qa__k">Q3</span><span class="qa__q">Trang có chạy tốt và nhanh trên điện thoại không?</span><i class="qa__sign" aria-hidden="true"></i></summary><p>Có. Trang nào mình cũng thử trên điện thoại và màn hình lớn trước khi bàn giao. Trang 3D cần vài giây để tải trên điện thoại, nên có màn chờ hiện đúng phần trăm đã tải.</p></details></div></section>
 
   <section class="sect block" id="terms"><details class="qa qa--terms"><summary><h2 class="k">05 — Điều khoản</h2><i class="qa__sign" aria-hidden="true"></i></summary>
-    <ul class="terms"><li><span>Bạn cung cấp nội dung chữ và hình ảnh. Cần viết hộ thì mình báo giá thêm.</span></li><li><span>Toàn bộ trang và mã nguồn thuộc về bạn.</span></li><li><span>Sửa quá 2 vòng thì mình báo giá trước khi làm.</span></li><li><span>Khách trong nước thanh toán bằng chuyển khoản, khách nước ngoài qua PayPal.</span></li><li><span>Trao đổi qua email shockingmikedesign@gmail.com, cần thì hẹn gọi.</span></li></ul></details></section>
+    <ul class="terms"><li><span>Bạn cung cấp nội dung chữ và hình ảnh. Cần viết hộ thì mình báo giá thêm.</span></li><li><span>Toàn bộ trang và mã nguồn thuộc về bạn.</span></li><li><span>Sửa quá số vòng của gói thì mình báo giá trước khi làm.</span></li><li><span>Khách trong nước thanh toán bằng chuyển khoản, khách nước ngoài qua PayPal.</span></li><li><span>Trao đổi qua email shockingmikedesign@gmail.com, cần thì hẹn gọi.</span></li></ul></details></section>
 
   <section class="sect block" id="contact"><div class="sect__head"><h2 class="k">06 — Chưa chắc gói nào hợp?</h2></div><div class="closing">
        <div>
@@ -157,7 +201,6 @@
         <button type="button" id="carePlus" aria-label="+1">+</button>
       </div>
       <span class="slip__price" id="carePrice">2–4 triệu đồng/tháng</span>
-      <small class="slip__hint">Mức cụ thể tuỳ khối lượng việc mỗi tháng.</small>
     </div>
     <label class="slip__row slip__toggle">
       <span class="slip__label">Cần mình viết nội dung</span>

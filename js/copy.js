@@ -89,20 +89,52 @@ export const COPY = {
       meta: { title: 'Prices · Shocking Mike', description: 'Landing pages for brands, designed and coded by Shocking Mike. Three packages with clear prices from $1,500. Replies within 2 working days.' },
       back: 'Back to portfolio',
       hero: { title: 'Prices', lead: 'I design and code landing pages for brands. Every price is on this page, so you don’t have to ask. If you do write, I reply within 2 working days.' },
-      label: { plan: 'Package', plans: 'Packages', price: 'Price', timeline: 'Timeline', example: 'Sample page', includes: 'Includes' },
+      label: { plan: 'Package', plans: 'Packages', price: 'Price', timeline: 'Timeline', example: 'Sample page', includes: 'Includes', sample: 'See sample page' },
+      // the figures that close each package block: printed big, with these small labels under them
+      stats: { weeks: 'weeks', sections: 'sections at most', rounds: 'rounds of revisions', fix: 'days of free bug fixes' },
       notes: ['Your quote is a fixed price for the scope it sets out. Every package works smoothly on phones.'],
       plans: {
-        standard: { name: 'Standard', for: 'You need a sharp page live soon, with one moment people stop to play with.', includes: ['One landing page built to sell', 'One custom interactive highlight', 'A 3D opening scene or scroll effect'], timeline: '2–3 weeks', price: '$1,500–2,500', example: 'Kern Society', cta: 'Choose Standard' },
-        advanced: { name: 'Advanced', for: 'You want people to stay on the page and look around.', includes: ['A 3D page visitors can explore', 'Your brand story guides the way', 'Sound and lighting where they fit'], timeline: '4–6 weeks', price: 'From $5,000', example: 'Rhumb Line', cta: 'Choose Advanced' },
-        custom: { name: 'Custom', for: 'You want a world built around your brand, with nothing taken off the shelf.', includes: ['A brand world built from scratch', 'Story, visuals and motion', '3D, sound and lighting as needed'], timeline: '6–10 weeks', price: 'From $10,000', example: 'Chớm', note: 'I take one of these at a time.', cta: 'Choose Custom' }
+        standard: { name: 'Standard', fit: 'A clean, clear page to run ads to or send to customers', for: 'If you just need a clean, clear page to run ads to or send to customers, this is enough. I won’t suggest paying for more than you need.', includes: ['One memorable moment', 'Up to 6 sections', 'Loading screen with real progress', 'Background sound when it fits', 'A sketch of the opening to approve first', '2 rounds of revisions', '30 days of free bug fixes'], timeline: '2–3 weeks', price: '$1,500–2,500', example: 'Kern Society', cta: 'Choose Standard' },
+        advanced: { name: 'Advanced', fit: 'A story worth hearing, and visitors who stay to explore', for: 'If your brand has a story worth hearing — what makes you different, why you’re worth more — an ordinary scrolling page runs out of room to tell it. This package turns that story into a place visitors step into, explore, and remember. It’s the one I recommend for most brands.', includes: ['A place to explore, not just scroll', 'Up to 10 sections', 'Page story planned with you before design', 'Loading screen with real progress, plus a version for older phones', 'Background sound where it fits', '3 rounds of revisions', '30 days of free bug fixes'], timeline: '4–6 weeks', price: 'From $5,000', example: 'Rhumb Line', cta: 'Choose Advanced' },
+        custom: { name: 'Custom', fit: 'A big picture no template can hold', for: 'For when you have a big picture in mind that no template can hold. It doesn’t stop at one space: the visual style, every scene, every movement is made for your brand alone, joined into one complete story. I work with you from the first idea until it looks the way you pictured it.', includes: ['A world: several scenes joined into one story', 'Visual style, scenes and motion made for your brand alone', 'With you from the first idea', '4 rounds of revisions', '60 days of free bug fixes'], timeline: '6–10 weeks', price: 'From $10,000', example: 'Chớm', cta: 'Choose Custom' }
       },
-      care: { name: 'Monthly care', description: 'After launch, I keep the page up to date and running. Add it to any package.', includes: ['Text updates and photo swaps', 'Seasonal promotion pages', 'Monitoring to keep the page running'], price: '$300–600/month', priceNote: 'The exact rate depends on how much work each month needs.', cta: 'Add monthly care' },
+      /* the table at the head of the page: three packages side by side, rows gathered in groups. A cell that
+         starts with ✓ is drawn as a tick (anything after it is a small note), — as a dash, @sample as the link
+         to that package's sample page. */
+      compare: {
+        caption: 'The three packages side by side', recommend: 'What I recommend', details: 'See details',
+        title: 'Compare packages',
+        // the four lines on each card: the ones that differ most between the packages
+        cards: { standard: ['One memorable moment', 'Up to 6 sections', '2 rounds of revisions', '30 days of free bug fixes'], advanced: ['A place to explore', 'Up to 10 sections', 'Story planned with you', '3 rounds of revisions'], custom: ['A world', 'Own art direction', '4 rounds of revisions', '60 days of free bug fixes'] },
+        yes: 'included', no: 'not included',
+        groups: [
+          { name: 'The page', rows: [
+            ['Experience', 'One memorable moment', 'A place to explore', 'A world'],
+            ['Sections', 'up to 6', 'up to 10', 'as the story needs'],
+            ['Sample page', '@sample', '@sample', '@sample'],
+            ['Loading screen with real progress', '✓', '✓', '✓'],
+            ['Background sound, with a mute button', 'when needed', 'where it fits', 'where it fits'],
+            ['Own art direction', '—', '—', '✓']
+          ] },
+          { name: 'How we work', rows: [
+            ['Story planned with you', 'a sketch of the opening to approve', '✓', '✓'],
+            ['Rounds of revisions', '2', '3', '4'],
+            ['Free bug fixes after launch', '30 days', '30 days', '60 days']
+          ] },
+          { name: 'Every package', all: true, rows: ['Designed from scratch, no templates', 'Works on phone, tablet and desktop', 'A lighter version for older phones', 'Gentle motion across the page', 'A contact or order form that reaches your inbox', 'Basic SEO and a proper image when shared', 'Your own domain, free hosting, visitor stats', 'Every account in your name', 'Full source code handed over'] }
+        ],
+        after: { care: 'Monthly care from {price}', copy: 'Copywriting quoted separately', text: 'You provide the text' }
+      },
+      // what every package has, said once under the three of them rather than repeated inside each
+      shared: { title: 'Every package includes', items: ['Designed from scratch, no templates', 'Works on phone, tablet and desktop', 'A contact or order form that reaches your inbox', 'Basic SEO and a proper image when the page is shared', 'Live on your own domain, on free hosting (no monthly fee), with visitor stats', 'Every account in your name', 'Full source code handed over'],
+        text: 'You provide the text. Copywriting is quoted separately.', notTitle: 'Not included (quoted separately)', not: ['online checkout', 'a blog or self-editing system', 'extra pages', 'extra languages', 'photography', 'logo and brand identity', 'the domain and third-party fees'] },
+      care: { name: 'Monthly care', description: 'Text and photo updates, seasonal sections, and keeping the page running well as browsers change. We agree the scope together.', price: '$300–600/month', cta: 'Add monthly care' },
       addon: { name: 'Copywriting', description: 'No words for the page yet? I can write them.', price: 'Quoted separately', cta: 'Add copywriting' },
-      process: { title: 'How it works', steps: ['You email me your brand, current website, deadline and budget.', 'Within 2 working days, I send a fixed quote with exactly what’s included.', 'You pay 50% upfront. I sketch the opening section for approval, then build. Up to 2 rounds of changes.', 'The page goes live on your domain and account; you pay the other 50%.'] },
-      terms: { title: 'Terms', items: ['You provide the text and images. Copywriting is quoted separately.', 'The finished page and all its source code belong to you.', 'Changes beyond 2 rounds are quoted before any work begins.', 'Payment by bank transfer in Vietnam, or PayPal from abroad.', 'We work over email at shockingmikedesign@gmail.com, with calls when needed.'] },
+      process: { title: 'How it works', steps: ['You email me your brand, current website, deadline and budget.', 'Within 2 working days, I send a fixed quote with exactly what’s included.', 'You pay 50% upfront. I sketch the opening section for approval, then build. The number of revision rounds depends on the package.', 'The page goes live on your domain and account; you pay the other 50%.'] },
+      terms: { title: 'Terms', items: ['You provide the text and images. Copywriting is quoted separately.', 'The finished page and all its source code belong to you.', 'Changes beyond your package’s rounds of revisions are quoted before any work begins.', 'Payment by bank transfer in Vietnam, or PayPal from abroad.', 'We work over email at shockingmikedesign@gmail.com, with calls when needed.'] },
       faq: { title: 'Common questions', items: [
         ['What do I need to prepare?', 'Your brand name, the product to feature, any text and photos you have, and a few websites you like. I’ll tell you if anything’s missing.'],
-        ['Can the page be changed after handover?', 'Yes. Free bug fixes for 30 days after launch. After that, monthly care covers updates and seasonal pages.'],
+        ['Can the page be changed after handover?', 'Yes. Free bug fixes for 30 or 60 days after launch, depending on the package. After that, monthly care covers updates and seasonal pages.'],
         ['Will it work well and load fast on phones?', 'Yes. I test every page on phones and large monitors before handover. 3D pages take a few seconds to load on a phone, so they open with a loading screen that shows real progress.']
       ] },
       contact: { title: 'Not sure which package fits?', text: 'Tell me your budget and what the page needs to do. I’ll suggest the package that fits, even when a smaller one will do.', email: 'shockingmikedesign@gmail.com',
@@ -123,11 +155,11 @@ export const COPY = {
       estimate: {
         title: 'ESTIMATE', from: 'Shocking Mike · Landing page design and development',
         date: 'Date', client: 'Brand', site: 'Current website', deadline: 'Needed by', budget: 'Budget', empty: 'Not provided',
-        item: { standard: 'Standard package: sales landing page with one interactive highlight', advanced: 'Advanced package: explorable 3D page led by your brand story', custom: 'Custom package: brand world built from scratch', care: 'Monthly care × {n} months', copywriting: 'Copywriting', copywritingAmount: 'Quoted separately' },
+        item: { standard: 'Standard package: one memorable moment, up to 6 sections', advanced: 'Advanced package: a place to explore, up to 10 sections', custom: 'Custom package: a world of scenes joined into one story', care: 'Monthly care × {n} months', copywriting: 'Copywriting', copywritingAmount: 'Quoted separately' },
         total: 'Estimated total', totalFrom: 'From', excludes: 'Excludes copywriting (quoted separately).',
         note: 'This is a preliminary estimate based on published prices. Mike will confirm the final price and scope within 2 working days.',
         termsTitle: 'Terms in brief',
-        terms: ['50% deposit to start; the other 50% when the page goes live.', 'Opening section sketched for approval before build; up to 2 rounds of changes.', 'The client provides text and images.', 'The page and source code belong to the client, hosted on the client’s own domain and accounts.', 'Payment by bank transfer (Vietnam) or PayPal (international).', 'Free bug fixes for 30 days after launch.'],
+        terms: ['50% deposit to start; the other 50% when the page goes live.', 'Opening section sketched for approval before build; {rounds} rounds of revisions.', 'The client provides text and images.', 'The page and source code belong to the client, hosted on the client’s own domain and accounts.', 'Payment by bank transfer (Vietnam) or PayPal (international).', 'Free bug fixes for {days} days after launch.'],
         contactLabel: 'Contact', contact: 'shockingmikedesign@gmail.com'
       },
       button: { send: 'Send request to Mike', copy: 'Copy estimate', copied: 'Copied', edit: 'Edit details', print: 'Print or save as PDF', close: 'Close' },

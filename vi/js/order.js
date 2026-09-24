@@ -11,19 +11,19 @@ export const PLAN_ORDER = ['standard', 'advanced', 'custom'];
    Vietnamese files hold no dollar figure — not on screen, and not in the source either. */
 export const PACKAGES = {
   standard: {
-    id: 'standard',
+    id: 'standard', sections: 6, rounds: 2, fixDays: 30,   // most sections (none for Custom: as many as the story needs), rounds of revisions, days of free bug fixes
      vnd: [12e6, 20e6], 
     
     exampleUrl: 'https://shockingmike.github.io/kern-society/', theme: { bg: '#e8e4da', fg: '#161616' }
   },
   advanced: {
-    id: 'advanced',
+    id: 'advanced', sections: 10, rounds: 3, fixDays: 30,   // most sections (none for Custom: as many as the story needs), rounds of revisions, days of free bug fixes
      vnd: [40e6, null], 
     
     exampleUrl: 'https://shockingmike.github.io/rhumb-line/', theme: { bg: '#1e2a35', fg: '#ecdcbc' }
   },
   custom: {
-    id: 'custom',
+    id: 'custom', sections: null, rounds: 4, fixDays: 60,   // most sections (none for Custom: as many as the story needs), rounds of revisions, days of free bug fixes
      vnd: [80e6, null], 
     
     exampleUrl: 'https://shockingmike.github.io/chom/', theme: { bg: '#e6d3c8', fg: '#3a2030' }
@@ -136,7 +136,8 @@ export function buildEstimate(lang, state, date) {
   rows.push({ t: 'text', s: E.note, cls: 'r-note' });
   rows.push({ t: 'rule', ch: '-' });
   rows.push({ t: 'text', s: E.termsTitle, cls: 'r-thead' });
-  for (const s of E.terms) rows.push({ t: 'text', s: `· ${s}`, cls: 'r-terms' });
+  // the terms name this package's own rounds of revisions and days of bug fixes
+  for (const s of E.terms) rows.push({ t: 'text', s: `· ${s.replace('{rounds}', pk.rounds).replace('{days}', pk.fixDays)}`, cls: 'r-terms' });
   rows.push({ t: 'rule', ch: '-', cls: 'r-rule' });
   rows.push({ t: 'text', s: `${E.contactLabel}: ${E.contact}`, cls: 'r-meta' });
   return {

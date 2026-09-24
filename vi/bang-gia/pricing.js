@@ -1,11 +1,10 @@
-/* pricing.js — the front page of a broadsheet. A masthead between heavy rules, the whole price list as an
-   index strip under it, then one story per package running the full width of the sheet: the name at
-   headline size on the left, the price in the second ink at the right margin, a lead line under both, and
-   newspaper columns below (the picture of the sample page, what is included, the timeline). One second
-   ink, used in exactly three places: the masthead rule, the price figures, the order button. Monthly care
-   and copywriting are the same story, smaller, under their own heading. Choosing one slides in the project
-   form on a small receipt printer; "Create estimate" prints the preliminary estimate line by line.
-   ?pick=standard|advanced|custom preselects. */
+/* pricing.js — the front page of a broadsheet. A masthead between heavy rules; the three packages side by side
+   (cards, the full comparison table, care and copywriting in two small boxes); then one block per package that
+   does the persuading: the sample page itself, running in a thin browser frame and taking more than half the
+   width, beside the name, the price, Mike's own paragraph, a row of big figures and two buttons. The frames
+   swap sides from one package to the next (s2-luat.txt). One second ink, used for the masthead rule, the price
+   figures and the order button. Choosing one slides in the project form on a small receipt printer; "Create
+   estimate" prints the preliminary estimate line by line. ?pick=standard|advanced|custom preselects. */
 
 import { PACKAGES, PLAN_ORDER, createOrder, careAmount, total, mailtoHref, askHref, estimateText, rowsToLines, COLS } from '../js/order.js';
 import { getLang, setLang, applyDocLang, T } from '../js/lang.js';
@@ -53,26 +52,24 @@ function applyStatic() {
 
 /* ---------- the page ---------- */
 const LABEL = 'Shocking Mike Records';
-/* a real screenshot of each sample page, taken from the live site (media/) */
+/* each sample page, recorded from the live site (media/): a still for the first look, 8 seconds of it running */
 const SHOT = { standard: '../media/kern-society.jpg', advanced: '../media/rhumb-line.jpg', custom: '../media/chom.jpg' };
+const FILM = { standard: '../media/kern-society.mp4', advanced: '../media/rhumb-line.mp4', custom: '../media/chom.mp4' };
 const sectHead = (n, title) => `<div class="sect__head"><h2 class="k">${esc(n)} — ${esc(title)}</h2></div>`;
 const cta = (pick, text) => `<button class="row" type="button" data-pick="${pick}"><span class="row__label">${esc(text)}</span><span class="row__arrow">${ARROW}</span></button>`;
+const OUT = '<svg viewBox="0 0 12 12" width="12" height="12" aria-hidden="true"><path d="M2.5 9.5 9.5 2.5M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>';
 
-/* one line of the index strip at the head of the sheet */
-const sumRow = (n, go, name, time, price, add) =>
-  `<li><a class="sum${add ? ' sum--add' : ''}" href="#${go}" data-go="${go}">` +
-  `<span class="sum__n">${n}</span><span class="sum__name">${esc(name)}</span>` +
-  `<span class="sum__time">${esc(time)}</span><span class="sum__price">${esc(price)}</span></a></li>`;
-
-/* one column of a story: a small tracked label with a rule under it, then the particulars */
-const col = (k, body) => `<div class="col"><span class="k">${esc(k)}</span>${body}</div>`;
-
-/* the head of a story: the name at headline size, the price in the second ink at the right margin */
-const storyHead = (n, name, kPrice, price) =>
-  `<div class="plan__head">
-      <div><span class="plan__n">${n}</span><h3 class="plan__name">${esc(name)}</h3></div>
-      <div><span class="k plan__kprice">${esc(kPrice)}</span><p class="plan__price">${esc(price)}</p></div>
-    </div>`;
+/* the sample page in a thin browser frame: the address in the bar, the still under it. The moving version is
+   laid over the still only when the frame comes near the screen (wireFilms), so opening the page loads no video. */
+const frame = (id, name, alt) => {
+  const url = PACKAGES[id].exampleUrl || '';
+  return `<figure class="shot">
+      <div class="browser">
+        <div class="browser__bar" aria-hidden="true"><i></i><i></i><i></i><span class="browser__url">${esc(url.replace(/^https?:\/\//, '').replace(/\/$/, ''))}</span></div>
+        <div class="browser__view${id === 'custom' ? ' browser__view--trim' : ''}" data-film="${FILM[id]}"><img src="${SHOT[id]}" width="960" height="600" alt="${esc(alt)}" loading="lazy" decoding="async"></div>
+      </div>
+    </figure>`;
+};
 
 function renderPage() {
   const P = T(lang).pricing;
@@ -82,57 +79,55 @@ function renderPage() {
   $('#heroLabel').innerHTML = `<span>${LABEL}</span><span>2026</span><span>N&deg; 01</span>`;
   $('#heroNote').textContent = P.notes[0];
 
-  // ---- the index strip: every price at a glance, before anything else ----
-  $('#glanceK').textContent = P.label.price;
-  $('#glanceAddK').textContent = `${P.care.name} · ${P.addon.name}`;
-  $('#summary').innerHTML = PLAN_ORDER
-    .map((id, i) => sumRow(String(i + 1).padStart(2, '0'), `plan-${id}`, P.plans[id].name, P.plans[id].timeline, P.plans[id].price))
-    .join('');
-  $('#summaryAdd').innerHTML =
-    sumRow('04', 'care', P.care.name, '', P.care.price, true) +
-    sumRow('05', 'addon', P.addon.name, '', P.addon.price, true);
+  // ---- the three packages side by side, before anything else ----
+  renderCompare(P);
 
-  // ---- the three packages: one story each, running the whole width of the sheet ----
+  // ---- one block per package: the sample page running beside Mike's own words (s2-luat.txt) ----
   $('#plansK').textContent = `01 — ${P.label.plans}`;
+  const C = P.compare, F = P.stats;
   $('#plans').innerHTML = PLAN_ORDER.map((id, i) => {
     const c = P.plans[id], pk = PACKAGES[id];
     const n = String(i + 1).padStart(2, '0');
-    const name = pk.exampleUrl
-      ? `<a href="${pk.exampleUrl}" target="_blank" rel="noopener">${esc(c.example)}</a>`
-      : esc(c.example);
-    const img = `<img src="${SHOT[id]}" width="960" height="600" alt="${esc(c.example)}"${i ? ' loading="lazy"' : ''}>`;
-    return `<li><article class="plan" id="plan-${id}" data-plan="${id}">
-      ${storyHead(n, c.name, P.label.price, c.price)}
-      <p class="plan__for">${esc(c.for)}${c.note ? ` <span class="plan__note">${esc(c.note)}</span>` : ''}</p>
-      <div class="plan__body">
-        <figure class="shot">
-          ${pk.exampleUrl ? `<a href="${pk.exampleUrl}" target="_blank" rel="noopener">${img}</a>` : img}
-          <figcaption class="k shot__cap">${esc(P.label.example)} · ${name}</figcaption>
-        </figure>
-        ${col(P.label.includes, `<ul class="plan__list">${c.includes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`)}
-        ${col(P.label.timeline, `<p>${esc(c.timeline)}</p>`)}
+    const weeks = (c.timeline.match(/\d+(?:\s?[–-]\s?\d+)?/) || [''])[0];
+    // the figures that close the block; Custom has no fixed number of sections, so it shows three
+    const facts = [[weeks, F.weeks], [pk.sections, F.sections], [pk.rounds, F.rounds], [pk.fixDays, F.fix]]
+      .filter(([v]) => v != null && v !== '')
+      .map(([v, k]) => `<li><b>${esc(v)}</b><span>${esc(k)}</span></li>`).join('');
+    const sample = pk.exampleUrl
+      ? `<a class="row row--ink" href="${pk.exampleUrl}" target="_blank" rel="noopener"><span class="row__label">${esc(P.label.sample)}</span><span class="row__arrow">${OUT}</span></a>`
+      : '';
+    return `<li><article class="plan plan--pkg${i % 2 ? ' plan--flip' : ''}" id="plan-${id}" data-plan="${id}">
+      <div class="plan__head">
+        <span class="plan__n">${n}</span>
+        <div class="plan__title"><h3 class="plan__name">${esc(c.name)}</h3>${id === PICK ? `<span class="card__tag">${esc(C.recommend)}</span>` : ''}</div>
+        <p class="plan__price">${priceHTML(c.price)}</p>
       </div>
-      ${cta(id, c.cta)}
+      ${frame(id, c.name, `${c.example} · ${P.label.example}`)}
+      <div class="plan__body">
+        <p class="k plan__kicker" data-entry>${esc(C.cards[id][0])}</p>
+        <p class="plan__for">${esc(c.for)}${c.note ? ` <span class="plan__note">${esc(c.note)}</span>` : ''}</p>
+        <ul class="facts">${facts}</ul>
+        <div class="plan__acts">${cta(id, c.cta)}${sample}</div>
+      </div>
     </article></li>`;
   }).join('');
 
-  // ---- added on, not a fourth package ----
+  // ---- what no package covers: the small print under all three (what they all include is in the table above) ----
+  const S = P.shared;
+  $('#shared').innerHTML = `<h3 class="k shared__k">${esc(S.notTitle)}</h3>
+    <ul class="shared__nots">${S.not.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+    <p class="shared__fine">${esc(S.text)}</p>`;
+
+  // ---- added on, not a fourth package: the same words and buttons, no picture, side by side ----
   $('#extrasK').textContent = `02 — ${P.care.name} · ${P.addon.name}`;
-  $('#extras').innerHTML = `
-    <li><article class="plan plan--add" id="care">
-      ${storyHead('04', P.care.name, P.label.price, P.care.price)}
-      <p class="plan__for">${esc(P.care.description)}</p>
-      <div class="plan__body">
-        ${col(P.label.includes, `<ul class="plan__list">${P.care.includes.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>`)}
-        ${col(P.label.price, `<p>${esc(P.care.priceNote)}</p>`)}
-      </div>
-      ${cta('care', P.care.cta)}
-    </article></li>
-    <li><article class="plan plan--add" id="addon">
-      ${storyHead('05', P.addon.name, P.label.price, P.addon.price)}
-      <p class="plan__for">${esc(P.addon.description)}</p>
-      ${cta('copy', P.addon.cta)}
+  const extra = (key, pick, x) => `<li><article class="plan plan--add" id="${key}">
+      <h3 class="plan__name">${esc(x.name)}</h3>
+      <p class="plan__price${/\d/.test(x.price) ? '' : ' plan__price--word'}">${priceHTML(x.price)}</p>
+      <p class="plan__for">${esc(x.description)}</p>
+      <div class="plan__acts">${cta(pick, x.cta)}</div>
     </article></li>`;
+  $('#extras').innerHTML = extra('care', 'care', P.care) + extra('addon', 'copy', P.addon);
+  wireFilms();
 
   // ---- the back of the sheet: short items, two columns, hairlines ----
   $('#process').innerHTML = sectHead('03', P.process.title) +
@@ -150,6 +145,159 @@ function renderPage() {
        </div>
      </div>`;
 }
+
+/* ---------- the three packages: cards first, the full comparison under them ----------
+   Learnt from well-made pricing pages (s1b-luat.txt): three cards of one mould — name, the price as the biggest
+   thing on the card, one sentence, four lines, a button at the foot — the recommended one told apart only by a
+   small tag beside its name and a filled button. Under them, the whole comparison as a table whose head stays
+   put while it scrolls past; a cell with nothing in it is left empty. Then care and copywriting, two small boxes. */
+const TICK = '<svg viewBox="0 0 14 11" width="14" height="11" aria-hidden="true" focusable="false"><path d="M1.3 5.9 5 9.2 12.7 1.5" fill="none" stroke="currentColor" stroke-width="1.7"/></svg>';
+const PICK = 'advanced';
+
+/* the figures of a price set big, the words round them (a currency word, "from") small and quiet */
+const priceHTML = (s) => esc(s).replace(/([$]?\d[\d.,]*(?:\s?[–-]\s?[$]?\d[\d.,]*)?)/g, (m) => `<b>${m}</b>`);
+
+/* one cell: ✓ becomes the drawn tick (anything after it a small note), — stays empty, @sample the sample page */
+function cmpCell(C, P, id, v) {
+  if (v === '@sample') {
+    const pk = PACKAGES[id];
+    const name = esc(P.plans[id].example);
+    return pk.exampleUrl ? `<a href="${pk.exampleUrl}" target="_blank" rel="noopener">${name}</a>` : name;
+  }
+  if (v.startsWith('✓')) {
+    const note = v.slice(1).trim();
+    return `<span class="tick" role="img" aria-label="${esc(C.yes)}">${TICK}</span>${note ? `<span class="cmp__note">${esc(note)}</span>` : ''}`;
+  }
+  if (v === '—') return `<span class="sr-only">${esc(C.no)}</span>`;
+  return `<span class="cmp__t">${esc(v)}</span>`;
+}
+
+function renderCompare(P) {
+  const C = P.compare;
+  const ids = PLAN_ORDER;
+  const go = (id, text, solid) => `<a class="row${solid ? '' : ' row--line'}" href="#plan-${id}" data-go="plan-${id}"><span class="row__label">${esc(text)}</span><span class="row__arrow">${ARROW}</span></a>`;
+
+  const cards = ids.map((id) => {
+    const c = P.plans[id];
+    const pick = id === PICK;
+    const lines = C.cards[id].map((x, i) => `<li${i === 0 ? ' class="card__lead"' : ''}>${TICK}<span>${esc(x)}</span></li>`).join('');
+    return `<article class="card${pick ? ' is-pick' : ''}" data-plan="${id}">
+      <div class="card__head"><h3 class="card__name">${esc(c.name)}</h3>${pick ? `<span class="card__tag">${esc(C.recommend)}</span>` : ''}</div>
+      <p class="card__price">${priceHTML(c.price)}</p>
+      <p class="card__time">${esc(c.timeline)}</p>
+      <p class="card__fit">${esc(c.fit)}</p>
+      <ul class="card__list">${lines}</ul>
+      <div class="card__foot">${go(id, C.details, pick)}</div>
+    </article>`;
+  }).join('');
+
+  const cell = (id, inner, tag = 'td', attrs = '') => `<${tag} class="cmp__c" data-plan="${id}"${attrs}>${inner}</${tag}>`;
+  const heads = ids.map((id) => {
+    const c = P.plans[id];
+    return cell(id, `<span class="cmp__name">${esc(c.name)}</span><span class="cmp__price">${esc(c.price)}</span>`
+      + `<a class="cmp__go" href="#plan-${id}" data-go="plan-${id}">${esc(C.details)}<span aria-hidden="true"> →</span></a>`, 'th', ' scope="col"');
+  }).join('');
+  const groups = C.groups.map((g) => {
+    const rows = g.all ? g.rows.map((label) => [label, '✓', '✓', '✓']) : g.rows;
+    const top = `<tr class="cmp__group"><th scope="rowgroup" class="cmp__gname" colspan="4" data-entry><span class="cmp__t">${esc(g.name)}</span></th></tr>`;
+    const body = rows.map(([label, ...v]) =>
+      `<tr><th scope="row" class="cmp__label"><span class="cmp__t">${esc(label)}</span></th>${ids.map((id, i) => cell(id, cmpCell(C, P, id, v[i]))).join('')}</tr>`).join('');
+    return `<tbody>${top}${body}</tbody>`;
+  }).join('');
+  const tabs = ids.map((id) =>
+    `<button class="cmp__tab" type="button" data-show="${id}" aria-pressed="${id === PICK}">`
+    + `<span class="cmp__tabname">${esc(P.plans[id].name)}</span><span class="cmp__tabprice">${esc(P.plans[id].price)}</span></button>`).join('');
+
+  const box = (href, name, price, text, note) => `<article class="addon-box">
+      <h3 class="addon-box__name">${esc(name)}</h3>
+      <p class="addon-box__price">${esc(price)}</p>
+      <p class="addon-box__text">${esc(text)}${note ? ` <span class="addon-box__note">${esc(note)}</span>` : ''}</p>
+      <a class="addon-box__go" href="#${href}" data-go="${href}">${esc(C.details)}<span aria-hidden="true"> →</span></a>
+    </article>`;
+
+  $('#compare').innerHTML = `
+    <h2 class="sr-only" id="cmpCap">${esc(C.caption)}</h2>
+    <div class="cards">${cards}</div>
+    <div class="cmpwrap">
+      <h2 class="cmp__title" id="cmpTitle">${esc(C.title)}</h2>
+      <div class="cmp__tabs" role="group" aria-label="${esc(C.title)}">${tabs}</div>
+      <table class="cmp" data-show="${PICK}" aria-labelledby="cmpTitle">
+        <colgroup><col class="cmp__labcol">${ids.map(() => '<col>').join('')}</colgroup>
+        <thead><tr><td class="cmp__corner"></td>${heads}</tr></thead>
+        ${groups}
+      </table>
+    </div>
+    <div class="addons">
+      ${box('care', P.care.name, P.care.price, P.care.description)}
+      ${box('addon', P.addon.name, P.addon.price, P.addon.description, C.after.text)}
+    </div>`;
+}
+
+/* ---------- the sample pages, running ----------
+   Nothing is fetched while the page opens: each frame holds only its still. When a frame comes within half
+   a screen of view, a muted, looping video is laid over the still. Only one sample page runs at a time: the
+   frame most in view, once at least a third of it shows; the others stop. While the page is being scrolled
+   the running one holds still, and carries on a moment after the scrolling rests: scrolling and playing at
+   once cost frames on a weak machine (s2 check: one 50 ms frame per video at 1440 without this). A phone
+   that asked to save data, a browser without IntersectionObserver, and a visit without JavaScript keep the
+   still and never load a video. */
+let filmWatch = [];
+function wireFilms() {
+  filmWatch.forEach((o) => o.disconnect());
+  filmWatch = [];
+  let save = false;
+  try { save = !!(navigator.connection && navigator.connection.saveData); } catch { save = false; }
+  if (save || !('IntersectionObserver' in window)) return;
+  const views = $$('.browser__view[data-film]');
+  const shown = new Map();   // how much of each frame is on screen, 0 to 1
+  let moving = false, rest = 0;
+  const choose = () => {
+    let best = null, most = 0.34;
+    shown.forEach((r, el) => { if (r > most) { most = r; best = el; } });
+    views.forEach((el) => {
+      const v = el.querySelector('video');
+      if (!v) return;
+      if (el === best && !moving) { if (v.paused) { const p = v.play(); if (p) p.catch(() => {}); } } else if (!v.paused) v.pause();
+    });
+  };
+  const onScroll = () => {
+    if (!moving) { moving = true; choose(); }
+    clearTimeout(rest);
+    rest = setTimeout(() => { moving = false; choose(); }, 160);
+  };
+  addEventListener('scroll', onScroll, { passive: true });
+  const lay = (el) => {
+    if (el.querySelector('video')) return;
+    const v = document.createElement('video');
+    v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true');
+    v.preload = 'auto';
+    v.poster = el.querySelector('img').getAttribute('src');
+    v.addEventListener('playing', () => v.classList.add('is-live'), { once: true });
+    v.src = el.dataset.film;
+    el.appendChild(v);
+    choose();
+  };
+  const near = new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.isIntersecting) { lay(e.target); near.unobserve(e.target); }
+  }), { rootMargin: '50% 0px' });
+  const seen = new IntersectionObserver((es) => {
+    es.forEach((e) => shown.set(e.target, e.isIntersecting ? e.intersectionRatio : 0));
+    choose();
+  }, { threshold: [0, 0.2, 0.35, 0.5, 0.65, 0.8, 1] });
+  views.forEach((el) => { near.observe(el); seen.observe(el); });
+  filmWatch = [near, seen, { disconnect: () => { removeEventListener('scroll', onScroll); clearTimeout(rest); } }];
+}
+
+/* on a phone the table shows one package at a time; the three buttons over it choose which */
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('.cmp__tab');
+  if (!b) return;
+  const t = $('.cmp');
+  if (!t) return;
+  t.dataset.show = b.dataset.show;
+  $$('.cmp__tab').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+});
 
 /* ---------- the project form ---------- */
 function renderForm() {
@@ -172,7 +320,6 @@ function renderForm() {
         <button type="button" id="carePlus" aria-label="+1">+</button>
       </div>
       <span class="slip__price" id="carePrice"></span>
-      <small class="slip__hint">${esc(P.care.priceNote)}</small>
     </div>
     <label class="slip__row slip__toggle">
       <span class="slip__label">${esc(F.copywriting)}</span>

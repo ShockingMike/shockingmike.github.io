@@ -90,20 +90,50 @@ export const COPY = {
       meta: { title: 'Bảng giá · Shocking Mike', description: 'Landing page cho thương hiệu, do Shocking Mike tự thiết kế và tự code. Ba gói giá rõ ràng từ 12 triệu đồng, trả lời trong 2 ngày làm việc.' },
       back: 'Về trang portfolio',
       hero: { title: 'Bảng giá', lead: 'Mình là Mike, tự thiết kế và tự code landing page cho thương hiệu. Giá gói nào cũng ghi hết ở đây, khỏi phải nhắn hỏi. Còn nếu bạn nhắn, mình trả lời trong 2 ngày làm việc.' },
-      label: { plan: 'Gói', plans: 'Các gói', price: 'Giá', timeline: 'Thời gian', example: 'Trang mẫu', includes: 'Gồm' },
+      label: { plan: 'Gói', plans: 'Các gói', price: 'Giá', timeline: 'Thời gian', example: 'Trang mẫu', includes: 'Gồm', sample: 'Xem trang mẫu' },
+      stats: { weeks: 'tuần', sections: 'mục tối đa', rounds: 'vòng sửa', fix: 'ngày sửa lỗi miễn phí' },
       notes: ['Giá trọn gói, tính theo phạm vi công việc ghi trong báo giá. Gói nào cũng chạy tốt trên điện thoại.'],
       plans: {
-        standard: { name: 'Tiêu chuẩn', for: 'Cần một trang chỉn chu lên mạng sớm, có một chỗ khiến khách dừng lại nghịch thử.', includes: ['Một landing page bán hàng', 'Điểm nhấn tương tác làm riêng', 'Cảnh 3D đầu trang hoặc hiệu ứng cuộn'], timeline: '2–3 tuần', price: '12–20 triệu đồng', example: 'Kern Society', cta: 'Chọn gói Tiêu chuẩn' },
-        advanced: { name: 'Nâng cao', for: 'Muốn khách ở lại trang và đi xem một vòng.', includes: ['Trang 3D để khách tự khám phá', 'Câu chuyện thương hiệu dẫn dắt', 'Âm thanh, ánh sáng nếu hợp'], timeline: '4–6 tuần', price: 'Từ 40 triệu đồng', example: 'Rhumb Line', cta: 'Chọn gói Nâng cao' },
-        custom: { name: 'Đặt riêng', for: 'Muốn cả một thế giới dựng quanh thương hiệu, không món nào lấy từ hàng có sẵn.', includes: ['Thế giới thương hiệu dựng từ đầu', 'Câu chuyện, hình ảnh, chuyển động', '3D, âm thanh, ánh sáng khi cần'], timeline: '6–10 tuần', price: 'Từ 80 triệu đồng', example: 'Chớm', note: 'Mình chỉ nhận mỗi lúc một dự án loại này.', cta: 'Chọn gói Đặt riêng' }
+        standard: { name: 'Tiêu chuẩn', fit: 'Cần một trang đẹp, rõ ràng để chạy quảng cáo hay gửi khách', for: 'Nếu bạn chỉ cần một trang đẹp, rõ ràng để chạy quảng cáo hay gửi cho khách, gói này là đủ. Mình không khuyên trả thêm khi chưa cần.', includes: ['Một khoảnh khắc đáng nhớ', 'Tối đa 6 mục', 'Màn chờ theo tiến độ tải thật', 'Âm thanh nền khi cần', 'Phác phần đầu trang để bạn duyệt trước', '2 vòng sửa', 'Sửa lỗi miễn phí 30 ngày'], timeline: '2–3 tuần', price: '12–20 triệu đồng', example: 'Kern Society', cta: 'Chọn gói Tiêu chuẩn' },
+        advanced: { name: 'Nâng cao', fit: 'Có câu chuyện đáng nghe, muốn khách ở lại khám phá', for: 'Nếu thương hiệu của bạn có một câu chuyện đáng nghe — điều làm bạn khác, lý do bạn đáng giá hơn — thì một trang cuộn bình thường kể không hết. Gói này biến câu chuyện đó thành một nơi khách tự bước vào khám phá, và nhớ lâu. Đây là gói mình khuyên cho phần lớn thương hiệu.', includes: ['Một nơi để khám phá, không chỉ để cuộn', 'Tối đa 10 mục', 'Lên kịch bản trang cùng bạn trước khi thiết kế', 'Màn chờ theo tiến độ tải thật, có bản cho máy yếu', 'Âm thanh nền khi hợp', '3 vòng sửa', 'Sửa lỗi miễn phí 30 ngày'], timeline: '4–6 tuần', price: 'Từ 40 triệu đồng', example: 'Rhumb Line', cta: 'Chọn gói Nâng cao' },
+        custom: { name: 'Đặt riêng', fit: 'Có hình dung lớn mà không khuôn nào chứa nổi', for: 'Dành cho khi bạn có một hình dung lớn mà không khuôn nào chứa nổi. Không dừng ở một không gian: phong cách hình ảnh, từng cảnh, từng chuyển động đều làm riêng cho thương hiệu bạn, nối thành một câu chuyện trọn vẹn. Mình đi cùng bạn từ lúc còn là ý tưởng tới khi nó đúng như bạn hình dung.', includes: ['Một thế giới: nhiều cảnh nối thành một câu chuyện', 'Hình ảnh, từng cảnh, từng chuyển động làm riêng cho thương hiệu', 'Đi cùng bạn từ lúc còn là ý tưởng', '4 vòng sửa', 'Sửa lỗi miễn phí 60 ngày'], timeline: '6–10 tuần', price: 'Từ 80 triệu đồng', example: 'Chớm', cta: 'Chọn gói Đặt riêng' }
       },
-      care: { name: 'Chăm sóc hằng tháng', description: 'Sau khi trang lên mạng, mình vẫn lo cho nó chạy ổn và luôn mới. Gói nào cũng thêm được.', includes: ['Cập nhật nội dung, thay ảnh', 'Làm trang khuyến mãi theo mùa', 'Theo dõi, giữ trang chạy ổn định'], price: '2–4 triệu đồng/tháng', priceNote: 'Mức cụ thể tuỳ khối lượng việc mỗi tháng.', cta: 'Thêm chăm sóc hằng tháng' },
+      /* the table at the head of the page: three packages side by side, rows gathered in groups. A cell that
+         starts with ✓ is drawn as a tick (anything after it is a small note), — as a dash, @sample as the link
+         to that package's sample page. */
+      compare: {
+        caption: 'Ba gói đặt cạnh nhau', recommend: 'Gói mình khuyên', details: 'Xem chi tiết',
+        title: 'So sánh chi tiết',
+        // the four lines on each card: the ones that differ most between the packages
+        cards: { standard: ['Một khoảnh khắc đáng nhớ', 'Tối đa 6 mục', '2 vòng sửa', 'Sửa lỗi miễn phí 30 ngày'], advanced: ['Một nơi để khám phá', 'Tối đa 10 mục', 'Lên kịch bản trang cùng bạn', '3 vòng sửa'], custom: ['Một thế giới', 'Chỉ đạo hình ảnh riêng', '4 vòng sửa', 'Sửa lỗi miễn phí 60 ngày'] },
+        yes: 'có', no: 'không có',
+        groups: [
+          { name: 'Trang', rows: [
+            ['Trải nghiệm', 'Một khoảnh khắc đáng nhớ', 'Một nơi để khám phá', 'Một thế giới'],
+            ['Số mục', 'tối đa 6', 'tối đa 10', 'theo kịch bản'],
+            ['Trang mẫu', '@sample', '@sample', '@sample'],
+            ['Màn chờ theo tiến độ tải thật', '✓', '✓', '✓'],
+            ['Âm thanh nền, có nút tắt', 'khi cần', 'khi hợp', 'khi hợp'],
+            ['Chỉ đạo hình ảnh riêng', '—', '—', '✓']
+          ] },
+          { name: 'Cách làm', rows: [
+            ['Lên kịch bản trang cùng bạn', 'phác phần đầu để duyệt', '✓', '✓'],
+            ['Vòng sửa', '2', '3', '4'],
+            ['Sửa lỗi miễn phí sau bàn giao', '30 ngày', '30 ngày', '60 ngày']
+          ] },
+          { name: 'Gói nào cũng có', all: true, rows: ['Thiết kế riêng, không dùng mẫu', 'Chạy tốt trên điện thoại, máy tính bảng, máy tính', 'Có bản nhẹ cho máy yếu', 'Chuyển động nhẹ khắp trang', 'Form liên hệ, đặt hàng gửi về email', 'SEO cơ bản và ảnh đẹp khi chia sẻ', 'Chạy trên tên miền của bạn, host miễn phí, có thống kê truy cập', 'Mọi tài khoản đứng tên bạn', 'Bàn giao toàn bộ mã nguồn'] }
+        ],
+        after: { care: 'Chăm sóc hằng tháng từ {price}', copy: 'Viết chữ hộ báo giá riêng', text: 'Chữ trên trang do bạn gửi' }
+      },
+      shared: { title: 'Gói nào cũng có', items: ['Thiết kế riêng, không dùng mẫu', 'Chạy tốt trên điện thoại, máy tính bảng, máy tính', 'Form liên hệ hoặc đặt hàng gửi thẳng về email', 'SEO cơ bản và ảnh hiện đẹp khi chia sẻ', 'Chạy trên tên miền của bạn, host miễn phí (không mất phí hằng tháng), có thống kê lượt truy cập', 'Mọi tài khoản đứng tên bạn', 'Bàn giao toàn bộ mã nguồn'],
+        text: 'Chữ trên trang do bạn gửi; cần viết hộ thì báo giá riêng.', notTitle: 'Không bao gồm (báo giá riêng)', not: ['bán hàng có giỏ hàng và thanh toán', 'blog hay hệ thống tự sửa nội dung', 'thêm trang', 'thêm ngôn ngữ', 'chụp ảnh', 'logo, nhận diện thương hiệu', 'tên miền và phí dịch vụ bên ngoài'] },
+      care: { name: 'Chăm sóc hằng tháng', description: 'Cập nhật chữ và ảnh, thêm mục theo mùa, giữ trang chạy ổn khi trình duyệt thay đổi. Làm gì thì mình bàn theo nhu cầu của bạn.', price: '2–4 triệu đồng/tháng', cta: 'Thêm chăm sóc hằng tháng' },
       addon: { name: 'Viết nội dung', description: 'Chưa có sẵn chữ cho trang thì mình viết giúp.', price: 'Báo giá riêng', cta: 'Thêm viết nội dung' },
-      process: { title: 'Quy trình làm việc', steps: ['Bạn gửi email cho mình: thương hiệu, trang hiện có, thời hạn và ngân sách.', 'Trong 2 ngày làm việc, mình gửi báo giá trọn gói, ghi rõ những việc sẽ làm.', 'Bạn đặt cọc 50%. Mình phác phần đầu trang để bạn duyệt, rồi mới dựng. Sửa tối đa 2 vòng.', 'Thanh toán 50% còn lại khi trang lên mạng, trên tên miền và tài khoản của bạn.'] },
-      terms: { title: 'Điều khoản', items: ['Bạn cung cấp nội dung chữ và hình ảnh. Cần viết hộ thì mình báo giá thêm.', 'Toàn bộ trang và mã nguồn thuộc về bạn.', 'Sửa quá 2 vòng thì mình báo giá trước khi làm.', 'Khách trong nước thanh toán bằng chuyển khoản, khách nước ngoài qua PayPal.', 'Trao đổi qua email shockingmikedesign@gmail.com, cần thì hẹn gọi.'] },
+      process: { title: 'Quy trình làm việc', steps: ['Bạn gửi email cho mình: thương hiệu, trang hiện có, thời hạn và ngân sách.', 'Trong 2 ngày làm việc, mình gửi báo giá trọn gói, ghi rõ những việc sẽ làm.', 'Bạn đặt cọc 50%. Mình phác phần đầu trang để bạn duyệt, rồi mới dựng. Số vòng sửa theo gói.', 'Thanh toán 50% còn lại khi trang lên mạng, trên tên miền và tài khoản của bạn.'] },
+      terms: { title: 'Điều khoản', items: ['Bạn cung cấp nội dung chữ và hình ảnh. Cần viết hộ thì mình báo giá thêm.', 'Toàn bộ trang và mã nguồn thuộc về bạn.', 'Sửa quá số vòng của gói thì mình báo giá trước khi làm.', 'Khách trong nước thanh toán bằng chuyển khoản, khách nước ngoài qua PayPal.', 'Trao đổi qua email shockingmikedesign@gmail.com, cần thì hẹn gọi.'] },
       faq: { title: 'Câu hỏi thường gặp', items: [
         ['Cần chuẩn bị gì trước khi bắt đầu?', 'Tên thương hiệu, sản phẩm muốn giới thiệu, chữ và ảnh đang có, cùng vài trang web bạn thích. Còn thiếu gì, mình sẽ nói rõ.'],
-        ['Sau khi bàn giao, có sửa trang được nữa không?', 'Có. Sửa lỗi miễn phí trong 30 ngày sau khi bàn giao. Sau đó, gói chăm sóc hằng tháng lo việc cập nhật chữ, ảnh, trang khuyến mãi.'],
+        ['Sau khi bàn giao, có sửa trang được nữa không?', 'Có. Sửa lỗi miễn phí 30 hoặc 60 ngày sau khi bàn giao, tuỳ gói. Sau đó, gói chăm sóc hằng tháng lo việc cập nhật chữ, ảnh, trang khuyến mãi.'],
         ['Trang có chạy tốt và nhanh trên điện thoại không?', 'Có. Trang nào mình cũng thử trên điện thoại và màn hình lớn trước khi bàn giao. Trang 3D cần vài giây để tải trên điện thoại, nên có màn chờ hiện đúng phần trăm đã tải.']
       ] },
       contact: { title: 'Chưa chắc gói nào hợp?', text: 'Bạn cứ gửi ngân sách và điều trang cần làm được. Mình sẽ gợi ý gói hợp, kể cả khi gói nhỏ hơn là đủ.', email: 'shockingmikedesign@gmail.com',
@@ -124,11 +154,11 @@ export const COPY = {
       estimate: {
         title: 'BÁO GIÁ SƠ BỘ', from: 'Shocking Mike · Thiết kế và code landing page',
         date: 'Ngày lập', client: 'Thương hiệu', site: 'Trang hiện có', deadline: 'Cần xong trước', budget: 'Ngân sách dự kiến', empty: 'Chưa cung cấp',
-        item: { standard: 'Gói Tiêu chuẩn: landing page bán hàng, một điểm nhấn tương tác', advanced: 'Gói Nâng cao: trang 3D để khám phá, dẫn dắt bằng câu chuyện thương hiệu', custom: 'Gói Đặt riêng: thế giới thương hiệu làm riêng từ đầu', care: 'Chăm sóc hằng tháng × {n} tháng', copywriting: 'Viết nội dung', copywritingAmount: 'Báo giá riêng' },
+        item: { standard: 'Gói Tiêu chuẩn: một khoảnh khắc đáng nhớ, tối đa 6 mục', advanced: 'Gói Nâng cao: một nơi để khám phá, tối đa 10 mục', custom: 'Gói Đặt riêng: nhiều cảnh nối thành một câu chuyện', care: 'Chăm sóc hằng tháng × {n} tháng', copywriting: 'Viết nội dung', copywritingAmount: 'Báo giá riêng' },
         total: 'Tổng tạm tính', totalFrom: 'Từ', excludes: 'Chưa gồm phần viết nội dung (báo giá riêng).',
         note: 'Đây là báo giá sơ bộ theo bảng giá công khai. Mike xác nhận giá chốt và phạm vi công việc trong 2 ngày làm việc.',
         termsTitle: 'Điều khoản tóm tắt',
-        terms: ['Đặt cọc 50% khi bắt đầu, 50% còn lại khi trang lên mạng.', 'Duyệt bản phác phần đầu trang trước khi dựng; sửa tối đa 2 vòng.', 'Khách hàng cung cấp nội dung chữ và hình ảnh.', 'Trang và mã nguồn thuộc về khách hàng, chạy trên tên miền và tài khoản của khách.', 'Thanh toán: chuyển khoản (trong nước), PayPal (quốc tế).', 'Sửa lỗi miễn phí trong 30 ngày sau khi bàn giao.'],
+        terms: ['Đặt cọc 50% khi bắt đầu, 50% còn lại khi trang lên mạng.', 'Duyệt bản phác phần đầu trang trước khi dựng; sửa {rounds} vòng.', 'Khách hàng cung cấp nội dung chữ và hình ảnh.', 'Trang và mã nguồn thuộc về khách hàng, chạy trên tên miền và tài khoản của khách.', 'Thanh toán: chuyển khoản (trong nước), PayPal (quốc tế).', 'Sửa lỗi miễn phí {days} ngày sau khi bàn giao.'],
         contactLabel: 'Liên hệ', contact: 'shockingmikedesign@gmail.com'
       },
       button: { send: 'Gửi yêu cầu cho Mike', copy: 'Chép báo giá', copied: 'Đã chép', edit: 'Sửa thông tin', print: 'In hoặc lưu PDF', close: 'Đóng' },
