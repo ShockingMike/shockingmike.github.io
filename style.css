@@ -59,10 +59,11 @@ a { color: inherit; }
 .about__role { font: italic 400 16px/1.4 var(--serif); }
 .about__role span + span::before { content: ''; display: inline-block; width: 3px; height: 3px; border-radius: 50%; background: currentColor; margin: 0 8px; vertical-align: middle; }
 
+/* the mark: the red record (Mike, 25/9 — the same picture as his avatar everywhere); a fixed colour, so it
+   stays itself on every record's page */
 .rail__disc {
-  width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid currentColor; flex: none;
-  background: radial-gradient(circle, currentColor 0 1.6px, transparent 2.1px);
-  box-shadow: inset 0 0 0 5px transparent, inset 0 0 0 6.2px currentColor;
+  width: 28px; height: 28px; border-radius: 50%; flex: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='40%25' r='70%25'%3E%3Cstop offset='0' stop-color='%23d0472c'/%3E%3Cstop offset='1' stop-color='%23a8341c'/%3E%3C/radialGradient%3E%3ClinearGradient id='s' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%23fff6e8' stop-opacity='.3'/%3E%3Cstop offset='.42' stop-color='%23fff' stop-opacity='0'/%3E%3Cstop offset='.58' stop-color='%23fff' stop-opacity='0'/%3E%3Cstop offset='1' stop-color='%23fff6e8' stop-opacity='.15'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='50' cy='50' r='50' fill='url(%23g)'/%3E%3Ccircle cx='50.6' cy='51.4' r='40.4' fill='%23280600' fill-opacity='.35'/%3E%3Ccircle cx='50' cy='50' r='40' fill='%230e0d10'/%3E%3Ccircle cx='50' cy='50' r='39' fill='url(%23s)'/%3E%3Ccircle cx='50' cy='50' r='14.5' fill='%23ece8e1'/%3E%3Ccircle cx='50' cy='50' r='10.4' fill='none' stroke='%23c23b22' stroke-width='1.6'/%3E%3Ccircle cx='50' cy='50' r='2.8' fill='%230e0d10'/%3E%3C/svg%3E") center / contain no-repeat;
 }
 /* arrow above, ticks below, 24px between them — the arrow keeps its place even when it is not showing, so the
    ticks never move and the two can never overlap */
