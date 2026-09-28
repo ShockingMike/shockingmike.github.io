@@ -25,7 +25,10 @@
    Pieces: desk.js (objects, views, camera fitting), voyage.js, copy.js; lib/layout (positions), lib/bake +
    lib/canvas-tex + lib/ocean-chart (procedural textures), lib/cabin (table, wall, portholes), lib/lamp, lib/props
    (compass, cup, box, log, slip, letter...), lib/sheet (chart sheets, ink, ship pin), lib/pick (pick proxies,
-   highlight shells), lib/coffee, lib/beams, lib/outdoors (sky, sea, rain), lib/post, lib/weather. */
+   highlight shells), lib/coffee, lib/beams, lib/outdoors (sky, sea, rain), lib/post, lib/weather; for speed:
+   lib/batch (static meshes merged), lib/refraction (glass without a second cabin render), lib/quality (steps down on a
+   slow machine). QA: ?q=0..3 forces a step, ?perf (&gputime) fills window.__cabin.perf(), ?nolite, ?nobatch,
+   ?norefraction, and window.__cabin.still(t) holds a pose for pixel comparisons. */
 import * as THREE from 'three';
 import { clamp, lerp, smooth, easeInOut, breathe, frameCost, TAU, vnoise, fillet } from './lib/util.js';
 import { LAYOUT } from './lib/layout.js';
@@ -43,6 +46,9 @@ import { harbourChart } from './lib/harbour.js';
 import { createBeams } from './lib/beams.js';
 import { createOutdoors } from './lib/outdoors.js';
 import { createPost } from './lib/post.js';
+import { createRefraction, MASK } from './lib/refraction.js';
+import { batchStatic } from './lib/batch.js';
+import { makeGovernor } from './lib/quality.js';
 import { WEATHER, cloneWeather, mixWeather } from './lib/weather.js';
 import { OBJECT_IDS, LEG_WEATHER, SEA_WEATHER, publicWeather, VIEWS, RECTS, viewPoints, fitPose, newPose, copyPose } from './desk.js';
 import { buildRoute, bearingReading, VOYAGE_ORDER, OCEAN, oceanXY, HOME, wrapDeg } from './voyage.js';
@@ -107,7 +113,7 @@ export function rendererName(gl) {
 
 export async function start(boot) {
   // Motion always runs, whatever prefers-reduced-motion says (Mike, 2026-09-15). A slow machine only waits longer and
-  // gets lighter rendering (degrade(): AO, shadow maps, pixel ratio); it never loses motion.
+  // gets lighter rendering (quality steps, see tierSettings and lib/quality.js); it never loses motion.
   const timeline = [['start', Math.round(performance.now())]];
   const stamp = (name) => timeline.push([name, Math.round(performance.now())]);
   const sound = boot.sound || { tick() {}, creak() {}, thunder() {}, setWeather() {}, arm() {}, state: () => ({}) };
@@ -124,7 +130,15 @@ export async function start(boot) {
   // QA only: ?chartpx=N tries another size for the two chart textures (load-time and sharpness comparisons)
   const chartPx = +(new URLSearchParams(location.search).get('chartpx') || 0);
   if (chartPx >= 1024 && chartPx <= 8192) Q.chart = chartPx;
-  const view = () => [canvas.clientWidth || innerWidth, canvas.clientHeight || innerHeight];
+  // The canvas's CSS size, read once per resize: reading clientWidth every frame (and from getAnchor, nine times a frame
+  // while the page moves its buttons) forced a style and layout pass each time.
+  let viewSize = null, canvasRect = null;
+  const view = () => viewSize || (viewSize = [canvas.clientWidth || innerWidth, canvas.clientHeight || innerHeight]);
+  const rectOf = () => canvasRect || (canvasRect = canvas.getBoundingClientRect());
+  const staleView = () => { viewSize = null; canvasRect = null; };
+  if (typeof ResizeObserver === 'function') new ResizeObserver(staleView).observe(canvas);
+  window.addEventListener('resize', staleView);
+  window.addEventListener('scroll', () => { canvasRect = null; }, { passive: true, capture: true });
 
   let renderer;
   try {
@@ -140,6 +154,8 @@ export async function start(boot) {
   renderer.toneMappingExposure = 1;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFShadowMap;
+  // shadow maps are drawn once a frame, by the scene pass (post.render sets needsUpdate), not again for GTAO's normals
+  renderer.shadowMap.autoUpdate = false;
   // Shader diagnostics only with ?debug: on Windows/ANGLE the HLSL compiler prints harmless precision notes as warnings,
   // and skipping the synchronous status checks lets shaders compile in parallel.
   renderer.debug.checkShaderErrors = /[?&]debug\b/.test(location.search);
@@ -237,6 +253,7 @@ export async function start(boot) {
   const cpuFactor = clamp(canvasMs / 200, 1, 3);
   const projectedMs = performance.now() + firstBakeMs * (parallelCompile ? 4.6 : 6.6) + 2000 * cpuFactor + frameCost() * 30;
   Q.budget = { firstBakeMs: Math.round(firstBakeMs), canvasMs: Math.round(canvasMs), frameMs: Math.round(frameCost()), parallelCompile, projectedMs: Math.round(projectedMs), lite: projectedMs > 9500 };
+  if (/[?&]nolite\b/.test(location.search)) Q.budget.lite = false; // QA: keep refraction and the lamp's shadow on a cold cache
   if (Q.budget.lite) { Q.transmission = false; Q.pointShadow = 0; Q.tier += '-lite'; }
   await step();
 
@@ -324,6 +341,8 @@ export async function start(boot) {
 
   /* ---------- Scene ---------- */
   const scene = new THREE.Scene();
+  // world matrices are updated once a frame (post.render), not once for every pass that draws the scene
+  scene.matrixWorldAutoUpdate = false;
   const camera = new THREE.PerspectiveCamera(50, view()[0] / view()[1], 0.02, 12000);
   const out = createOutdoors();
   scene.add(out.sky, out.sea, out.rain);
@@ -376,6 +395,9 @@ export async function start(boot) {
     : timed('cabinets', () => buildCabinets(M, renderer, { lights: /[?&]cablights\b/.test(location.search) }));
   ship.add(cabinets.group);
   const beams = createBeams(renderer.getPixelRatio()); ship.add(beams.group);
+  // static parts (table, wall, portholes, decor, cabinets) merged by material: far fewer draw calls in every pass
+  // QA: ?nobatch keeps every mesh separate (for comparisons)
+  Q.batch = /[?&]nobatch(&|$)/.test(location.search) ? null : batchStatic([table, wall, portholes[0].group, portholes[1].group, decor.group, cabinets.group]);
   await step();
 
   /* ---------- Pickable objects: proxies for ray casts, shells for the highlight ---------- */
@@ -525,13 +547,73 @@ export async function start(boot) {
     post.hideForAO.push(out.sky, out.sea, lamp.globe, lamp.glow, lamp.flame, cup.steam.mesh, ...beams.meshes, ...portholes.map((p) => p.glass), out.rain, routeInk.mesh, bearingInk.mesh, ...highlights.shells, ...cabinets.glass);
     ship.traverse((o) => { if (o.name === 'domeGlass' || o.name === 'contactShadow' || o.name === 'glow') post.hideForAO.push(o); });
   }
+  // Refractive glass samples a copy of the scene target instead of a second render of the cabin (lib/refraction.js).
+  // The camera sees layers 0-2 (opaque, glass, transparent); layer 3 holds the glass's back faces for that copy.
+  // QA: ?norefraction keeps three's own refraction pass (for comparisons).
+  let refraction = null;
+  if (post && Q.transmission && !/[?&]norefraction(&|$)/.test(location.search)) {
+    refraction = createRefraction(renderer, [M.lampGlass, M.domeGlass, glassMat]);
+    Q.refraction = refraction.attach(scene);
+    post.setRefraction(refraction);
+    camera.layers.mask = MASK.scene;
+  }
+  /* ---------- Quality steps (lib/quality.js watches the frame times and steps down on a slow machine) ----------
+     The costly effects go first, the resolution last:
+       0  everything (the look Mike approved);
+       1  ambient occlusion at half resolution, the lamp's shadow at half size, MSAA 2x;
+       2  no ambient occlusion, no lamp shadow (the lamp still lights and swings), no MSAA (SMAA stays), a lighter
+          depth of field, the sun's shadow at half size;
+       3  as 2, and the cabin drawn at 3/4 of the screen's pixels, then scaled up with a light sharpening.
+     Motion never stops at any step: hull, lamp, sea, steam and the pointer's camera lean all keep running.
+     The cabin never renders below 0.7 of the screen's pixels (0.7 of 2x on screens finer than 2x), and whenever it
+     renders below the screen it is scaled up with the sharpening pass, never by the browser. Text is HTML: always sharp. */
+  const deviceRatio = window.devicePixelRatio || 1;
+  const BASE = { ao: Q.ao, msaa: Q.msaa, dofTaps: Q.dofTaps || 48, shadow: Q.shadow, pointShadow: lamp.light.castShadow ? Q.pointShadow : 0 };
+  function tierSettings(t) {
+    return {
+      ao: !BASE.ao ? 0 : t === 0 ? 1 : t === 1 ? 0.5 : 0,
+      lamp: !BASE.pointShadow ? 0 : t === 0 ? BASE.pointShadow : t === 1 ? Math.min(BASE.pointShadow, 512) : 0,
+      msaa: t === 0 ? BASE.msaa : t === 1 ? Math.min(BASE.msaa, 2) : 0,
+      dofTaps: t <= 1 ? BASE.dofTaps : t === 2 ? Math.min(BASE.dofTaps, 24) : Math.min(BASE.dofTaps, 16),
+      sun: t <= 1 ? BASE.shadow : Math.min(BASE.shadow, 1024),
+      scale: t <= 2 ? 1 : 0.75
+    };
+  }
+  let renderScale = 1;
+  // canvas: the drawing buffer's pixels per CSS pixel; inner: the cabin's render (never below the floor)
+  // (phones keep their canvas at the 1.5x cap they always had; the floor is 0.7 of the screen's density up to 2x)
+  function ratios() {
+    if (!post) return { canvas: Q.dpr, inner: Q.dpr };
+    const screen = Math.min(deviceRatio, 2), canvas = mobile ? Q.dpr : screen;
+    const inner = Math.min(canvas, Math.max(0.7 * screen, Q.dpr * renderScale));
+    return { canvas, inner };
+  }
+  function applyTier(t) {
+    const s = tierSettings(t);
+    if (post) post.setQuality({ ao: s.ao, msaa: s.msaa, dofTaps: s.dofTaps });
+    const ls = lamp.light.shadow;
+    if (lamp.light.castShadow) {
+      // off: the shaders keep their program (no recompile, no stall); the shadow is drawn once into a tiny map, never
+      // again, and weighs nothing (intensity 0)
+      if (!s.lamp) { if (ls.intensity !== 0) { ls.mapSize.set(16, 16); makeShadowMap(lamp.light); ls.autoUpdate = false; ls.needsUpdate = true; ls.intensity = 0; } }
+      else if (ls.mapSize.x !== s.lamp) { ls.mapSize.set(s.lamp, s.lamp); makeShadowMap(lamp.light); }
+    }
+    if (sun.shadow.mapSize.x !== s.sun) { sun.shadow.mapSize.set(s.sun, s.sun); makeShadowMap(sun); }
+    renderScale = s.scale;
+    resize();
+  }
   const size = new THREE.Vector2();
   function resize() {
+    staleView();
     const [w, h] = view();
+    const r = ratios();
+    if (renderer.getPixelRatio() !== r.canvas) renderer.setPixelRatio(r.canvas);
     renderer.setSize(w, h, false);
     renderer.getDrawingBufferSize(size);
-    if (post) post.setSize(size.x, size.y);
-    highlights.setViewport(size.x, size.y, renderer.getPixelRatio());
+    let iw = size.x, ih = size.y;
+    if (post) { post.setQuality({ scale: r.inner / r.canvas }); post.setSize(size.x, size.y); [iw, ih] = post.quality.inner; }
+    highlights.setViewport(iw, ih, r.inner);
+    beams.setPixelRatio(r.inner);
     camera.aspect = w / h;
     if (phase === 'loading') topDown = topDownPose(boot.chartRect && boot.chartRect());
   }
@@ -734,7 +816,7 @@ export async function start(boot) {
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), invM = new THREE.Matrix4(), hitP = new THREE.Vector3();
   const oceanPlane = new THREE.Plane(new THREE.Vector3(0, 1, 0), -0.0008);
   function setRay(x, y) {
-    const rect = canvas.getBoundingClientRect();
+    const rect = rectOf();
     ndc.set(((x - rect.left) / rect.width) * 2 - 1, -(((y - rect.top) / rect.height) * 2 - 1));
     ray.setFromCamera(ndc, camera);
   }
@@ -832,6 +914,9 @@ export async function start(boot) {
   const perf = { frames: 0, t0: performance.now(), fps: 0, low: 0, history: [] };
   const P = { focus: 1, bloom: 0.4, vignette: 0.3, time: 0, sat: 1, tint: [1, 1, 1], fade: 1 };
   let last = performance.now();
+  // the starting step comes from the GPU's name (lib/quality.js); ?q=0..3 forces one
+  const governor = makeGovernor({ name: rendererName(renderer.getContext()), onChange: applyTier });
+  applyTier(governor.tier);
   let glassClock = 0, outClock = 40, lastKey = '', postUpto = 9;
 
   function cameraPose(now, w, h) {
@@ -850,7 +935,8 @@ export async function start(boot) {
       const t = clamp((el - fly0) / intro.dur, 0, 1);
       liftUp.set(0, 0.04, 0.12); liftDn.set(0, 0.2, 0.04);
       bezierPose(intro.top, target, t, poseCur, liftUp, liftDn);
-      if (t >= 1) { phase = 'entered'; introWaiters.splice(0).forEach((r) => r()); }
+      // window.__ready: the reader is at the desk (frame-time tools wait for it)
+      if (t >= 1) { phase = 'entered'; window.__ready = true; introWaiters.splice(0).forEach((r) => r()); }
       return poseCur;
     }
     if (camTween) {
@@ -865,9 +951,21 @@ export async function start(boot) {
     return copyPose(poseCur, target);
   }
 
+  // QA: __cabin.still(t) holds every clock and swing at a fixed pose (t in seconds, null lets time run again), so two
+  // builds can be compared pixel for pixel. Never used by the page.
+  let qaStill = null;
+  function holdStill() {
+    mo.time = qaStill; mo.phase = 0.6 + qaStill;
+    pend.ux = pend.uz = pend.vx = pend.vz = 0; co.sx = co.sz = co.vx = co.vz = 0; card.x = card.z = card.yaw = 0;
+    par.x = par.y = par.tx = par.ty = 0;
+    outClock = 40 + qaStill; glassClock = qaStill;
+    ripples.forEach((r) => r.set(0, 0, 0, 0));
+  }
   function frame(now) {
-    const dt = clamp((now - last) / 1000, 0, 1 / 20);
+    const rawMs = now - last;
+    let dt = clamp((now - last) / 1000, 0, 1 / 20);
     last = now;
+    if (qaStill !== null) { dt = 0; holdStill(); }
     const [w, h] = view();
     if (Math.abs(camera.aspect - w / h) > 1e-3) resize();
 
@@ -1015,7 +1113,7 @@ export async function start(boot) {
     if (phase !== 'loading') sound.tick(dt, 0.5 + 0.5 * Math.sin(mo.phase - 0.8), mo.time);
 
     if (post) post.render(dt, P, postUpto);
-    else { renderer.setRenderTarget(null); renderer.render(scene, camera); }
+    else { scene.updateMatrixWorld(); renderer.shadowMap.needsUpdate = true; renderer.setRenderTarget(null); renderer.render(scene, camera); }
 
     perf.frames++;
     if (now - perf.t0 >= 1000) {
@@ -1023,24 +1121,26 @@ export async function start(boot) {
       perf.history.push(Math.round(perf.fps));
       if (perf.history.length > 30) perf.history.shift();
       perf.frames = 0; perf.t0 = now;
-      if (phase === 'entered') { if (perf.fps < 30) perf.low++; else perf.low = 0; if (perf.low >= 4) { perf.low = 0; degrade(); } }
     }
-  }
-
-  function degrade() {
-    Q.level++;
-    if (Q.level === 1 && post) post.setAO(false);
-    else if (Q.level === 2) {
-      Q.dof = false;
-      sun.shadow.mapSize.set(Q.shadow / 2, Q.shadow / 2); makeShadowMap(sun);
-      if (lamp.light.castShadow) { lamp.light.shadow.mapSize.set(Q.pointShadow / 2, Q.pointShadow / 2); makeShadowMap(lamp.light); }
-    } else if (Q.level === 3) { renderer.setPixelRatio(1); resize(); }
+    // the quality governor watches real frame times once the reader is at the desk
+    if (phase === 'entered' && rawMs > 0) governor.tick(rawMs);
   }
 
   let running = false, paused = false, disposed = false, rafId = 0;
+  // QA: ?perf keeps the main-thread time of each frame and the draw calls (window.__cabin.perf())
+  const perfMode = /[?&]perf\b/.test(location.search), cpuTimes = [], drawCalls = [];
+  if (perfMode) { renderer.info.autoReset = false; window.__rlq = { renderer, scene, camera, post, lamp, sun, M, Q }; }
   function loop(now) {
     if (document.hidden || paused || disposed) { running = false; return; }
-    if (!contextLost) frame(now);
+    if (!contextLost) {
+      if (perfMode) {
+        const t0 = performance.now();
+        renderer.info.reset();
+        frame(now);
+        cpuTimes.push(performance.now() - t0); drawCalls.push(renderer.info.render.calls);
+        if (cpuTimes.length > 600) { cpuTimes.shift(); drawCalls.shift(); }
+      } else frame(now);
+    }
     rafId = requestAnimationFrame(loop);
   }
   function run() { if (running || paused || disposed) return; running = true; last = performance.now(); rafId = requestAnimationFrame(loop); }
@@ -1115,11 +1215,15 @@ export async function start(boot) {
       const drawables = [];
       scene.traverse((o) => { if ((o.isMesh || o.isPoints || o.isSprite || o.isLine) && !o.userData.pickProxy) drawables.push([o, o.visible, o.frustumCulled]); });
       drawables.forEach(([o]) => { o.visible = false; });
+      scene.updateMatrixWorld();
+      const camMask = camera.layers.mask;
+      camera.layers.mask = MASK.all; // every layer, the glass's back faces too
       let doneU = 0;
       for (const u of units) {
         const ts = performance.now();
         u.o.visible = true; u.o.frustumCulled = false;
         renderer.setRenderTarget(post.sceneRT);
+        renderer.shadowMap.needsUpdate = true;
         renderer.render(scene, camera);
         u.o.visible = false;
         compileLog.push(['warm-unit:' + unitName(u.o), u.w, Math.round(performance.now() - ts)]);
@@ -1128,6 +1232,7 @@ export async function start(boot) {
         await breathe();
       }
       drawables.forEach(([o, vis, culled]) => { o.visible = vis; o.frustumCulled = culled; });
+      camera.layers.mask = camMask;
       for (let k = 1; k <= 5; k++) {
         const ts = performance.now();
         postUpto = k;
@@ -1136,6 +1241,8 @@ export async function start(boot) {
         boot.report('warm', 0.45 + (0.15 * k) / 5);
         await breathe();
       }
+      // the lighter steps' programs (fewer depth-of-field taps, the sharpening upscale), so stepping down never stalls
+      post.warmExtras();
       postUpto = 9;
     } else frame(performance.now());
     compileLog.push(['warm-frame-' + i, 0, Math.round(performance.now() - tw0)]);
@@ -1326,8 +1433,15 @@ export async function start(boot) {
   window.__cabin = {
     get phase() { return phase; },
     fps: () => perf.fps,
+    still: (t) => { qaStill = t === null || t === undefined ? null : +t; },
+    // QA (?perf): median main-thread ms per frame, draw calls per frame, GPU ms per post stage; perfReset() starts over
+    perf: () => {
+      const med = (a) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return +s[s.length >> 1].toFixed(2); };
+      return { cpu: med(cpuTimes), calls: med(drawCalls), gpu: post ? post.gpuTimes() : null, frames: cpuTimes.length, quality: post ? post.quality : null };
+    },
+    perfReset: () => { cpuTimes.length = 0; drawCalls.length = 0; if (post) post.resetTimes(); },
     fpsHistory: () => perf.history.slice(),
-    quality: () => ({ tier: Q.tier, level: Q.level, budget: Q.budget, transmission: Q.transmission, lampShadow: lamp.light.castShadow, ao: Q.ao, dof: Q.dof, dpr: renderer.getPixelRatio(), post: !!post, gpu: rendererName(renderer.getContext()), programs: renderer.info.programs ? renderer.info.programs.length : -1 }),
+    quality: () => ({ tier: Q.tier, level: governor.tier, step: governor.tier, steps: governor.log, forced: governor.forced, gpuClass: governor.info, render: post ? post.quality : null, batch: Q.batch, refraction: Q.refraction || null, budget: Q.budget, transmission: Q.transmission, lampShadow: lamp.light.castShadow, ao: Q.ao, dof: Q.dof, dpr: renderer.getPixelRatio(), post: !!post, gpu: rendererName(renderer.getContext()), programs: renderer.info.programs ? renderer.info.programs.length : -1 }),
     // try another orientation for a view (QA framing searches): merges into VIEWS[target][ff], optional rect; returns the fit
     tuneView: (target, ff, spec, rect) => {
       if (spec) Object.assign(VIEWS[target][ff], spec);

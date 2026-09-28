@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import * as K from './covers.js';
 import * as A from './album.js';
 import { buildRoom } from './room.js';
+import { makeGovernor } from './quality.js';
 
 const DEG = Math.PI / 180;
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
@@ -26,15 +27,20 @@ const FLIP = 66 * DEG; // flipped through: lying forward against the front of th
 /* Building the shop blocks the browser for seconds, so the build hands control back at every natural break
    (`onStep`): the wait screen gets to move its number and draw a frame before the next lump of work starts. */
 export async function createStage({ canvas, records, images, credits, flyerPrint, onFrame, onState, onCue, onFlyer, onStep = async () => {} }) {
+  // quality steps, so laptops without a graphics card stay smooth (see quality.js): fewer pixels and a smaller
+  // shadow map on the lighter steps, never below the screen's own resolution on ordinary screens
+  const TIER = [{ ratio: 1.75, shadow: 2048 }, { ratio: 1.5, shadow: 1024 }, { ratio: 1.25, shadow: 1024 }, { ratio: 1.0, shadow: 512 }];
+  const gov = makeGovernor({ onChange: (t) => applyTier(t) });
   let renderer;
   try {
     // ?probe=1 keeps the drawn frame readable so the picture-checking tools can look at it; the page itself
     // never asks for that, because keeping the buffer costs memory and speed.
     const probe = new URLSearchParams(location.search).has('probe');
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, premultipliedAlpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: probe });
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: gov.tier < 2, alpha: true, premultipliedAlpha: true, powerPreference: 'high-performance', preserveDrawingBuffer: probe });
   } catch (e) { return null; }
   if (!renderer.getContext()) return null;
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+  const pixelRatio = (t) => Math.min(window.devicePixelRatio || 1, TIER[t].ratio);
+  renderer.setPixelRatio(pixelRatio(gov.tier));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.shadowMap.enabled = true;
@@ -54,7 +60,7 @@ export async function createStage({ canvas, records, images, credits, flyerPrint
   const key = new THREE.DirectionalLight(0xffe9cf, 1.9);
   key.position.set(-70, 80, 90);
   key.castShadow = true;
-  key.shadow.mapSize.set(2048, 2048);
+  key.shadow.mapSize.set(TIER[gov.tier].shadow, TIER[gov.tier].shadow);
   Object.assign(key.shadow.camera, { left: -70, right: 70, top: 70, bottom: -70, near: 10, far: 320 });
   key.shadow.radius = 9;
   key.shadow.bias = -0.0005;
@@ -542,7 +548,14 @@ export async function createStage({ canvas, records, images, credits, flyerPrint
   const _fwd = new THREE.Vector3();
   let roomFade = 1;
   let shadowOnly = false;
+  function applyTier(t) {
+    renderer.setPixelRatio(pixelRatio(t));
+    key.shadow.mapSize.set(TIER[t].shadow, TIER[t].shadow); key.shadow.map?.dispose(); key.shadow.map = null;
+    renderer.shadowMap.needsUpdate = true;
+    layout(); dirty = true;
+  }
   function frame(now) {
+    gov.tick(now - last);
     const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
     last = now;
     let moving = false;

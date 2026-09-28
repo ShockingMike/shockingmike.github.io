@@ -11,6 +11,7 @@ import { V3, REF, sketchAround, SKETCH_MATS, buildBottle, labelTexture, bottleSh
 import { buildCrowd, KINDS, crowdAnchor, prepareSheets } from './crowd.js';
 import { balconyLife } from './balcony.js';
 import { notesFromCopy, loadCopy } from './notes.js';
+import { TIERS, TOP, MIN_OF_SCREEN, gpuInfo, forcedTier, firstTier, makeGovernor } from './quality.js';
 
 const T0 = performance.now();
 const params = new URLSearchParams(location.search);
@@ -124,6 +125,32 @@ renderer.info.autoReset = false;
 renderer.autoClear = false;
 const ANISO = Math.min(8, renderer.capabilities.getMaxAnisotropy());
 const scene = new THREE.Scene();
+
+// ---------------- the quality step (core/quality.js, README 16) ----------------
+// On the four-season page the page decides the step for every season (window.__tier, and setQuality() when it changes);
+// a season on its own page takes ?q=, else a guess from the graphics chip's name (it only watches its own frames with
+// ?qauto=1: the checks in core/qa run on this page and must not have the picture change under them).
+const Q_FORCED = forcedTier(params);
+const GPU = gpuInfo(renderer.getContext());
+const parentTier = () => { try { const t = window.parent !== window ? window.parent.__tier : undefined; return Number.isFinite(t) ? t : null; } catch (e) { return null; } };
+let tierNow = Q_FORCED ?? (EMBED ? parentTier() : null) ?? firstTier(GPU);
+// what a step means here: the table, then (for measuring one thing at a time) ?qscale= ?qmsaa= ?qsun= ?qlamp= ?qsteps=
+// ?qdiv= ?qsharp= on top. The scale never goes under MIN_OF_SCREEN of the screen's own pixels, nor over step 0's.
+function qualityOf(t) {
+  const T = { ...TIERS[Math.max(0, Math.min(TOP, t))] };
+  for (const [k, p] of [['scale', 'qscale'], ['msaa', 'qmsaa'], ['sun', 'qsun'], ['lamp', 'qlamp'], ['shaftSteps', 'qsteps'], ['shaftDiv', 'qdiv'], ['sharpen', 'qsharp']]) {
+    if (params.has(p) && Number.isFinite(+params.get(p))) T[k] = +params.get(p);
+  }
+  const floor = Math.min(1, (MIN_OF_SCREEN * (window.devicePixelRatio || 1)) / DPR);
+  T.scale = Math.max(floor, Math.min(1, T.scale));
+  T.msaa = Math.max(0, Math.min(renderer.capabilities.maxSamples || 4, T.msaa | 0));
+  T.shaftSteps = Math.max(4, Math.min(40, T.shaftSteps | 0));
+  T.shaftDiv = Math.max(1, T.shaftDiv | 0);
+  return T;
+}
+let QS = qualityOf(tierNow);
+window.__tier = tierNow;
+window.__gpu = GPU.name;
 
 // ---------------- the street and the viewpoint (from the season) ----------------
 // every season looks down a street that runs along -z: kerbs and house fronts at these x
@@ -862,7 +889,8 @@ function fillNotes(n, l = 'en') {
 // An orthographic view from the sun over the street, from just behind the eye to ~105 m down it. Casters are drawn with a
 // depth-only twin of their own material (same vertex shader: the wind, the crowd's stepped walk and, for skinned meshes, the bones),
 // so each shadow moves exactly like its thing. The ground and the walls read it and cut it into a brushed edge.
-const SH_SIZE = 2048;
+// (2048 at step 0; the quality step may halve it: QS.sun, applyQuality)
+let SH_SIZE = QS.sun;
 const SH_LAYER = 4;
 const casters = [];
 const rtShadow = new THREE.WebGLRenderTarget(SH_SIZE, SH_SIZE, { type: THREE.UnsignedByteType, generateMipmaps: false, depthBuffer: true });
@@ -898,6 +926,8 @@ function addCasters(root, { lampOnly = false } = {}) {
 // The maps are refreshed one lamp per frame (the crowd moves on twos anyway), all of them on the first frame.
 const LAMP_LAYER = 5;
 const lamps = [];
+// a lamp's shadow map at the quality step's share of the size the season asked for
+const lampSize = (s0) => Math.max(128, Math.round(s0 * QS.lamp));
 let lampTick = 0;
 function addLamp(i, pos, o = {}) {
   const radius = o.radius ?? 6;
@@ -914,7 +944,8 @@ function addLamp(i, pos, o = {}) {
   if (o.shadow === 'cube') return addCubeLamp(i, pos, o, radius);
   if (!o.shadow || lamps.length >= 3) return { i };
   const k = lamps.length;
-  const size = o.shadowSize ?? 1024;
+  const size0 = o.shadowSize ?? 1024;
+  const size = lampSize(size0);
   const rt = new THREE.WebGLRenderTarget(size, size, { type: THREE.UnsignedByteType, generateMipmaps: false, depthBuffer: true });
   rt.depthTexture = new THREE.DepthTexture(size, size);
   rt.depthTexture.type = THREE.UnsignedIntType;
@@ -933,7 +964,7 @@ function addLamp(i, pos, o = {}) {
   U.uLampMat.value[k].multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse);
   U.uLampTexel.value.setComponent(k, 1 / size);
   U.uBulbFlag.value[i] = 2 + k;
-  lamps.push({ i, k, cam, rt, fresh: false });
+  lamps.push({ i, k, cam, rt, size0, fresh: false });
   state.stats.lamps = lamps.length;
   return { i, k };
 }
@@ -941,7 +972,8 @@ function addLamp(i, pos, o = {}) {
 let cube = null;
 function addCubeLamp(i, pos, o, radius) {
   if (cube) { console.warn('[chom-world] only one lamp can have cube shadows'); return { i }; }
-  const size = o.shadowSize ?? 512;
+  const size0 = o.shadowSize ?? 512;
+  const size = lampSize(size0);
   const rt = new THREE.WebGLRenderTarget(size * 3, size * 2, { type: THREE.UnsignedByteType, generateMipmaps: false, depthBuffer: true });
   rt.depthTexture = new THREE.DepthTexture(size * 3, size * 2);
   rt.depthTexture.type = THREE.UnsignedIntType;
@@ -961,7 +993,7 @@ function addCubeLamp(i, pos, o, radius) {
   U.tCube.value = rt.depthTexture;
   U.uCubeTexel.value.set(1 / (size * 3), 1 / (size * 2));
   U.uBulbFlag.value[i] = 5;
-  cube = { i, rt, cams, size, next: 0, fresh: false, perFrame: o.facesPerFrame ?? 2 };
+  cube = { i, rt, cams, size, size0, next: 0, fresh: false, perFrame: o.facesPerFrame ?? 2 };
   state.stats.cubeLamp = i;
   return { i, cube: true };
 }
@@ -1442,17 +1474,23 @@ function placeHit(p, fk) {
 }
 
 // ---------------- render targets ----------------
+// size: the canvas (always what step 0 draws); rsize: the scene's own targets (the canvas x the quality step's scale).
+// The last pass (canvas grain, grade, the hand-over's brush edge) is always drawn at the canvas's full size.
 const size = new THREE.Vector2();
 renderer.getDrawingBufferSize(size);
-const rtMain = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType, samples: 4 });
-rtMain.depthTexture = new THREE.DepthTexture(size.x, size.y);
+const rsize = new THREE.Vector2();
+const scaledSize = () => rsize.set(Math.max(2, Math.round(size.x * QS.scale)), Math.max(2, Math.round(size.y * QS.scale)));
+scaledSize();
+const shaftW = () => Math.max(1, Math.floor(rsize.x / QS.shaftDiv)), shaftH = () => Math.max(1, Math.floor(rsize.y / QS.shaftDiv));
+const rtMain = new THREE.WebGLRenderTarget(rsize.x, rsize.y, { type: THREE.HalfFloatType, samples: QS.msaa });
+rtMain.depthTexture = new THREE.DepthTexture(rsize.x, rsize.y);
 rtMain.depthTexture.type = THREE.UnsignedIntType;
-// sunbeams in the damp air, half size, softened twice
-const rtShaft = new THREE.WebGLRenderTarget(size.x >> 1, size.y >> 1, { type: THREE.HalfFloatType });
-const rtShaftB = new THREE.WebGLRenderTarget(size.x >> 1, size.y >> 1, { type: THREE.HalfFloatType });
-const rtBottle = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType, samples: 4 });
-const rtBlurA = new THREE.WebGLRenderTarget(size.x >> 1, size.y >> 1, { type: THREE.HalfFloatType });
-const rtBlurB = new THREE.WebGLRenderTarget(size.x >> 1, size.y >> 1, { type: THREE.HalfFloatType });
+// sunbeams in the damp air, half size (a quarter on the lighter steps), softened twice
+const rtShaft = new THREE.WebGLRenderTarget(shaftW(), shaftH(), { type: THREE.HalfFloatType });
+const rtShaftB = new THREE.WebGLRenderTarget(shaftW(), shaftH(), { type: THREE.HalfFloatType });
+const rtBottle = new THREE.WebGLRenderTarget(rsize.x, rsize.y, { type: THREE.HalfFloatType, samples: QS.msaa });
+const rtBlurA = new THREE.WebGLRenderTarget(rsize.x >> 1, rsize.y >> 1, { type: THREE.HalfFloatType });
+const rtBlurB = new THREE.WebGLRenderTarget(rsize.x >> 1, rsize.y >> 1, { type: THREE.HalfFloatType });
 const fsCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 const fsScene = new THREE.Scene();
 const fsQuad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2));
@@ -1488,11 +1526,12 @@ const shaftMat = new THREE.ShaderMaterial({
     uGap: { value: new THREE.Vector2(...(BEAMS ? BEAMS.gap : [0, 0])) },
     uWinZ: { value: new THREE.Vector2(...(BEAMS?.winZ ?? [-16.5, -22])) }, uWinLo: { value: new THREE.Vector3(...(BEAMS?.winLo ?? [3.9, 5.7, 7.5])) },
     uBoxMax: { value: new THREE.Vector3(...(BEAMS?.boxMax ?? [5.2, 10.5, -5.0])) },
+    uSteps: { value: QS.shaftSteps },
   },
   vertexShader: fsVert,
   fragmentShader: /* glsl */`
     uniform sampler2D tDepth, tBrush, tRoof; uniform vec4 uRoof; uniform vec3 uKeyDir, uCam; uniform mat4 uInvProj, uCamWorld; uniform vec2 uGap;
-    uniform vec2 uWinZ; uniform vec3 uWinLo, uBoxMax;
+    uniform vec2 uWinZ; uniform vec3 uWinLo, uBoxMax; uniform float uSteps;
     varying vec2 vUv;
     float hash12(vec2 p){ vec3 p3 = fract(vec3(p.xyx) * .1031); p3 += dot(p3, p3.yzx + 33.33); return fract((p3.x + p3.y) * p3.z); }
     float sunAt(vec3 wp, float jit){
@@ -1528,11 +1567,13 @@ const shaftMat = new THREE.ShaderMaterial({
       float tf = min(min(min(t2.x, t2.y), t2.z), far);
       if (tf <= tn) { gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0); return; }
       vec3 perp = normalize(cross(uKeyDir, vec3(0.0, 1.0, 0.0)));
+      // (uSteps: 40 at step 0; the lighter quality steps walk fewer)
       const int N = 40;
-      float stepL = (tf - tn) / float(N);
+      float stepL = (tf - tn) / uSteps;
       float j = hash12(gl_FragCoord.xy);
       float acc = 0.0;
       for (int i = 0; i < N; i++) {
+        if (float(i) >= uSteps) break;
         vec3 p = uCam + rd * (tn + (float(i) + j) * stepL);
         // the beams read only further down the street, where they cross it as rays: nearer, the beam volume filled whole
         // stretches of the frame with a pale veil (read as a see-through patch), so the air nearer than ~11 m stays clear
@@ -1554,12 +1595,25 @@ const shaftMat = new THREE.ShaderMaterial({
 // painting -> (street out of focus, a little darker) -> bottle on top -> real linen canvas -> A's bright, warm grade
 const finalMat = new THREE.ShaderMaterial({
   depthTest: false, depthWrite: false,
-  uniforms: { tScene: { value: rtMain.texture }, tBlur: { value: rtBlurB.texture }, tBottle: { value: rtBottle.texture }, tShaft: { value: rtShaftB.texture }, uDim: { value: 0 }, tLinen: { value: null }, uRes: { value: size.clone() }, uDpr: { value: DPR }, uShaftCol: { value: lin('#ffd9a0') }, uShaftK: { value: season.beams ? 1 : 0 }, uDbg: { value: 0 }, uPeel: { value: 0 }, tDepth: { value: rtMain.depthTexture }, tBrushS: U.tBrush, uNF: { value: new THREE.Vector2(0.05, 1200) }, uFocus: { value: new THREE.Vector3(0.5, 0.5, 0) }, uFocusK: { value: new THREE.Vector4(...(BOT?.focus ?? [0.12, 0.06, 0, 0.58])) } },
+  uniforms: { tScene: { value: rtMain.texture }, tBlur: { value: rtBlurB.texture }, tBottle: { value: rtBottle.texture }, tShaft: { value: rtShaftB.texture }, uDim: { value: 0 }, tLinen: { value: null }, uRes: { value: size.clone() }, uDpr: { value: DPR }, uShaftCol: { value: lin('#ffd9a0') }, uShaftK: { value: season.beams ? 1 : 0 }, uDbg: { value: 0 }, uPeel: { value: 0 }, tDepth: { value: rtMain.depthTexture }, tBrushS: U.tBrush, uNF: { value: new THREE.Vector2(0.05, 1200) }, uFocus: { value: new THREE.Vector3(0.5, 0.5, 0) }, uFocusK: { value: new THREE.Vector4(...(BOT?.focus ?? [0.12, 0.06, 0, 0.58])) }, uSharp: { value: 0 }, uTexel: { value: new THREE.Vector2(1 / rsize.x, 1 / rsize.y) } },
   vertexShader: fsVert,
   fragmentShader: /* glsl */`
     uniform sampler2D tScene, tBlur, tBottle, tLinen, tShaft; uniform vec2 uRes; uniform float uDpr, uDim, uShaftK, uDbg; uniform vec3 uShaftCol, uFocus; uniform vec4 uFocusK;
     uniform sampler2D tDepth, tBrushS; uniform float uPeel; uniform vec2 uNF;
+    uniform float uSharp; uniform vec2 uTexel;
     varying vec2 vUv;
+    // the painting drawn smaller than the canvas (the lighter quality steps) and brought up to it: a light unsharp mask
+    // over its four neighbours, in a compressed range so a lamp's bright core cannot ring
+    vec3 tm(vec3 c){ return c / (1.0 + c); }
+    vec3 sceneAt(vec2 uv){
+      vec3 c = texture2D(tScene, uv).rgb;
+      if (uSharp <= 0.0) return c;
+      vec3 t = tm(c);
+      vec3 n = tm(texture2D(tScene, uv + vec2(uTexel.x, 0.0)).rgb) + tm(texture2D(tScene, uv - vec2(uTexel.x, 0.0)).rgb)
+             + tm(texture2D(tScene, uv + vec2(0.0, uTexel.y)).rgb) + tm(texture2D(tScene, uv - vec2(0.0, uTexel.y)).rgb);
+      t = clamp(t + (t - n * 0.25) * uSharp * 2.0, 0.0, 0.995);
+      return t / (1.0 - t);
+    }
     vec3 toSRGB(vec3 c){ return mix(c * 12.92, 1.055 * pow(c, vec3(1.0 / 2.4)) - 0.055, step(0.0031308, c)); }
     float band(float x, float t){ float w = max(fwidth(x), 1e-4) * 1.5; return smoothstep(t - w, t + w, x); }
     vec3 shafts(vec3 c){
@@ -1571,7 +1625,7 @@ const finalMat = new THREE.ShaderMaterial({
       return 1.0 - (1.0 - c / (1.0 + c)) * (1.0 - uShaftCol * a) ;
     }
     void main(){
-      vec3 c = texture2D(tScene, vUv).rgb;
+      vec3 c = sceneAt(vUv);
       { vec3 ct = c / (1.0 + c); vec3 st = shafts(c); c = st / max(1.0 - st, 1e-3); }
       if (uDim > 0.0) {
         c = mix(c, texture2D(tBlur, vUv).rgb, smoothstep(0.0, 0.5, uDim));
@@ -1911,6 +1965,7 @@ function loop(now) {
   update(dt);
   renderFrame();
   if (DEV) warnNear();
+  if (OWN_GOV) OWN_GOV.tick(frameMs);
   fpsAcc += dt; fpsN++; frameMsAcc += frameMs; frameMax = Math.max(frameMax, frameMs);
   if (fpsAcc > 0.5) {
     state.stats.fps = +(fpsN / fpsAcc).toFixed(1);
@@ -1922,6 +1977,17 @@ function loop(now) {
   requestAnimationFrame(loop);
 }
 
+// the scene's targets at the canvas size x the quality step's scale
+function sizeTargets() {
+  scaledSize();
+  rtMain.setSize(rsize.x, rsize.y);
+  rtBottle.setSize(rsize.x, rsize.y);
+  rtBlurA.setSize(rsize.x >> 1, rsize.y >> 1);
+  rtBlurB.setSize(rsize.x >> 1, rsize.y >> 1);
+  rtShaft.setSize(shaftW(), shaftH());
+  rtShaftB.setSize(shaftW(), shaftH());
+  finalMat.uniforms.uTexel.value.set(1 / rsize.x, 1 / rsize.y);
+}
 function resize() {
   const w = window.innerWidth, h = window.innerHeight;
   view.w = w; view.h = h;
@@ -1930,16 +1996,60 @@ function resize() {
   camera.updateProjectionMatrix();
   renderer.setSize(w, h);
   renderer.getDrawingBufferSize(size);
-  rtMain.setSize(size.x, size.y);
-  rtBottle.setSize(size.x, size.y);
-  rtBlurA.setSize(size.x >> 1, size.y >> 1);
-  rtBlurB.setSize(size.x >> 1, size.y >> 1);
-  rtShaft.setSize(size.x >> 1, size.y >> 1);
-  rtShaftB.setSize(size.x >> 1, size.y >> 1);
+  sizeTargets();
   finalMat.uniforms.uRes.value.copy(size);
   U.uPx.value = (2 * Math.tan(THREE.MathUtils.degToRad(FOV / 2))) / h;
 }
 window.addEventListener('resize', resize);
+
+// ---------------- the quality step, applied (core/quality.js, README 16) ----------------
+// Everything a step changes is here, and nothing else: how large the scene's targets are, how many samples smooth their
+// edges, how large the shadow maps are, how many steps the beams take, how much the picture is sharpened when it is
+// drawn smaller than the canvas. Nothing that moves is touched: every motion keeps its clock.
+function applyQuality(t) {
+  const n = Math.max(0, Math.min(TOP, t | 0));
+  const was = QS;
+  tierNow = n;
+  QS = qualityOf(n);
+  window.__tier = n;
+  if (QS.msaa !== was.msaa) {
+    for (const rt of [rtMain, rtBottle]) { rt.samples = QS.msaa; rt.dispose(); }
+  }
+  sizeTargets();
+  if (QS.sun !== SH_SIZE) {
+    SH_SIZE = QS.sun;
+    rtShadow.setSize(SH_SIZE, SH_SIZE);
+    if (casters.length) setupShadow();
+  }
+  for (const l of lamps) {
+    const s = lampSize(l.size0);
+    if (l.rt.width === s) continue;
+    l.rt.setSize(s, s);
+    U.uLampTexel.value.setComponent(l.k, 1 / s);
+    l.fresh = false;
+  }
+  if (cube) {
+    const s = lampSize(cube.size0);
+    if (cube.size !== s) {
+      cube.size = s;
+      cube.rt.setSize(s * 3, s * 2);
+      U.uCubeTexel.value.set(1 / (s * 3), 1 / (s * 2));
+      cube.fresh = false;
+    }
+  }
+  shaftMat.uniforms.uSteps.value = QS.shaftSteps;
+  finalMat.uniforms.uSharp.value = QS.scale < 1 ? QS.sharpen : 0;
+  state.quality = qualityNow();
+  return state.quality;
+}
+function qualityNow() {
+  return { tier: tierNow, forced: Q_FORCED !== null, gpu: GPU.name, soft: GPU.soft, ...QS, px: [rsize.x, rsize.y], canvas: [size.x, size.y], ofScreen: +((QS.scale * DPR) / (window.devicePixelRatio || 1)).toFixed(3) };
+}
+state.setQuality = (t) => (Number.isFinite(+t) && +t !== tierNow ? applyQuality(+t) : qualityNow());
+state.quality = qualityNow();
+finalMat.uniforms.uSharp.value = QS.scale < 1 ? QS.sharpen : 0;
+// a season on its own page with ?qauto=1 watches its own frames (the four-season page watches for all of them)
+const OWN_GOV = !EMBED && params.get('qauto') === '1' ? makeGovernor({ start: tierNow, forced: Q_FORCED, onChange: (t) => applyQuality(t) }) : null;
 
 // ---------------- test hooks ----------------
 // (checks: the four-season page's arrival and fly-through on this page too; the close-up held at k without its animation)

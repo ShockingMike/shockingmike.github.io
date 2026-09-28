@@ -6,12 +6,29 @@
 //
 // The page layer (page/page.js, owned by the page agent) is mounted here if it exists: mountPage(api), see README section 12.
 import { notesFromCopy, loadCopy } from './notes.js';
+import { gpuInfo, forcedTier, firstTier, makeGovernor } from './quality.js';
 const params = new URLSearchParams(location.search);
 const DEV = params.get('dev') === '1';
 const IDS = (params.get('seasons') || 'xuan,ha,thu,dong').split(',').filter(Boolean);
 // what the page's address hands on to each season's frame (a setting being measured must reach the season, or the
 // measurement is of the wrong thing)
-const PASS = ['people', 't', 'quietms', 'linestyle', 'linew', 'sketchmove'].filter((k) => params.has(k)).map((k) => `&${k}=${encodeURIComponent(params.get(k))}`).join('');
+const PASS = ['people', 't', 'quietms', 'linestyle', 'linew', 'sketchmove', 'q', 'qscale', 'qmsaa', 'qsun', 'qlamp', 'qsteps', 'qdiv', 'qsharp'].filter((k) => params.has(k)).map((k) => `&${k}=${encodeURIComponent(params.get(k))}`).join('');
+
+// ---------------- can this machine draw the seasons, and at which quality step (core/quality.js, README 16) ----------------
+// Asked once, before any season frame is made: each frame reads window.__tier as it starts. The context asked is let go
+// straight away (it would otherwise stay alive next to the five the page draws with).
+const probe = document.createElement('canvas');
+const probeGl = probe.getContext('webgl2', { powerPreference: 'high-performance' }) || probe.getContext('webgl', { powerPreference: 'high-performance' });
+const GPU = gpuInfo(probeGl);
+try { probeGl?.getExtension('WEBGL_lose_context')?.loseContext(); } catch (e) { /* gone already */ }
+const Q_FORCED = forcedTier(params);
+// A software renderer (no graphics chip: SwiftShader, llvmpipe, Windows' Basic Render Driver) draws one frame of the
+// lightest scene in about 1.4 s, and a season's build moves a slice per frame, so the first season never finishes and the
+// whole tab stops answering — measured 28/9. No step can bring that to a page anyone can look at, so it gets the reading
+// version, the same as a machine without WebGL. (?q= forces the scenes anyway, for testing.)
+const NO_3D = !probeGl ? 'no WebGL' : GPU.soft && Q_FORCED === null ? `software renderer (${GPU.name})` : null;
+window.__tier = Q_FORCED ?? firstTier(GPU);
+window.__gpu = GPU.name;
 const N = IDS.length;
 // the scroll room: an opening stretch (the spring camera waits at its start), then one stretch per season:
 //   HOLD_VH standing still where the season arrives (its bottle can be clicked), PUSH_VH pushing through its layers,
@@ -98,7 +115,7 @@ const api = (i) => { try { return frames[i].contentWindow.__chom; } catch (e) { 
 // A still life the page opens on, before the first season: one open bottle and the ribbon of scent climbing from it, with the
 // spring waiting inside the scent. It is not a season: no card, no bottle button, never in the keyboard order. It has the
 // opening stretch of the scroll room to itself. ?intro=0 (no opening stretch) or ?opening=0 leaves it out altogether.
-const OPEN_ID = INTRO_VH > 0 && params.get('opening') !== '0' ? (params.get('opening') || 'mocua') : null;
+const OPEN_ID = !NO_3D && INTRO_VH > 0 && params.get('opening') !== '0' ? (params.get('opening') || 'mocua') : null;
 // where the opening gives way: by then the picture it carries has taken the whole frame, so the season steps into its place
 // without anything being seen to change (and the page draws one scene again, not two)
 const OPEN_END = 0.97;
@@ -224,6 +241,7 @@ window.addEventListener('message', (e) => {
     if (d.ready) {
       state.opening.ready = true;
       state.opening.readyMs = d.readyMs;
+      pushTier(-1);
       openApi().journey({ push: 0, run: true, active: false });
       openPage();
       apply(true);
@@ -234,6 +252,7 @@ window.addEventListener('message', (e) => {
   if (i < 0) return;
   const d = e.data;
   if (d.error) {
+    failed.add(i);
     fail(i === 0 ? 'load-failed' : 'season-failed', { id: IDS[i], message: d.error });
     openNext(i, 'it could not be built');
     goNext(i, 'it could not be built');
@@ -250,6 +269,7 @@ window.addEventListener('message', (e) => {
     state.seasons[i].ready = true;
     state.seasons[i].progress = 1;
     state.seasons[i].readyMs = d.readyMs;
+    pushTier(i);
     api(i).journey({ run: false });
     pushLanguage(i);
     if (i === 0) {
@@ -273,6 +293,8 @@ function openPage() {
   if (!pageMounted) root.classList.remove('is-loading');
   state.ready = true;
   state.readyMs = Math.round(performance.now());
+  // (the name every page of the portfolio uses for "the page can be looked at", for the shared measuring scripts)
+  window.__ready = true;
   holdEntrance();
   emit('ready', { readyMs: state.readyMs });
 }
@@ -297,21 +319,43 @@ const seasonsPx = () => Math.max(1, measure().height - measure().vh - introPx())
 // the intro's progress (0..1) and g (0..1 across the seasons), from the scroll position; g is 0 through the intro
 const scrollTarget = () => {
   const y = window.scrollY - measure().top;
-  introT = clamp01(y / Math.max(1, introPx()));
   // (where the viewer really is in the opening, before the stop below: a first season still building reads it and, once
   // the viewer is on the way in, stops pacing itself — core/world.js viewerComing)
-  state.introRaw = introT;
-  // the walk into the scent stops just short of the way in until the first season is ready to be walked into
-  if (openOn() && !state.seasons[0].ready) introT = Math.min(introT, 0.86);
+  state.introRaw = clamp01(y / Math.max(1, introPx()));
   return clamp01((y - introPx()) / seasonsPx());
 };
+// where the walk into the scent is headed: where the scroll is, except that it stops just short of the way in until the
+// first season is ready to be walked into (asked every frame, so the walk goes on by itself once the season is ready)
+const introAim = () => (openOn() && !state.seasons[0].ready ? Math.min(state.introRaw, 0.86) : state.introRaw);
 const FIXED = params.has('g') ? clamp01(parseFloat(params.get('g')) || 0) : null;
+state.introRaw = 0;
 let introT = 0;
 let target = FIXED ?? 0, g = target;
 // (seasons building in the background take less time per frame while the viewer scrolls)
 window.__chomScrollAt = 0;
 window.addEventListener('scroll', () => { window.__chomScrollAt = Date.now(); if (FIXED === null) target = scrollTarget(); }, { passive: true });
-state.setG = (v) => { target = g = clamp01(v); introT = 1; apply(true); return true; };
+state.setG = (v) => { target = g = clamp01(v); introT = state.introRaw = 1; apply(true); return true; };
+
+// ---------------- the pace of the scroll (README 10b) ----------------
+// However hard the scroll is flung (a laptop's touchpad throws thousands of pixels a second), what the scroll drives —
+// the walk into the scent, each season's push through its layers, each hand-over — goes forward no faster than a pace
+// the eye can follow, and then catches up with the scroll by itself. Mike's friends said of another page that a hard
+// touchpad scroll made everything go by "vèo vèo, không kịp nhìn". Only the top speed is held: a scroll slower than
+// this is followed exactly as before (the walk into the scent step for step, the seasons with their usual easing).
+// Going back is not held (it may be quicker). In vh of scroll per second, so it is the same on every screen:
+//   the walk into the scent (300vh)  at most 120 vh/s: 2.5 s at the least
+//   a season's push (340vh)          at most 160 vh/s: 2.1 s
+//   a hand-over (100vh)              at most  80 vh/s: 1.25 s
+// ?pace=0 turns it off (for comparing); ?pace=<k> multiplies every pace by k.
+const PACE_K = params.has('pace') ? Math.max(0, +params.get('pace') || 0) : 1;
+const PACE_INTRO_VH = 120, PACE_PUSH_VH = 160, PACE_HAND_VH = 80;
+state.pace = { on: PACE_K > 0, k: PACE_K, introVhS: PACE_INTRO_VH, pushVhS: PACE_PUSH_VH, handVhS: PACE_HAND_VH, held: 0 };
+// how far g may go forward in a second, from where g is now
+const gPace = (gv) => {
+  const x = gv * N, i = Math.min(N - 1, Math.floor(x)), u = x - i;
+  const vh = i < N - 1 && u > 1 - HAND ? PACE_HAND_VH : PACE_PUSH_VH;
+  return (vh * PACE_K) / (N * SEASON_VH);
+};
 const scrollYFor = (gv) => measure().top + introPx() + gv * seasonsPx();
 state.scrollYFor = scrollYFor;
 
@@ -455,6 +499,7 @@ function scrollToSeason(i, opt = 'smooth') {
     if (!quick) { cutVeil.classList.add('is-on'); await waitMs(220); }
     window.scrollTo({ top: scrollYFor(gT), behavior: 'instant' });
     target = g = scrollTarget();
+    introT = introAim();
     apply(true);
     await waitFrames(3);
     if (!quick) { cutVeil.classList.remove('is-on'); await waitMs(380); }
@@ -507,16 +552,62 @@ function carryPicture(dt) {
     .catch(() => { picBusy = false; });
 }
 
+// ---------------- the quality step, watched (core/quality.js, README 16) ----------------
+// One step for the whole page: the page's own frames are what the viewer sees, whichever seasons are drawing them.
+// While seasons are still being built behind the page the governor only believes frames that are slow beyond doubt
+// (each frame also carries a slice of that building). A season that finishes building is told the step then (it made its
+// targets with the step it started with).
+const failed = new Set();
+const building = () => (OPEN_ID && !openFailed && !state.opening.ready) || state.seasons.some((x, i) => !x.ready && !failed.has(i));
+const pushTier = (i) => { const a = i < 0 ? openApi() : api(i); try { if (a && a.setQuality) a.setQuality(window.__tier); } catch (e) { /* not ready */ } };
+state.tierLog = [[Math.round(performance.now()), window.__tier]];
+const GOV = makeGovernor({
+  start: window.__tier, forced: Q_FORCED,
+  onChange: (t) => {
+    window.__tier = t;
+    state.tierLog.push([Math.round(performance.now()), t]);
+    if (OPEN_ID) pushTier(-1);
+    for (let i = 0; i < N; i++) pushTier(i);
+  },
+});
+// (for measuring: put the whole page on step t now; the governor carries on from there)
+state.setTier = (t) => { GOV.set(Math.round(+t)); return GOV.tier; };
+state.quality = () => ({
+  tier: GOV.tier, forced: GOV.forced, gpu: GPU.name, soft: GPU.soft, integrated: GPU.integrated, log: state.tierLog.slice(),
+  frames: [openApi(), ...IDS.map((_, i) => api(i))].map((a) => { try { return a && a.quality ? { tier: a.quality.tier, px: a.quality.px, ofScreen: a.quality.ofScreen } : null; } catch (e) { return null; } }),
+});
+
 let lastT = performance.now(), fAcc = 0, fN = 0;
 let devEl = null;
 function tick(now) {
-  const dt = Math.min(0.05, (now - lastT) / 1000);
+  const rawMs = now - lastT;
+  const dt = Math.min(0.05, rawMs / 1000);
   lastT = now;
   fAcc += dt; fN++;
   if (fAcc > 0.5) { state.fps = +(fN / fAcc).toFixed(1); fAcc = 0; fN = 0; }
-  const k = FIXED !== null ? 1 : 1 - Math.exp(-dt * 5.5);
-  g += (target - g) * k;
-  if (Math.abs(target - g) < 1e-5) g = target;
+  if (state.ready && !lastError) GOV.tick(rawMs, { building: building() });
+  // (once the page's end part covers the whole screen nothing of the scene can be seen: no pace to keep, it is simply
+  // where the scroll is — the winter street waits under the end part, as before)
+  const covered = FIXED === null && window.scrollY >= measure().top + measure().height;
+  if (FIXED !== null || covered) { g = target; introT = introAim(); }
+  else {
+    // the walk into the scent: straight after the scroll, as before, but forward no faster than its pace
+    const aim = introAim();
+    if (aim <= introT || PACE_K <= 0) introT = aim;
+    else introT = Math.min(aim, introT + ((PACE_INTRO_VH * PACE_K) / INTRO_VH) * dt);
+    // the seasons wait while the walk into the scent is still catching up (so a fling from the top does not use up the
+    // spring behind the scent before anyone can see it)
+    const tg = introT < 1 && target > g ? g : target;
+    let step = (tg - g) * (1 - Math.exp(-dt * 5.5));
+    if (step > 0 && PACE_K > 0) {
+      const cap = gPace(g) * dt;
+      if (step > cap) { step = cap; state.pace.held++; }
+    }
+    g += step;
+    if (Math.abs(tg - g) < 1e-5) g = tg;
+  }
+  // (true while the scene is still on its way to where the scroll is: a check waits for this, not for a guessed time)
+  state.catching = FIXED === null && (g !== target || introT !== introAim());
   if (state.ready) apply();
   if (state.ready) { try { carryPicture(dt); } catch (e) { dropOpening('could not show the season inside its scent'); console.error(e); } }
   if (DEV) {
@@ -576,9 +667,8 @@ if (page && page.mountPage) {
 state.page = !!page;
 state.api = pageApi;
 coreCopy = await loadCopy();
-// WebGL is needed for the seasons; without it the page layer shows its fallback
-const probe = document.createElement('canvas');
-if (!(probe.getContext('webgl2') || probe.getContext('webgl'))) fail('no-webgl');
+// WebGL is needed for the seasons (and a real graphics chip, above); without it the page layer shows its fallback
+if (NO_3D) { console.info(`[chom] the reading version: ${NO_3D}`); window.__no3d = NO_3D; fail('no-webgl', { message: NO_3D, gpu: GPU.name, software: GPU.soft }); window.__ready = true; }
 else {
   load(0);
   setTimeout(() => { if (!state.ready) fail('timeout'); }, 60000);

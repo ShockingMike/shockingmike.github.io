@@ -29,7 +29,7 @@ const readout = doc.querySelector('[data-loader-readout]');
 const trace = [], marks = {};
 
 /* ---------- Module graph of the scene: real (uncompressed) byte sizes, written by tools/qa/harness/scene-manifest.mjs */
-/*SCENE-MANIFEST*/const SCENE_FILES = [["three/build/three.core.js",1458113],["three",392831],["./cabin.js",86575],["three/addons/postprocessing/SMAAPass.js",50379],["./lib/canvas-tex.js",33560],["./lib/props.js",27428],["./lib/cabinets.js",23266],["three/addons/postprocessing/GTAOPass.js",19910],["./coast.js",17928],["./lib/decor.js",17586],["three/addons/postprocessing/UnrealBloomPass.js",15397],["three/addons/math/SimplexNoise.js",15148],["./lib/cabin.js",15124],["three/addons/shaders/SMAAShader.js",15002],["./lib/outdoors.js",12861],["three/addons/shaders/GTAOShader.js",12166],["./lib/sheet.js",11047],["./lib/ocean-chart.js",10964],["./lib/bake.js",10907],["./desk.js",9742],["./lib/weather.js",9620],["./lib/coffee.js",8247],["./voyage.js",7889],["./lib/pick.js",7392],["./lib/post.js",7341],["three/addons/shaders/PoissonDenoiseShader.js",7080],["./lib/util.js",6902],["three/addons/geometries/RoundedBoxGeometry.js",6470],["./lib/lamp.js",5588],["./lib/beams.js",4615],["three/addons/postprocessing/Pass.js",4218],["three/addons/postprocessing/OutputPass.js",4184],["./lib/layout.js",3378],["./lib/harbour.js",2899],["three/addons/shaders/OutputShader.js",1876],["./copy.js",1767],["three/addons/shaders/LuminosityHighPassShader.js",1291],["three/addons/shaders/CopyShader.js",729]];/*END*/
+/*SCENE-MANIFEST*/const SCENE_FILES = [["three/build/three.core.js",1458113],["three",392831],["./cabin.js",94653],["three/addons/postprocessing/SMAAPass.js",50379],["./lib/canvas-tex.js",33019],["./lib/props.js",26953],["./lib/cabinets.js",23266],["three/addons/postprocessing/GTAOPass.js",19910],["./coast.js",17924],["./lib/decor.js",17803],["./lib/post.js",15489],["three/addons/postprocessing/UnrealBloomPass.js",15397],["three/addons/math/SimplexNoise.js",15148],["three/addons/shaders/SMAAShader.js",15002],["./lib/cabin.js",14862],["./lib/outdoors.js",12624],["three/addons/shaders/GTAOShader.js",12166],["./lib/sheet.js",11047],["./lib/ocean-chart.js",10776],["./lib/bake.js",10667],["./desk.js",9742],["./lib/weather.js",9469],["./lib/coffee.js",8247],["./voyage.js",7889],["./lib/pick.js",7392],["three/addons/shaders/PoissonDenoiseShader.js",7080],["./lib/util.js",6772],["./lib/refraction.js",6515],["three/addons/geometries/RoundedBoxGeometry.js",6470],["./lib/batch.js",5613],["./lib/lamp.js",5476],["./lib/beams.js",4758],["three/addons/postprocessing/Pass.js",4218],["three/addons/postprocessing/OutputPass.js",4184],["./lib/layout.js",3378],["./lib/harbour.js",2899],["./lib/quality.js",2864],["three/addons/shaders/OutputShader.js",1876],["./copy.js",1767],["three/addons/shaders/LuminosityHighPassShader.js",1291],["three/addons/shaders/CopyShader.js",729]];/*END*/
 
 function importMap() {
   let imports = {};
@@ -328,6 +328,7 @@ function failover(reason) {
     await runPage(null);
     // everything that will load has loaded: the loader reads 100 before it leaves
     paint(100);
+    window.__ready = true;
     marks.shown100 = ms();
     leaving = true;
     leave();

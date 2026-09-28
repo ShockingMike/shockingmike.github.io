@@ -88,5 +88,6 @@ export function createBeams(pixelRatio) {
     uniforms.uTime.value = time;
     uniforms.uLen.value = len;
   }
-  return { group, update, meshes: shafts.map((s) => s.mesh) };
+  // the dust's point size follows the cabin's render resolution (device pixels per CSS pixel)
+  return { group, update, meshes: shafts.map((s) => s.mesh), setPixelRatio(pr) { uniforms.uPx.value = pr; } };
 }

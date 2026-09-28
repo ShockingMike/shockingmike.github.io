@@ -92,6 +92,7 @@ export function buildDecor(M) {
     const bottom = new THREE.Group(); bottom.position.y = 0.0125; g.add(bottom);
     bottom.add(mesh(lathe([[0, 0], [0.025, 0], [0.021, 0.012, 0.004], [0.006, 0.028], [0, 0.03]], 32, 3), M.sand, false, true));
     const stream = mesh(new THREE.CylinderGeometry(0.0011, 0.0011, 1, 6), M.sand, false, false); g.add(stream);
+    top.userData.live = bottom.userData.live = stream.userData.live = true; // moved every frame: never batched (lib/batch.js)
     return (t) => {
       const p = ((t + 17) % 50) / 50, s = smooth(0, 1, p);
       top.scale.set(0.55 + 0.45 * (1 - s), Math.max(0.02, 1 - s), 0.55 + 0.45 * (1 - s));
@@ -155,6 +156,7 @@ export function buildDecor(M) {
   const setHand = baro.hand(0.05, 0.002, M.marker, 0.0385, 0.008);
   setHand.rotation.z = -12 * DEG;
   let needleAngle = 0;
+  [hourHand, minuteHand, secondHand, needle].forEach((h) => { h.userData.live = true; });
 
   /* ---------- Shelf with three sample jars ---------- */
   {
