@@ -116,7 +116,13 @@ export function createLoader({ copy, onEnter, beforeEnter, nameTarget }) {
   const complete = () => {
     if (failed) return;
     // a true 100%: the page behind is laid out first, then the waiting screen gives way to the opening room
-    Promise.resolve(beforeEnter ? beforeEnter() : null).then(() => enter());
+    // (29/9) ...and painted once while the waiting screen still covers it. An opaque waiting screen hides the room from
+    // the browser, which then paints all of it on the very frame the screen starts to go: 67–83 ms of the graphics card
+    // in most runs, the one long frame of the entrance (core/qa/loadstutter.mjs). At 99.9% the screen looks the same
+    // but no longer hides anything, so the room is painted here, two frames before, under the screen at 100%.
+    el.style.opacity = '0.999';
+    const painted = () => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(r, 50))));
+    Promise.resolve(beforeEnter ? beforeEnter() : null).then(painted).then(() => enter());
   };
   // ---- the name goes to its place -------------------------------------------------------------------------
   // There is only ever ONE "Chớm" on the screen. The waiting screen's name does not fade out while the opening

@@ -9,6 +9,8 @@
 //     layout.roles: ['picker']; layout.picker = { boat, pole, picked, boatAt, period, deckY, pickAt, pickBlooms, pickBloomAt }
 //   returns { update(t, dt, camera), sketch, movers(t), solids, caps(t), faceProbes(), pole(t), qa }
 const here = (p) => new URL(p, import.meta.url).href;
+// the files this folder will fetch while it builds: the core fetches them early, beside the page's own (core/world.js)
+export const ASSETS = [here('./haisen.glb'), here('./haisen.json')];
 const THREE = await import('three');
 const { GLTFLoader } = await import('three/addons/loaders/GLTFLoader.js');
 const RIG = await import(here('./rig.js'));

@@ -17,6 +17,8 @@ async function firstOf(...urls) {
 const K = await firstOf(here('./khach.js'), here('../khach.js'));
 const KP = await firstOf(here('./khach-paint.js'), here('../khach-paint.js'));
 const MODEL = [here('./khach.glb'), here('../model/khach.glb')];
+// the files this folder will fetch while it builds: the core fetches them early, beside the page's own (core/world.js)
+export const ASSETS = [MODEL[0]];
 const LOOP = 6;
 
 export async function buildPeople(scene, R, layout, core) {

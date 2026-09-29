@@ -7,6 +7,7 @@ export const COPY = {
   "loader.label": "Xưởng hương Hà Nội",
   "loader.unit": "%",
   "loader.error": "Trình duyệt này không mở được xưởng. Chữ vẫn ở bên dưới cả.",
+  "loader.season": "Đang pha mùa {season}… {pct}%",
   "fallback.notice": "Máy này không hiện được 3D.",
   "nav.label": "Các mùa và đặt hàng",
   "nav.logoAria": "Chớm, Xưởng hương Hà Nội, về đầu trang",

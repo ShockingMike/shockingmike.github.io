@@ -24,6 +24,8 @@ const SKETCH = await import(here('./sketch.js'));
 const { V3, FPS, STEP } = RIG;
 
 const MODEL = (n) => [here(`./${n}.glb`)];
+// the files this folder will fetch while it builds: the core fetches them early, beside the page's own (core/world.js)
+export const ASSETS = ['chu', 'co', 'ngo', 'tram'].flatMap((n) => [here(`./${n}.glb`), here(`./${n}.json`)]);
 const ROLE_MODEL = { seller: 'ngo', warmerA: 'chu', warmerB: 'co', incense: 'tram' };
 // the Blender objects (glTF nodes) and the look each one wears
 const NODE_LOOK = { Body: 'skin', Jacket: 'jacket', Pants: 'pants', Under: 'under', Scarf: 'scarf', Hat: 'hat', Hair: 'hair', Band: 'band', Buttons: 'button', Socks: 'socks', Shoes: 'shoes' };

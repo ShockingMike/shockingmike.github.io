@@ -25,6 +25,8 @@ import { buildBike, BUNCH_HOLD, BUNCH_HOLD_LOW, LAMP_LIGHT } from './bike.js';
 import { sellerActs, girlActs, Prop, LOOP, NOTE, NOTE_OFF, MARKS } from './acts.js';
 
 const here = (p) => new URL(p, import.meta.url).href;
+// the files this folder will fetch while it builds: the core fetches them early, beside the page's own (core/world.js)
+export const ASSETS = [here('./banhoa.glb'), here('./cogai.glb')];
 const _v = new THREE.Vector3(), _v2 = new THREE.Vector3(), _v3 = new THREE.Vector3(), _q = new THREE.Quaternion(), _m = new THREE.Matrix4(), _m2 = new THREE.Matrix4();
 
 // ---------------------------------------------------------------- the looks (dark / light of each cloth under warm lamps)

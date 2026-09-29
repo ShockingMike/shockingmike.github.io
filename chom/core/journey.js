@@ -46,7 +46,8 @@ const INTRO_VH = params.has('intro') ? parseFloat(params.get('intro')) : 300;
 const HOLD_VH = 100, PUSH_VH = 340, HAND_VH = 100;
 const SEASON_VH = HOLD_VH + PUSH_VH + HAND_VH;
 const HOLD = HOLD_VH / SEASON_VH, HAND = HAND_VH / SEASON_VH;
-const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
+// (a NaN comes out as 0, not as NaN: `x < 0` and `x > 1` are both false for it)
+const clamp01 = (x) => (x > 0 ? (x < 1 ? x : 1) : 0);
 const sm = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 const root = document.documentElement;
 root.classList.add('journey');
@@ -69,7 +70,7 @@ const state = (window.__journey = {
 });
 
 // ---------------- the page layer's hooks ----------------
-const hooks = { progress: [], ready: [], season: [], scroll: [], notes: [], error: [], enter: [], cut: [] };
+const hooks = { progress: [], ready: [], season: [], scroll: [], notes: [], error: [], enter: [], cut: [], wait: [] };
 let lastError = null, progressMax = 0;
 const fail = (reason, detail = {}) => {
   if (lastError) return;
@@ -140,7 +141,8 @@ function dropOpening(why) {
   openFailed = true;
   console.warn(`[chom] the opening scene (${OPEN_ID}) ${why}; the page goes straight to the seasons`);
   if (openFrame) openFrame.classList.add('is-off');
-  if (!state.ready && state.seasons[0].ready) openPage();
+  if (!state.ready) reportProgress(loadNow());
+  maybeOpen();
   apply(true);
 }
 // The first season loads at once. Near the end of its loading the others are opened too, one after another (their drawing
@@ -191,11 +193,28 @@ try {
 } catch (e) { /* no observer: the other two ways out still hold */ }
 hooks.enter.push(() => setTimeout(() => { if (!performance.getEntriesByName('pg:fly-start').length) releaseEntrance('no flight'); }, ENTRANCE_NO_FLIGHT_MS));
 
+// ---------------- the first seconds after the page opens are left alone (29/9) ----------------
+// Spring is ready when the page opens now, so the first two scrolls never wait. What could still make those first
+// seconds stutter is the next seasons being opened and built behind the page — measured 29/9: frames of 67–117 ms in
+// the 5 s after stepping in, while the viewer walked into the scent. So for QUIET_MS after the viewer steps in, no season
+// frame is opened and no season starts to build; then they go on as before, one after another. (A viewer who gets to
+// summer before it is ready waits there, told so: "waiting for a season".)
+const QUIET_MS = +(params.get('quietafter') ?? 5000);
+let quietUntil = Infinity;              // until the viewer steps in, the waiting screen is up: work away
+const afterQuiet = [];
+const quietNow = () => performance.now() < quietUntil;
+window.__chomQuiet = false;             // (a season frame still getting ready works as during the entrance meanwhile)
+hooks.enter.push(() => {
+  quietUntil = performance.now() + QUIET_MS;
+  window.__chomQuiet = QUIET_MS > 0;
+  setTimeout(() => { window.__chomQuiet = false; for (const f of afterQuiet.splice(0)) f(); }, QUIET_MS + 20);
+});
 const opened = new Set(), openedNext = new Set(), toldGo = new Set([0]);
 function load(i, hold = false) {
   if (i >= N || opened.has(i)) return;
-  // (a season frame asked for during the entrance is opened when it is over)
+  // (a season frame asked for during the entrance, or in the quiet after it, is opened when that is over)
   if (i > 0 && window.__chomHold) { heldLoads.push(() => load(i, hold)); return; }
+  if (i > 0 && state.entered && quietNow()) { afterQuiet.push(() => load(i, hold)); return; }
   opened.add(i);
   frames[i].src = `./index.html?season=${IDS[i]}&embed=1${i > 0 ? '&bg=1' : ''}${hold ? '&hold=1' : ''}${PASS}${DEV ? '&dev=1' : ''}`;
   // a season that never answers (a file that will not load, a very slow machine) must not hold up the ones behind it
@@ -211,12 +230,18 @@ function openNext(i, why) {
 }
 function goNext(i, why) {
   if (i + 1 >= N || toldGo.has(i + 1)) return;
+  // (the next season builds only once the viewer is in and the quiet after it is over: building it under the waiting
+  // screen would only make spring's own wait longer)
+  if (!state.entered || quietNow()) { afterQuiet.push(() => goNext(i, why)); return; }
   toldGo.add(i + 1);
   if (why) console.warn(`[chom] ${IDS[i]}: ${why}; letting ${IDS[i + 1]} build anyway`);
   window.__chomGo[IDS[i + 1]] = true;
   load(i + 1);
 }
 function openRest() { openNext(0); }
+// spring starts at once, together with the opening scene (29/9: it used to wait for the page layer to be fetched and
+// mounted and the words to be loaded first — a second or more on a slow line, for nothing)
+if (!NO_3D) load(0);
 let coreCopy = null;
 function pushLanguage(i) {
   const a = api(i);
@@ -228,7 +253,28 @@ function pushLanguage(i) {
   a.setLanguage(lang);
   try { frames[i].contentDocument.documentElement.lang = lang; } catch (e) { /* not ready */ }
 }
-const loadProgress = () => state.seasons[0].progress;
+// ---------------- the waiting screen tells the truth (Mike, 29/9) ----------------
+// "Dù ghi đã load 100% nhưng trang vẫn chưa thực sự load 100%, lúc đầu vào vẫn phải chờ." Until 29/9 the page opened
+// the moment the opening scene was ready, and spring only really got going after that: measured on the live page,
+// 100% at 8.8 s and spring ready at 16.9 s, and a viewer who scrolled in the meantime stood at the way into the scent.
+// Now the waiting screen counts everything the first two scrolls need — the opening scene AND spring, each fetched,
+// built, its shaders compiled and warmed up — and the page opens only when both are ready. The share is each one's real
+// weight in the load: measured 29/9 on their own pages, the opening 1.6 s of 7.3 locally and 6.8 s of 24 at 10 Mbps
+// (5.5 MB and 9.2 MB), so a quarter and three quarters. It only ever rises (reportProgress keeps the highest).
+// Summer, autumn and winter go on loading behind the page while spring is looked at (a step into one that is not ready
+// yet waits, with the page layer saying so: "waiting for a season", below).
+const LOAD_W_OPEN = 0.25;
+const loadNow = () => (OPEN_ID && !openFailed
+  ? LOAD_W_OPEN * state.opening.progress + (1 - LOAD_W_OPEN) * state.seasons[0].progress
+  : state.seasons[0].progress);
+let mountDone = false;
+// the page opens when everything the first two scrolls need is ready (and the page layer, if any, is mounted)
+function maybeOpen() {
+  if (state.ready || !mountDone) return;
+  if (!state.seasons[0].ready) return;
+  if (OPEN_ID && !openFailed && !state.opening.ready) return;
+  openPage();
+}
 window.addEventListener('message', (e) => {
   if (e.origin !== location.origin || !e.data || !e.data.chom) return;
   if (OPEN_ID && e.data.chom === OPEN_ID) {
@@ -236,14 +282,15 @@ window.addEventListener('message', (e) => {
     if (d.error) { dropOpening('could not be built'); return; }
     if (d.progress !== undefined) {
       state.opening.progress = Math.max(state.opening.progress, d.progress);
-      if (!state.ready) reportProgress(state.opening.progress * 0.9);
+      if (!state.ready) reportProgress(loadNow());
     }
     if (d.ready) {
       state.opening.ready = true;
       state.opening.readyMs = d.readyMs;
       pushTier(-1);
       openApi().journey({ push: 0, run: true, active: false });
-      openPage();
+      if (!state.ready) reportProgress(loadNow());
+      maybeOpen();
       apply(true);
     }
     return;
@@ -263,7 +310,7 @@ window.addEventListener('message', (e) => {
   if (d.progress !== undefined) {
     state.seasons[i].progress = Math.max(state.seasons[i].progress, d.progress);
     if (i === 0 && d.progress >= 0.8) openRest();
-    if (!state.ready) reportProgress(loadProgress());
+    if (!state.ready && i === 0) reportProgress(loadNow());
   }
   if (d.ready) {
     state.seasons[i].ready = true;
@@ -273,8 +320,8 @@ window.addEventListener('message', (e) => {
     api(i).journey({ run: false });
     pushLanguage(i);
     if (i === 0) {
-      reportProgress(1);
-      openPage();
+      if (!state.ready) reportProgress(loadNow());
+      maybeOpen();
     }
     goNext(i);
     apply(true);
@@ -288,17 +335,21 @@ window.addEventListener('message', (e) => {
 // the page can be looked at now: the opening is up, or (without one) the first season is
 function openPage() {
   if (state.ready) return;
-  reportProgress(openOn() ? Math.max(progressMax, 0.95) : 1);
+  reportProgress(1);
   // without a page layer the core opens the page itself; with one, the page does (after its language choice)
   if (!pageMounted) root.classList.remove('is-loading');
   state.ready = true;
+  // (without a page layer nobody steps in for the viewer: the page is entered as it opens)
+  if (!pageMounted) setTimeout(() => pageApi.enter(), 0);
   state.readyMs = Math.round(performance.now());
   // (the name every page of the portfolio uses for "the page can be looked at", for the shared measuring scripts)
   window.__ready = true;
   holdEntrance();
   emit('ready', { readyMs: state.readyMs });
 }
+let progressAt = performance.now();
 function reportProgress(v) {
+  if (v > progressMax + 1e-4) progressAt = performance.now();
   progressMax = Math.max(progressMax, v);
   bar.style.transform = `scaleX(${progressMax})`;
   emit('progress', progressMax);
@@ -310,15 +361,19 @@ bar.style.transform = 'scaleX(0.05)';
 // (the room's place and size are kept, and read again only when something changes size: reading them on every scroll
 // event would make the browser lay the page out again whenever the page layer has just changed something)
 const geo = { top: 0, height: 0, vh: 0, dirty: true };
-const measure = () => { if (!geo.dirty) return geo; geo.top = room.offsetTop; geo.height = room.offsetHeight; geo.vh = window.innerHeight; geo.dirty = false; return geo; };
-const stale = () => { geo.dirty = true; };
+const measure = () => { if (!geo.dirty) return geo; geo.top = room.offsetTop; geo.height = room.offsetHeight; geo.vh = window.innerHeight; geo.ch = document.documentElement.clientHeight; geo.dirty = false; return geo; };
+const stale = () => { geo.dirty = true; tailReachPx = null; };
 window.addEventListener('resize', stale);
 if (typeof ResizeObserver !== 'undefined') { const ro = new ResizeObserver(stale); ro.observe(room); ro.observe(document.body); }
 const introPx = () => (INTRO_VH / 100) * measure().vh;
 const seasonsPx = () => Math.max(1, measure().height - measure().vh - introPx());
 // the intro's progress (0..1) and g (0..1 across the seasons), from the scroll position; g is 0 through the intro
+// (whether the page's end part covers the whole screen, kept here: read in the frame loop it forced the browser to lay the
+// page out again on the frame the name flies home — a 67–83 ms frame, measured 29/9 with core/qa/loadstutter.mjs)
+let coveredNow = false;
 const scrollTarget = () => {
   const y = window.scrollY - measure().top;
+  coveredNow = y >= measure().height;
   // (where the viewer really is in the opening, before the stop below: a first season still building reads it and, once
   // the viewer is on the way in, stops pacing itself — core/world.js viewerComing)
   state.introRaw = clamp01(y / Math.max(1, introPx()));
@@ -409,7 +464,7 @@ function openingApply(force) {
   const a = openApi();
   if (a && state.opening.ready && (force || on || lastOpenT !== t)) {
     lastOpenT = t;
-    a.journey({ push: Math.min(t, 1), run: on, active: false, arrive: 1, intro: t });
+    a.journey({ push: clamp01(t), run: on, active: false, arrive: 1, intro: t });
   }
 }
 let lastOpenT = -1, picAt = 0, picBusy = false;
@@ -486,13 +541,19 @@ function scrollToSeason(i, opt = 'smooth') {
   const gT = (k + HOLD * 0.5) / N;
   if (!o.cut) { window.scrollTo({ top: scrollYFor(gT), behavior: o.behavior ?? 'smooth' }); return Promise.resolve({ index: k, id: IDS[k], cut: false }); }
   const run = async () => {
+    cutBusy = true;
+    try { return await run0(); } finally { cutBusy = false; waitFor(-1); }
+  };
+  const run0 = async () => {
     const t0 = performance.now();
     if (notesOpen) { pageApi.closeNotes(); await waitMs(400); }
     while (!state.seasons[k].ready) {
       if (lastError) throw new Error(`season ${IDS[k]} failed to load`);
       emit('cut', { index: k, id: IDS[k], phase: 'waiting', progress: state.seasons[k].progress });
+      waitFor(k);
       await waitMs(120);
     }
+    waitFor(-1);
     const waited = Math.round(performance.now() - t0);
     const quick = matchMedia('(prefers-reduced-motion: reduce)').matches;
     emit('cut', { index: k, id: IDS[k], phase: 'cutting', waitedMs: waited });
@@ -510,6 +571,238 @@ function scrollToSeason(i, opt = 'smooth') {
   cutting = (cutting || Promise.resolve()).catch(() => {}).then(run);
   return cutting;
 }
+
+// ---------------- waiting for a season still being made (Sếp, 29/9) ----------------
+// A viewer who reaches a season that is not built yet (a slow machine, or a jump from the bar) is never left standing
+// without knowing why: the page layer shows "Đang pha mùa Hạ… 60%" (onWait) with the season's real progress, and the
+// scene goes on by itself once it is ready. waitFor(-1) = nothing is being waited for.
+let waitingFor = -1, waitPct = -1;
+function waitFor(i) {
+  const pct = i >= 0 ? Math.floor((state.seasons[i]?.progress ?? 0) * 100) : -1;
+  if (i === waitingFor && pct === waitPct) return;
+  waitingFor = i; waitPct = pct;
+  state.waiting = i >= 0 ? { index: i, id: IDS[i], progress: pct / 100 } : null;
+  emit('wait', i >= 0 ? { waiting: true, index: i, id: IDS[i], progress: pct / 100 } : { waiting: false });
+}
+
+// ---------------- one gesture, one step (README 10b; Mike, 29/9) ----------------
+// "Mỗi scroll sẽ là nửa mùa, scroll lần 1 ra mùa xuân, lần 2 ra note đằng sau." Through the four seasons the page moves
+// in steps: one flick of the wheel, one swipe on a touchpad, one swipe of a finger or one key goes to the next stop, and
+// the scene plays its way there at the pace above ("the pace of the scroll"). The stops:
+//   0  the opening (the open bottle by the oil lamp)
+//   1  spring standing still (its sheet, xuan-1): the whole walk into the scent is played between 0 and 1
+//   2  spring's memory (xuan-2): MEM_P of the way into its push — the memory sheet up and the camera well into the street
+//   3  summer standing still (ha-1): the rest of spring's push (xuan-3, no words) and the hand-over are played on the way
+//   ... the same for summer, autumn and winter, then one last stop at the very end of winter (phase 'end').
+// Below the last stop the page's end part (atelier, blend, order) scrolls as it always did; scrolling back up out of it
+// stops at the last stop, and the steps take over again.
+// Going back is a straight cut to the stop before: nothing is ever seen playing backwards (Mike approved this on the
+// Katherine Anne demo). A step asked for while the scene is still playing is queued: the scene plays on through, at its
+// pace, never skipping. Where the viewer is, is read off the scroll position every time (never kept), so a cut from
+// the bar or the scroll bar dragged by hand is simply followed. No step while something holds the page (a bottle's notes,
+// the phone menu, the page's scroll lock, a cut under way, the waiting screen). ?steps=0 = the plain scroll of before.
+const STEPS = FIXED === null && params.get('steps') !== '0';
+// where the memory stop stands in a season's push: the middle of the memory step's stretch, the point page/qa/page-check
+// photographs and measures the sheets against (at 0.45 spring's camera is already up against a lantern)
+const MEM_P = 0.25;
+let cutBusy = false;
+// How far above its own top the page's end part draws: its torn paper edge (the page layer's .pg-tail::before rides
+// 22 px up), a shadow, a child pushed up. Measured on the elements themselves, never assumed from the layout: at the
+// last stop the end part must not show at all, and on 29/9 Mike saw exactly that edge — "mùa đông bị nhô lên vệt trắng
+// ở dưới web", a strip of cream 15–20 px along the foot of the screen — because the last stop put the screen's foot on
+// the end part's own top, and the edge drawn above it showed. Kept until the page changes size.
+let tailReachPx = null;
+function tailReach() {
+  if (tailReachPx !== null) return tailReachPx;
+  let reach = 0;
+  try {
+    const base = tail.getBoundingClientRect().top;
+    const els = [tail, ...tail.children, ...[...tail.children].flatMap((c) => [...c.children])];
+    for (const el of els) {
+      const r = el.getBoundingClientRect();
+      if (r.width > 0 && r.height > 0) reach = Math.max(reach, base - r.top);
+      const shadow = getComputedStyle(el).boxShadow;
+      if (shadow && shadow !== 'none') {
+        // (a shadow's reach upward: its blur plus spread minus its downward offset, at most)
+        const n = (shadow.match(/-?[\d.]+px/g) || []).map(parseFloat);
+        if (n.length >= 3) reach = Math.max(reach, base - r.top + (n[2] || 0) + (n[3] || 0) - (n[1] || 0));
+      }
+      for (const ps of ['::before', '::after']) {
+        const cs = getComputedStyle(el, ps);
+        if (cs.content === 'none' || cs.display === 'none' || cs.position !== 'absolute') continue;
+        const t = parseFloat(cs.top);
+        if (Number.isFinite(t) && t < 0) reach = Math.max(reach, base - (r.top + t));
+      }
+    }
+  } catch (e) { reach = 32; }
+  tailReachPx = Math.min(400, Math.max(0, reach));
+  return tailReachPx;
+}
+function stopYs() {
+  const ys = [0];
+  for (let i = 0; i < N; i++) {
+    const end = i < N - 1 ? 1 - HAND : 1;
+    ys.push(scrollYFor((i + 0.5 * HOLD) / N), scrollYFor((i + HOLD + MEM_P * (end - HOLD)) / N));
+  }
+  // the last stop: the end of winter, with the screen's foot a little ABOVE everything the end part draws (2 px spare
+  // for the rounding of a zoomed page), so not one pixel of it shows; one plain scroll further brings it up
+  const view = Math.max(measure().vh, measure().ch || 0);
+  ys.push(Math.min(scrollYFor(1), measure().top + measure().height - view - tailReach() - 2));
+  const out = [];
+  for (const y of ys.map((v) => Math.round(v))) if (!out.length || y > out[out.length - 1] + 2) out.push(y);
+  return out;
+}
+// the g of each stop (for the hold below and for checks)
+const stopGs = () => {
+  const gs = [0];
+  for (let i = 0; i < N; i++) { const end = i < N - 1 ? 1 - HAND : 1; gs.push((i + 0.5 * HOLD) / N, (i + HOLD + MEM_P * (end - HOLD)) / N); }
+  // (the last one where the last stop really is: just short of 1, see stopYs)
+  const ys = stopYs();
+  gs.push(clamp01((ys[ys.length - 1] - measure().top - introPx()) / seasonsPx()));
+  return gs;
+};
+const lockedNow = () => !state.ready || (pageMounted && !state.entered) || root.classList.contains('is-loading') || root.classList.contains('is-focus')
+  || root.classList.contains('pg-menu-open') || root.classList.contains('pg-focus') || root.classList.contains('pg-no3d') || !!lastError;
+state.stepLog = [];
+// straight to a stop, with nothing played on the way (going back)
+function cutTo(y) {
+  window.scrollTo({ top: y, behavior: 'instant' });
+  target = g = scrollTarget();
+  introT = introAim();
+  apply(true);
+}
+function stepBy(dir) {
+  // (a step is the viewer's own move: whatever the end part's glide was doing a moment ago is over)
+  W.tailAt = 0; TOUCH.tailAt = 0;
+  const ys = stopYs(), y = window.scrollY;
+  if (dir > 0) {
+    const next = ys.find((v) => v > y + 2);
+    if (next === undefined) return false;
+    window.scrollTo({ top: next, behavior: 'instant' });
+    target = scrollTarget();
+    state.stepLog.push([Math.round(performance.now()), ys.indexOf(next), 'on']);
+    return true;
+  }
+  let prev;
+  for (const v of ys) if (v < y - 2) prev = v;
+  if (prev === undefined) return false;
+  cutTo(prev);
+  state.stepLog.push([Math.round(performance.now()), ys.indexOf(prev), 'back']);
+  return true;
+}
+// what counts as one gesture: events closer than 200 ms apart belong to the same one (a quick spin of the wheel, or a
+// touchpad swipe with its glide); it steps once, when it has moved 24 px (the Katherine Anne demo's numbers, Mike approved)
+const W = { at: 0, acc: 0, spent: false, native: false, tailAt: 0 };
+// when the event happened, not when the page got round to it: on a busy page the events of one swipe can be handled in
+// a clump 300 ms late, and timed by their handling they would count as two gestures (measured 29/9 on a throttled load:
+// one swipe went two stops). Events handed up from a season's frame carry their own time (core/world.js).
+const evAt = (e) => e.__chomAt ?? (performance.timeOrigin + e.timeStamp);
+const TOUCH = { y0: null, spent: false, native: false, tailAt: 0 };
+// true = the page takes the event (the caller prevents the browser's own scroll)
+function onWheel(e) {
+  if (!STEPS || e.ctrlKey) return false;
+  const dy = e.deltaY * (e.deltaMode === 1 ? 33 : e.deltaMode === 2 ? innerHeight : 1);
+  if (Math.abs(e.deltaX || 0) > Math.abs(dy)) return false;
+  const now = performance.now(), at = evAt(e), gap = at - W.at;
+  W.at = at;
+  if (gap > 200) { W.acc = 0; W.spent = false; W.native = false; }
+  if (cutBusy) return true;
+  if (lockedNow()) return false;
+  const ys = stopYs(), last = ys[ys.length - 1], y = window.scrollY;
+  if (y > last + 2) {
+    // the end part scrolls as it always did — but a movement up out of it stops at the journey's last stop
+    W.tailAt = now; W.native = true;
+    if (dy < 0 && y + dy <= last) { cutTo(last); W.spent = true; return true; }
+    return false;
+  }
+  if (W.native) {
+    // a movement that began in the end part (or went on into it from the last stop) never turns into a step
+    if (dy > 0 && y >= last - 2) return false;
+    W.spent = true;
+    return true;
+  }
+  if (W.spent) return true;
+  // at the last stop, going on down: into the end part, as a plain scroll
+  if (y >= last - 2 && dy > 0) { W.native = true; return false; }
+  W.acc += dy;
+  if (Math.abs(W.acc) >= 24) { stepBy(Math.sign(W.acc)); W.spent = true; }
+  return true;
+}
+function onTouch(kind, e) {
+  if (!STEPS) return false;
+  const now = performance.now();
+  if (kind === 'touchstart') {
+    TOUCH.y0 = e.touches.length === 1 ? e.touches[0].clientY : null;
+    TOUCH.spent = false;
+    const ys = stopYs();
+    TOUCH.native = window.scrollY > ys[ys.length - 1] + 2;
+    if (TOUCH.native) TOUCH.tailAt = now;
+    return false;
+  }
+  if (kind === 'touchend') { if (TOUCH.native) TOUCH.tailAt = now; TOUCH.y0 = null; return false; }
+  if (TOUCH.y0 === null || e.touches.length !== 1) return false;
+  if (cutBusy) return true;
+  if (lockedNow()) return false;
+  const ys = stopYs(), last = ys[ys.length - 1], y = window.scrollY;
+  if (TOUCH.native || y > last + 2) { TOUCH.native = true; TOUCH.tailAt = now; return false; }
+  const dy = TOUCH.y0 - e.touches[0].clientY;          // > 0: the finger goes up, the page goes on
+  if (!TOUCH.spent && y >= last - 2 && dy > 0) { TOUCH.native = true; return false; }
+  if (!TOUCH.spent && Math.abs(dy) > 40) { stepBy(Math.sign(dy)); TOUCH.spent = true; }
+  return true;
+}
+function onKey(e) {
+  if (!STEPS || e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return false;
+  const t = e.target;
+  if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName || ''))) return false;
+  const k = e.key;
+  const fwd = k === 'ArrowDown' || k === 'PageDown' || (k === ' ' && !e.shiftKey);
+  const back = k === 'ArrowUp' || k === 'PageUp' || (k === ' ' && e.shiftKey);
+  if (!fwd && !back && k !== 'Home') return false;
+  // (Space on a button presses the button)
+  if (k === ' ' && t && (t.tagName === 'BUTTON' || t.tagName === 'SUMMARY' || (t.getAttribute && t.getAttribute('role') === 'button'))) return false;
+  if (cutBusy) return true;
+  if (lockedNow()) return false;
+  W.tailAt = 0; TOUCH.tailAt = 0;
+  if (k === 'Home') { if (window.scrollY > 0) { cutTo(0); state.stepLog.push([Math.round(performance.now()), 0, 'home']); } return true; }
+  const ys = stopYs(), last = ys[ys.length - 1], y = window.scrollY;
+  if (y > last + 2) return false;                         // the end part keeps its own keys
+  if (fwd && y >= last - 2) return false;                 // at the last stop: on down into the end part
+  if (e.repeat) return true;                              // a key held down is one step
+  stepBy(fwd ? 1 : -1);
+  return true;
+}
+// the seasons' frames cover the screen and get the wheel, the finger and the keys when they are under them: they hand
+// them on here (core/world.js), and prevent the event when this says so
+window.__chomInput = (kind, e) => {
+  try {
+    if (kind === 'wheel') return onWheel(e);
+    if (kind === 'keydown') return onKey(e);
+    return onTouch(kind, e);
+  } catch (err) { console.error(err); return false; }
+};
+if (STEPS) {
+  window.addEventListener('wheel', (e) => { if (onWheel(e)) e.preventDefault(); }, { passive: false });
+  window.addEventListener('touchstart', (e) => onTouch('touchstart', e), { passive: true });
+  window.addEventListener('touchmove', (e) => { if (onTouch('touchmove', e) && e.cancelable) e.preventDefault(); }, { passive: false });
+  window.addEventListener('touchend', (e) => onTouch('touchend', e), { passive: true });
+  window.addEventListener('keydown', (e) => { if (onKey(e)) e.preventDefault(); });
+  // a click or a key anywhere (a link of the bar, the scroll bar) is the viewer's own move: nothing is held back
+  window.addEventListener('pointerdown', () => { W.tailAt = 0; TOUCH.tailAt = 0; }, { capture: true, passive: true });
+  // The end part's own scrolling (a touch fling, the wheel's smooth glide) can carry on past the last stop after the
+  // event that could have been stopped: straight back to the last stop, if it came up out of the end part just now
+  window.addEventListener('scroll', () => {
+    const now = performance.now();
+    if (now - W.tailAt > 700 && now - TOUCH.tailAt > 1500) return;
+    if (cutBusy || lockedNow()) return;
+    const ys = stopYs(), last = ys[ys.length - 1];
+    if (window.scrollY < last - 2) { cutTo(last); W.spent = true; W.tailAt = 0; TOUCH.tailAt = 0; }
+  }, { passive: true });
+}
+state.stepMode = STEPS;
+state.stops = () => stopYs();
+state.stopGs = stopGs;
+state.memP = MEM_P;
+state.stepBy = (d) => stepBy(d);
 
 // ---------------- the spring inside the scent ----------------
 // The first season draws a picture of itself; the opening shows that picture inside its ribbons of scent, bent and broken by
@@ -579,8 +872,19 @@ state.quality = () => ({
 
 let lastT = performance.now(), fAcc = 0, fN = 0;
 let devEl = null;
+// A safety net (29/9), as in world.js: an error inside one tick used to skip the line that asks for the next one, and the
+// page's scene would stop following the scroll for good. The next tick is now asked for whatever happens; the error is
+// still written to the console (once per kind).
+const tickFaults = new Set();
 function tick(now) {
-  const rawMs = now - lastT;
+  try { tickOnce(now); } catch (e) {
+    const key = String(e && e.message);
+    if (!tickFaults.has(key)) { tickFaults.add(key); console.error(e); }
+  }
+  requestAnimationFrame(tick);
+}
+function tickOnce(now) {
+  const rawMs = Math.max(0, now - lastT);
   const dt = Math.min(0.05, rawMs / 1000);
   lastT = now;
   fAcc += dt; fN++;
@@ -588,7 +892,7 @@ function tick(now) {
   if (state.ready && !lastError) GOV.tick(rawMs, { building: building() });
   // (once the page's end part covers the whole screen nothing of the scene can be seen: no pace to keep, it is simply
   // where the scroll is — the winter street waits under the end part, as before)
-  const covered = FIXED === null && window.scrollY >= measure().top + measure().height;
+  const covered = FIXED === null && coveredNow;
   if (FIXED !== null || covered) { g = target; introT = introAim(); }
   else {
     // the walk into the scent: straight after the scroll, as before, but forward no faster than its pace
@@ -597,7 +901,26 @@ function tick(now) {
     else introT = Math.min(aim, introT + ((PACE_INTRO_VH * PACE_K) / INTRO_VH) * dt);
     // the seasons wait while the walk into the scent is still catching up (so a fling from the top does not use up the
     // spring behind the scent before anyone can see it)
-    const tg = introT < 1 && target > g ? g : target;
+    let tg = introT < 1 && target > g ? g : target;
+    // A season not built yet is never walked into: the scene waits at the stop it is at (or where it stands, if that is
+    // further on, but never inside the hand-over into it), the page layer says what it is waiting for and how far that
+    // has got, and the scene goes on by itself the moment the season is ready. (Before 29/9 only the hand-over's picture
+    // waited; the scroll went on under it, and when the season came the hand-over was skipped in one frame.)
+    let waitI = -1;
+    if (tg > g) {
+      for (let i = 1; i < N; i++) {
+        if (state.seasons[i].ready || failed.has(i)) continue;
+        const hs = (i - HAND) / N;                     // where the hand-over into season i starts
+        if (tg > hs) {
+          let at = 0;
+          for (const sg of stopGs()) if (sg <= hs + 1e-9) at = sg;
+          const hold = Math.max(Math.min(g, hs), at);
+          if (hold < tg) { tg = Math.max(g, hold); waitI = i; }
+        }
+        break;
+      }
+    }
+    if (STEPS || waitI >= 0 || waitingFor >= 0) { if (!cutBusy) waitFor(waitI); }
     let step = (tg - g) * (1 - Math.exp(-dt * 5.5));
     if (step > 0 && PACE_K > 0) {
       const cap = gPace(g) * dt;
@@ -615,7 +938,6 @@ function tick(now) {
     devEl.hidden = false;
     devEl.textContent = `g ${g.toFixed(3)} · ${state.fps ?? ''} fps · ` + IDS.map((id, i) => { const s = state.plan?.[i]; return `${id}${state.seasons[i].ready ? '' : '…'} ${s?.run ? `p${s.push.toFixed(2)} t${s.through.toFixed(2)} pe${s.peel.toFixed(2)} a${s.arrive.toFixed(2)}` : '-'}`; }).join(' | ');
   }
-  requestAnimationFrame(tick);
 }
 
 // ---------------- the page layer (page/page.js), if there is one ----------------
@@ -643,6 +965,9 @@ const pageApi = {
   // scrollToSeason(i): scroll there ('smooth' or 'instant'); scrollToSeason(i, { cut: true }): cut straight there (a promise)
   scrollToSeason,
   onCut: (f) => { hooks.cut.push(f); },           // f({ index, id, phase: 'waiting' (progress) | 'cutting' | 'done', waitedMs })
+  // f({ waiting: true, index, id, progress 0..1 }) while the viewer waits for a season still being made (a step or a cut
+  // into it), f({ waiting: false }) when that is over (README 12)
+  onWait: (f) => { hooks.wait.push(f); if (state.waiting) f({ waiting: true, ...state.waiting }); },
   scrollToTail: (behavior = 'smooth') => window.scrollTo({ top: tail.offsetTop, behavior }),
   openNotes: () => { const i = lastPlan?.index ?? 0; api(i)?.open(); },
   // where season i's bottle is on the page (css px) when its camera stands still at its arrival; null until it has loaded
@@ -666,11 +991,17 @@ if (page && page.mountPage) {
 }
 state.page = !!page;
 state.api = pageApi;
+mountDone = true;
+maybeOpen();
 coreCopy = await loadCopy();
 // WebGL is needed for the seasons (and a real graphics chip, above); without it the page layer shows its fallback
 if (NO_3D) { console.info(`[chom] the reading version: ${NO_3D}`); window.__no3d = NO_3D; fail('no-webgl', { message: NO_3D, gpu: GPU.name, software: GPU.soft }); window.__ready = true; }
 else {
-  load(0);
-  setTimeout(() => { if (!state.ready) fail('timeout'); }, 60000);
+  // Given up only when nothing has moved for 45 s — never on a clock: on a slow line the honest load can take longer
+  // than a minute and still be getting somewhere (until 29/9: 60 s from the start, whatever was happening)
+  const stall = setInterval(() => {
+    if (state.ready || lastError) { clearInterval(stall); return; }
+    if (performance.now() - progressAt > 45000) { clearInterval(stall); fail('timeout'); }
+  }, 3000);
 }
 requestAnimationFrame(tick);

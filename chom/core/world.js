@@ -33,7 +33,53 @@ const waitGo = () => new Promise((res) => {
 if (EMBED) document.documentElement.classList.add('embed');
 const state = (window.__chom = { ready: false, stats: {}, season: SEASON_ID });
 const bar = document.getElementById('bar');
-const setProgress = (p) => { if (bar) bar.style.transform = `scaleX(${p})`; tellParent({ progress: p }); };
+// How far this scene has got, for the waiting screen (29/9: the waiting screen now counts the opening AND spring, and
+// must never stand still for long nor jump). Two parts, each only ever rising:
+//   the download — the bytes of the scene's own big files (the brush textures, each person's .glb) as they come in
+//   the build    — the steps the core and the season go through (progNow: 0.04 textures ... 0.9 warm-up ... 1)
+// what is sent is DL_SHARE of the first plus the rest of the second, so the bar moves with the line while the files come
+// down (before, it stood at one number through every download: 3 s at 10 Mbps) and with the work after.
+let progNow = 0, progSent = 0;
+const DL_SHARE = 0.4;
+const DL = { started: 0, heads: 0, total: 0, got: 0 };
+const dlFrac = () => (DL.started === 0 ? 1 : DL.heads < DL.started || DL.total <= 0 ? 0 : Math.min(1, DL.got / DL.total));
+function sendProgress() {
+  const p = progNow >= 1 ? 1 : DL_SHARE * dlFrac() + (1 - DL_SHARE) * progNow;
+  if (!(p > progSent + 0.004) && p < 1) return;
+  if (!(p > progSent)) return;
+  progSent = p;
+  if (bar) bar.style.transform = `scaleX(${p})`;
+  tellParent({ progress: p });
+}
+const setProgress = (p) => { if (!(p > progNow)) return; progNow = p; sendProgress(); };
+// a file fetched and counted as it comes in; resolves to its Blob (or rejects, and the caller loads it the old way)
+function meterFetch(url) {
+  DL.started++;
+  let counted = 0, headed = false;
+  const head = () => { if (!headed) { headed = true; DL.heads++; } };
+  return fetch(url).then(async (r) => {
+    if (!r.ok || !r.body) throw new Error(`${url}: ${r.status}`);
+    const len = +r.headers.get('content-length') || 0;
+    DL.total += len;
+    head();
+    const reader = r.body.getReader(), parts = [];
+    for (;;) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      parts.push(value);
+      counted += value.length;
+      if (len) { DL.got += value.length; sendProgress(); }
+    }
+    if (!len) { DL.total += counted; DL.got += counted; }
+    sendProgress();
+    return new Blob(parts, { type: r.headers.get('content-type') || '' });
+  }).catch((e) => {
+    // a file that failed counts as come (it is loaded again the old way, and says so if it still fails)
+    head();
+    sendProgress();
+    throw e;
+  });
+}
 // The four-season page's entrance (core/journey.js "the page's entrance is kept quiet"): while the page layer flies the name
 // home, a season that is still building waits at its next pause. The opening scene is never held (it is the one on screen).
 const HOLDABLE = EMBED && params.get('opening') !== '1';
@@ -41,7 +87,9 @@ const HOLDABLE = EMBED && params.get('opening') !== '1';
 // every new kind of shape — each one can stop the page for 50–120 ms). The rest of the build is the page's own thread
 // only, so it goes on at a trickle (WORK_ENTRANCE ms a frame) instead of stopping: holding it all cost the first season
 // 1.3 s, and a viewer who scrolls in at once then waited at the opening's stop.
-const entranceHeld = () => { if (!HOLDABLE) return false; try { return !!window.parent.__chomHold; } catch (e) { return false; } };
+// (29/9: and through the quiet seconds after the viewer steps in, core/journey.js "the first seconds after the page opens
+// are left alone" — a season still getting ready behind the page then works the same way it does during the entrance)
+const entranceHeld = () => { if (!HOLDABLE) return false; try { return !!(window.parent.__chomHold || window.parent.__chomQuiet); } catch (e) { return false; } };
 const entranceHold = async () => { while (entranceHeld()) await new Promise((r) => setTimeout(r, 50)); };
 // (true while a step is handing the GPU work: the brush textures at the start, then the whole warm-up)
 let gpuStep = false;
@@ -60,9 +108,15 @@ const inBackground = () => BG || (shownElsewhere() && !viewerComing());
 // (right after the next frame is drawn: whatever runs next does not hold that frame up)
 const nextFrame = () => new Promise((r) => requestAnimationFrame(() => setTimeout(r, 0))).then(() => (gpuStep ? entranceHold() : null));
 const lin = (h) => new THREE.Color(h);
-const clamp01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
+// (a NaN comes out as 0, not as NaN: `x < 0` and `x > 1` are both false for it)
+const clamp01 = (x) => (x > 0 ? (x < 1 ? x : 1) : 0);
 const sm = (a, b, x) => { const t = clamp01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
-const ease = (u) => u * u * u * (u * (u * 6 - 15) + 10);
+// The ease never leaves 0..1. Written out, it rounds PAST 1 for inputs a few millionths short of 1: ease(0.99999495) is
+// 1.0000000000000004. The camera's path (three.js getPointAt) cannot place anything past its end — it turns that into
+// NaN and throws "Cannot read properties of undefined (reading 'x')" — and the throw stopped that season's drawing loop
+// for good: its picture froze until the page was loaded again (29/9, caught once in ~30 walks: a season's push landing
+// in that sliver as the walk crossed the end of its push). Clamping the result fixes every caller at once.
+const ease = (u) => clamp01(u * u * u * (u * (u * 6 - 15) + 10));
 const D2R = Math.PI / 180;
 
 // ---------------- the season and the people ----------------
@@ -100,6 +154,21 @@ if (Object.values(CAST).includes('placeholder') && !peopleMods.placeholder) {
   try { peopleMods.placeholder = await import('../people/placeholder/people.js'); } catch (e) { for (const r of Object.keys(CAST)) if (CAST[r] === 'placeholder') delete CAST[r]; }
 }
 state.cast = CAST;
+// The people's own files (each .glb and the notes beside it) start coming down now, beside the brush textures, rather
+// than when each person is built: on a slow line spring stood still for seconds in the middle of its build, waiting for
+// them (29/9, 10 Mbps: its three figures arrived one after another, 10.0 to 12.9 s). Read to the end, so they are
+// whole in the browser's cache when the people folders ask for them (the same address, so the same file).
+state.prefetched = [];
+for (const m of Object.values(peopleMods)) for (const u of m.ASSETS || []) {
+  state.prefetched.push(u);
+  meterFetch(u).catch(() => null);
+}
+// the brush textures too, counted the same way (core/brush.js takes the Blobs)
+const TEX_BLOBS = {};
+for (const f of ['brush-nt.png', 'brush-d.png', 'strokes.png', 'wash.png', 'linen.jpg', 'knife.jpg']) {
+  TEX_BLOBS[f] = meterFetch(`./tex/${f}`);
+  TEX_BLOBS[f].catch(() => null);
+}
 // the notes panel's words: season.notes (English, or { en, vi }); the page layer may give others (setNotes) and pick the language
 const notesByLang = season.notes && season.notes.en ? { ...season.notes } : { en: season.notes };
 state.setNotes = (l, n) => { notesByLang[l] = n; return true; };
@@ -664,7 +733,10 @@ function makeApi(R, fontP) {
       if (!folders.length) return null;
       const parts = [];
       const n0 = casters.length;
-      for (const f of folders) {
+      // (the waiting screen moves on with each person built: until 29/9 it stood still through all of them, 4 s at 10 Mbps)
+      const pFrom = progNow, pTo = Math.max(progNow, 0.78);
+      for (const [fk, f] of folders.entries()) {
+        if (fk > 0) setProgress(pFrom + ((pTo - pFrom) * fk) / folders.length);
         const roles = ROLES.filter((r) => CAST[r] === f);
         // (each folder starts in a fresh slice of work; inside, the folder yields with await core.slice())
         await pauseNow();
@@ -773,13 +845,13 @@ async function build() {
   setProgress(0.04);
   const tb = performance.now();
   const fontP = loadFont();
-  const knifeP = loadTexture('./tex/knife.jpg', 2, { bitmap: true });
+  const knifeP = loadTexture('./tex/knife.jpg', 2, { bitmap: true, blob: TEX_BLOBS['knife.jpg'] });
   BUILD.WORK.budget = workBudget;
   BUILD.WORK.held = () => gpuStep && entranceHeld();
   // (uploading the brush textures is GPU work too: a frame opened just before the page's entrance waits it out here)
   gpuStep = true;
   await entranceHold();
-  TEX = await loadTextures(renderer, { maxAniso: ANISO, onProgress: (p) => setProgress(0.04 + p * 0.3), slice });
+  TEX = await loadTextures(renderer, { maxAniso: ANISO, onProgress: (p) => setProgress(0.04 + p * 0.3), slice, blobs: TEX_BLOBS });
   gpuStep = false;
   const knife = await knifeP;
   knife.colorSpace = THREE.NoColorSpace;
@@ -801,7 +873,10 @@ async function build() {
   await fontP;
   if (WAIT_GO) {
     // (the other textures go up now too, while the page is still loading)
-    for (const t of [TEX.strokes, TEX.wash, TEX.linen, knife]) { await slice(); renderer.initTexture(t); }
+    // (GPU work: it waits out the page's entrance and the quiet after it, like the warm-up)
+    gpuStep = true;
+    for (const t of [TEX.strokes, TEX.wash, TEX.linen, knife]) { await slice(); await entranceHold(); renderer.initTexture(t); }
+    gpuStep = false;
     tellParent({ held: true });
     const tw = performance.now();
     await waitGo();
@@ -1157,8 +1232,13 @@ state.showPicture = (bitmap, { k = 1, warp = 1, shard = 1 } = {}) => {
   }
   return true;
 };
+const J_UNIT = ['push', 'through', 'peel', 'arrive'];
 state.journey = (o) => {
+  const was = { ...J };
   Object.assign(J, o);
+  // (a guard, not a known fault: the page only ever sends 0..1 here, but a NaN or a missing number must leave the camera
+  // where it was rather than reach the path)
+  for (const k of J_UNIT) J[k] = Number.isFinite(J[k]) ? clamp01(J[k]) : was[k];
   if (o.intro !== undefined && OPENING) introLook(J.intro);
   if (EMBED) push.v = push.target = J.push;
   if (J.run && !running && state.ready) { running = true; last = performance.now(); requestAnimationFrame(loop); }
@@ -1328,6 +1408,18 @@ function closeNotes() {
 hit.addEventListener('click', (e) => { e.stopPropagation(); if (focus.open) closeNotes(); else openNotes(); });
 closeBtn.addEventListener('click', (e) => { e.stopPropagation(); closeNotes(); });
 window.addEventListener('keydown', (e) => { if (e.key === 'Escape' && focus.open) { e.preventDefault(); closeNotes(); } });
+// On the four-season page the season on screen lies over the whole page and gets the wheel, the finger and the keys
+// whenever they are over it or its bottle has the keyboard. The page moves in steps (core/journey.js, "one gesture,
+// one step"): everything is handed up to it, and the browser's own scroll is stopped when it says so.
+if (EMBED && window.parent !== window) {
+  // (with the moment it happened, on the page's own clock: the gesture's pauses are measured by it, core/journey.js)
+  const up = (kind, e) => { try { e.__chomAt = performance.timeOrigin + e.timeStamp; return !!(window.parent.__chomInput && window.parent.__chomInput(kind, e)); } catch (err) { return false; } };
+  window.addEventListener('wheel', (e) => { if (up('wheel', e)) e.preventDefault(); }, { passive: false });
+  window.addEventListener('touchstart', (e) => { up('touchstart', e); }, { passive: true });
+  window.addEventListener('touchmove', (e) => { if (up('touchmove', e) && e.cancelable) e.preventDefault(); }, { passive: false });
+  window.addEventListener('touchend', (e) => { up('touchend', e); }, { passive: true });
+  window.addEventListener('keydown', (e) => { if (!e.defaultPrevented && up('keydown', e)) e.preventDefault(); });
+}
 document.addEventListener('pointerdown', (e) => { if (focus.open && !panel.contains(e.target) && e.target !== hit) closeNotes(); });
 panel.addEventListener('transitionend', () => { if (!focus.open && !panel.classList.contains('is-shown')) panel.hidden = true; });
 
@@ -1957,13 +2049,26 @@ state.nearPeople = (o = {}) => nearPeople(o);
 // ---------------- loop ----------------
 let last = performance.now(), fpsAcc = 0, fpsN = 0, frameMsAcc = 0, frameMax = 0;
 const devEl = document.getElementById('dev');
+// A safety net (29/9): an error thrown while drawing a frame used to skip the line that asks for the next frame, so one bad
+// frame stopped the season for good (its picture froze, the camera no longer followed the scroll). The next frame is now
+// asked for whatever happens; the error is still written to the console (once per kind), so the checks still see it.
+const loopFaults = new Set();
 function loop(now) {
   if (EMBED && !J.run) { running = false; return; }
-  const frameMs = now - last;
+  try { frame(now); } catch (e) {
+    const key = String(e && e.message);
+    if (!loopFaults.has(key)) { loopFaults.add(key); console.error(e); }
+  }
+  requestAnimationFrame(loop);
+}
+function frame(now) {
+  // (the first frame after a restart can carry a timestamp a little before `last`)
+  const frameMs = Math.max(0, now - last);
   const dt = Math.min(0.05, frameMs / 1000);
   last = now;
   update(dt);
   renderFrame();
+  state.stats.frames = (state.stats.frames || 0) + 1;
   if (DEV) warnNear();
   if (OWN_GOV) OWN_GOV.tick(frameMs);
   fpsAcc += dt; fpsN++; frameMsAcc += frameMs; frameMax = Math.max(frameMax, frameMs);
@@ -1974,7 +2079,6 @@ function loop(now) {
     if (DEV) devEl.textContent = `${state.stats.fps} fps · ${state.stats.frameMs} ms/frame (max ${state.stats.frameMaxMs}) · ${state.stats.calls} draws · ${Math.round(state.stats.triangles / 1000)}k tris · load ${state.stats.readyMs} ms · t ${worldT.toFixed(1)} · push ${push.v.toFixed(2)} · focus ${focus.k.toFixed(2)}`;
     fpsAcc = 0; fpsN = 0; frameMsAcc = 0; frameMax = 0;
   }
-  requestAnimationFrame(loop);
 }
 
 // the scene's targets at the canvas size x the quality step's scale
@@ -2412,7 +2516,10 @@ async function warmUp() {
   // out (same objects, same cameras, same targets as before), so nothing in the picture changes; it only takes turns.
   // (only a season building behind something the viewer is looking at takes turns: the opening scene, and a season opened
   // on its own page, compile under their waiting screen as before — the opening would otherwise open 0.5 s later)
-  const COMPILE_AT_ONCE = +params.get('compileatonce') || (HOLDABLE ? 2 : Infinity);
+  // (29/9: spring now warms up under the waiting screen — the page opens only when it is ready — so nothing it could
+  // make stutter is on screen yet: it sends 6 at a time there, which halves its warm-up; behind a page being looked at
+  // it is still 2)
+  const COMPILE_AT_ONCE = +params.get('compileatonce') || (HOLDABLE ? (shownElsewhere() ? 2 : 6) : Infinity);
   const PARALLEL = renderer.extensions.has('KHR_parallel_shader_compile');
   const mats = new Set();
   const addAll = (set) => set.forEach((m) => mats.add(m));
@@ -2426,9 +2533,13 @@ async function warmUp() {
       await new Promise((r) => setTimeout(r, 8));
     }
   };
+  // (the warm-up is the last tenth of the waiting screen, and it moves with the work: 29/9, it used to sit at 90% for
+  // the whole of it — 2.5 s here, 5 s on a slow line — because nothing in it said how far it had got)
+  let sent = 0, toSend = 1;
   const compileOne = async (obj, cam, rt, target) => {
     // (a season that reached this before the page's entrance began stops sending here until it is over)
     await entranceHold();
+    setProgress(0.9 + (0.05 * sent++) / toSend);
     renderer.setRenderTarget(rt);
     addAll(renderer.compile(obj, cam, target));
     for (const pr of renderer.info.programs || []) if (!seenPrograms.has(pr)) { seenPrograms.add(pr); compiling.push(pr); }
@@ -2438,6 +2549,7 @@ async function warmUp() {
   };
   const drawables = [];
   scene.traverse((o) => { if (o.isMesh || o.isPoints || o.isLine || o.isSprite) drawables.push(o); });
+  toSend = drawables.length + casters.length + 3;
   for (const o of drawables) await compileOne(o, camera, rtMain, scene);
   if (casters.length) {
     for (const c of casters) { c.saved = c.mesh.material; c.mesh.material = c.sm; }
@@ -2462,9 +2574,11 @@ async function warmUp() {
     }
   }
   mark(`warm: ${programs.size} shaders compiled`, tw);
+  setProgress(0.955);
   const tu = performance.now();
   for (const p of programs) { p.getUniforms(); p.getAttributes(); await slice(); }
   mark('warm: uniforms', tu);
+  setProgress(0.96);
   // textures (in the materials' uniforms) and render targets
   const tt = performance.now();
   const texs = new Set();
@@ -2485,6 +2599,7 @@ async function warmUp() {
   }
   renderer.setRenderTarget(keep);
   mark('warm: textures and targets', tt);
+  setProgress(0.965);
   // every mesh drawn once into a 1 x 1 target (its buffers go up), and every caster once with its shadow material.
   // The first draw of a new kind of thing (a material with a new set of attributes) makes the GPU build a shader variant
   // on its main thread (a long stall of the whole page on a first visit; the browser keeps them for the next): those are
@@ -2517,6 +2632,7 @@ async function warmUp() {
   }
   let k = 0;
   while (k < draws.length) {
+    setProgress(0.965 + (0.025 * k) / Math.max(1, draws.length));
     const group = [draws[k++]];
     if (group[0].fresh) { await quiet(tb); await pauseNow(); }
     else {
@@ -2582,6 +2698,7 @@ async function warmUp() {
   }
   renderer.setRenderTarget(keep);
   mark('warm: shadow maps', tl);
+  setProgress(0.993);
   // the frame's passes once each, in their own slices, drawn into one pixel (the GPU sets up each pass's state now):
   // the painting, the beams, the blurs, the bottle, the canvas
   const tp = performance.now();

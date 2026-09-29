@@ -16,6 +16,8 @@
 // customer's own frame). From the hand-off on, the customer's note is hidden through her api (README 11):
 // core.people.get('customer').api.hideNote(on), called in lateUpdate (after every folder's update).
 const here = (p) => new URL(p, import.meta.url).href;
+// the files this folder will fetch while it builds: the core fetches them early, beside the page's own (core/world.js)
+export const ASSETS = [here('./nguoiban.glb')];
 const S = await import(here('./nguoiban.js'));
 const KP = await import(here('./khach-paint.js'));
 const LOOP = 6, FPS = 24, STEP = 2;

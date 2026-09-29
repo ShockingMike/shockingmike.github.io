@@ -417,6 +417,11 @@ html.pg { scrollbar-gutter: stable; background-color: #efe2d2; overflow-x: clip;
    off the bottle and off the stopper lying on the table — both boxes measured from the picture, and the clearance
    checked by page/qa/page-check.mjs. */
 .pg-cue { --edge: 8px; position: absolute; left: 50%; transform: translateX(-50%); bottom: 14px; padding: 5px 14px; font: 500 15px/1.3 var(--sans); letter-spacing: .02em; white-space: nowrap; }
+/* waiting for a season still being made (29/9): the same small sheet as the invitation, day paper and ink on every
+   scene, at the foot of the screen; it fades in and out with the wait */
+.pg-wait { --pc: var(--paper); color: var(--ink); bottom: 18px; opacity: 0; transition: opacity .35s ease; }
+.pg-wait.is-on { opacity: 1; }
+.pg-no3d .pg-wait { display: none; }
 .pg-notice { --edge: 6px; position: absolute; left: 50%; top: 88px; transform: translateX(-50%); padding: 6px 14px; font: 500 14px/1.3 var(--sans); white-space: nowrap; }
 
 /* ---------------------------------------------------------------- the epigraph

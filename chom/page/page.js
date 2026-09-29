@@ -1471,6 +1471,26 @@ export function mountPage(rawApi = {}) {
   // the bar is told to finish only when the room behind it is settled, not the moment the core is ready
   api.on('ready', () => { const settled = build(); warmWord(); hideCoreNotes(); loader.ready(settled); });
   api.on('error', (why) => { console.info('[page] reading version:', why); goNo3d(); build(); loader.fail(); });
+  // ---- waiting for a season still being made (29/9) -------------------------------------------------
+  // The core holds the scene at the stop it is at when the viewer steps (or jumps from the bar) into a season that is
+  // not ready yet, and says so with the season's real progress. The note says what is coming and how far it has got,
+  // on a sheet of paper at the foot of the screen like the opening's invitation to scroll, and goes as soon as the
+  // season is ready (the scene then goes on by itself).
+  const waitWords = h('span', {});
+  const waitNote = h('p', { class: 'pg-cue pg-wait pg-paint', role: 'status', 'aria-live': 'polite', hidden: true }, waitWords);
+  over.append(waitNote);
+  let waitHideT = 0;
+  api.on('wait', (w) => {
+    clearTimeout(waitHideT);
+    if (w && w.waiting && !state.no3d) {
+      waitWords.textContent = t('loader.season', { season: t(`season.${w.id}.name`), pct: Math.round((w.progress || 0) * 100) });
+      waitNote.hidden = false;
+      requestAnimationFrame(() => waitNote.classList.add('is-on'));
+    } else {
+      waitNote.classList.remove('is-on');
+      waitHideT = setTimeout(() => { waitNote.hidden = true; }, 400);
+    }
+  });
   api.on('season', (s) => {
     if (!s) return;
     const index = s.intro ? -1 : Number.isFinite(s.index) ? s.index : SEASONS.indexOf(s.id);

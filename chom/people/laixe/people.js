@@ -11,6 +11,8 @@
 //     hidden); the season's 'bike' mover (r 0.55, h 2.7) already keeps the pass-through check round him.
 //     core: the world's api (core.THREE, core.U, core.build, core.slice).
 const here = (p) => new URL(p, import.meta.url).href;
+// the files this folder will fetch while it builds: the core fetches them early, beside the page's own (core/world.js)
+export const ASSETS = [here('./laixe.glb')];
 const L = await import(here('./laixe.js'));
 const KP = await import(here('./khach-paint.js'));
 const LOOP = 6;

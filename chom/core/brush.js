@@ -25,7 +25,29 @@ export function rng(seed) {
 // one 1024 x 1024 brush sheet held the page 45 ms in a single texSubImage2D (loadstutter --why, Hạ starting to build right
 // after Xuân was ready, while the viewer watched the opening). Only for pictures read as data (NoColorSpace): the
 // texture comes back with flipY = false, since the bitmap is already the right way up.
-export const load = async (url, tries = 2, { bitmap = false } = {}) => {
+// blob: the file already fetched (core/world.js counts its bytes for the waiting screen). The picture is made from it the
+// same way: an ImageBitmap for data (turned, alpha not multiplied in, no colour conversion), else an <img>. If it did
+// not come, the picture is loaded from its address as before.
+export const load = async (url, tries = 2, { bitmap = false, blob = null } = {}) => {
+  if (blob) {
+    try {
+      const b = await blob;
+      if (bitmap && typeof createImageBitmap === 'function') {
+        const bm = await createImageBitmap(b, { imageOrientation: 'flipY', premultiplyAlpha: 'none', colorSpaceConversion: 'none' });
+        const tb = new THREE.Texture(bm);
+        tb.flipY = false;
+        tb.needsUpdate = true;
+        return tb;
+      }
+      const img = new Image();
+      const u = URL.createObjectURL(b);
+      img.src = u;
+      await img.decode();
+      const t = new THREE.Texture(img);
+      t.needsUpdate = true;
+      return t;
+    } catch (e) { /* loaded from its address below */ }
+  }
   for (let k = 1; ; k++) {
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -54,10 +76,10 @@ export const load = async (url, tries = 2, { bitmap = false } = {}) => {
 };
 
 // slice(): resolves when the next piece of start-up work may run (so a season loading in the background never stalls the page)
-export async function loadTextures(renderer, { base = './tex/', maxAniso = 8, onProgress = () => {}, slice = async () => {} } = {}) {
+export async function loadTextures(renderer, { base = './tex/', maxAniso = 8, onProgress = () => {}, slice = async () => {}, blobs = {} } = {}) {
   let done = 0;
   const tick = (t) => { onProgress(++done / 5); return t; };
-  const [nt, d, strokes, wash, linen] = await Promise.all(['brush-nt.png', 'brush-d.png', 'strokes.png', 'wash.png', 'linen.jpg'].map((f) => load(base + f, 2, { bitmap: true }).then(tick)));
+  const [nt, d, strokes, wash, linen] = await Promise.all(['brush-nt.png', 'brush-d.png', 'strokes.png', 'wash.png', 'linen.jpg'].map((f) => load(base + f, 2, { bitmap: true, blob: blobs[f] || null }).then(tick)));
   for (const t of [nt, d, strokes, wash, linen]) t.colorSpace = THREE.NoColorSpace;
 
   // join the two halves of the brush sheet

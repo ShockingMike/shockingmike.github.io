@@ -15,6 +15,8 @@ const inPack = /\/pack\/people\.js(\?|$)/.test(import.meta.url);
 const T = await import(here(inPack ? '../tea.js' : './tea.js'));
 const TP = await import(here(inPack ? '../tea-paint.js' : './tea-paint.js'));
 const MODEL = [here(inPack ? '../model/tea.glb' : './tea.glb')];
+// the files this folder will fetch while it builds: the core fetches them early, beside the page's own (core/world.js)
+export const ASSETS = [MODEL[0]];
 const LOOP = 6;
 let last = null;
 // her face as points in world space with outward normals, at the pose she is drawn in now (for the core's face check):
