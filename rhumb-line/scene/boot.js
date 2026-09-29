@@ -6,14 +6,16 @@
       shader compile, warm-up frames. Each step reports real progress.
    4. import('../app/main.js') by its real URL (served from the cache warmed in step 1), then
       page.init({ scene, reduce: false }).
-   5. At a real 100 %: #loader.is-leaving, the loader's chart settles onto the 3D chart and the camera flies back to the
+   5. The finished page drawn once behind the still-opaque loader (prepaint), so the browser's own first-draw work
+      happens here and not in the reader's first seconds at the desk.
+   6. At a real 100 %: #loader.is-leaving, the loader's chart settles onto the 3D chart and the camera flies back to the
       seat at the desk, html.is-loading comes off, #loader.is-gone, and `rhumbcabin:ready` fires on window.
    Motion always runs: prefers-reduced-motion is not read (Mike, 2026-09-15); the page is told reduce: false.
    No WebGL, a failed download or a scene error: #loader.is-error for ~1.5 s, html.no-webgl, page.init({ scene: null }),
    then the loader leaves. A stall watchdog makes sure the loader never hangs.
    The shown number only chases the real one: it never runs ahead, never goes back, and reaches 100 only when the scene
    and the page are both ready. Test pages may set window.RHUMB_BOOT = { page: false } (skip the page) or
-   { appUrl: '...' } (a stub page module). */
+   { appUrl: '...' } (a stub page module), and { prepaintMin: n } (QA: hold each prepaint view at least n frames). */
 import { createSound } from './sound.js';
 
 const doc = document, html = doc.documentElement;
@@ -57,8 +59,9 @@ function resolveSpec(spec, from) {
 
 /* ---------- Progress: weighted stages ---------- */
 // weights follow measured time on a cold shader cache (RTX 3060, local server): build ~2.7 s, compile ~4.2 s, warm-up ~4.5 s
-const WEIGHT = { files: 40, fonts: 3, build: 18, compile: 14, warm: 14, page: HAS_PAGE ? 11 : 0 };
-const stage = { files: 0, fonts: 0, build: 0, compile: 0, warm: 0, page: HAS_PAGE ? 0 : 1 };
+// paint: the page's views drawn behind the loader (prepaint), ~1-2.5 s on a first visit
+const WEIGHT = { files: 40, fonts: 3, build: 18, compile: 14, warm: 14, page: HAS_PAGE ? 11 : 0, paint: HAS_PAGE ? 9 : 0 };
+const stage = { files: 0, fonts: 0, build: 0, compile: 0, warm: 0, page: HAS_PAGE ? 0 : 1, paint: HAS_PAGE ? 0 : 1 };
 let real = 0, shown = 0, allDone = false, failed = false, leaving = false, lastInt = -1, lastT = 0, lastRise = performance.now();
 function recompute() {
   let sum = 0, tot = 0;
@@ -217,11 +220,12 @@ function fontsStage() {
 }
 
 /* ---------- Stage 4: the page ---------- */
+let pageMod = null;
 async function runPage(scene) {
   if (!HAS_PAGE) return;
   report('page', 0.1);
   let mod = null;
-  try { mod = await import(APP_URL); } catch (e) { console.error('[Rhumb Line] The page module could not load.', e); }
+  try { mod = pageMod = await import(APP_URL); } catch (e) { console.error('[Rhumb Line] The page module could not load.', e); }
   report('page', 0.35);
   if (mod && typeof mod.init === 'function') {
     try {
@@ -230,6 +234,74 @@ async function runPage(scene) {
   }
   marks.pageDone = ms();
   report('page', 1);
+}
+
+/* ---------- Stage 5 (step 5 above): the page drawn once behind the loader ----------
+   The browser draws the page's own surfaces (paper grain, card shadows, tag masks, rotated prints) with programs it
+   builds on first use; on a first visit that froze the desk for 50-350 ms each time something new appeared: the desk's
+   UI, the title card, each panel, a photo enlarged, a dialog, a sea moment (Chrome on Windows, 2026-09-29). So, with the
+   layout final and the loader still opaque, the finished page is shown behind it (html.is-prepaint, index.html) in each
+   of those views in turn (app/prepaint.js), each until frames run at their usual pace again, then everything is put
+   back with transitions and animations off, so nothing fades, moves or shifts. Reported as the 'paint' stage. */
+function nextFrameTime() { return new Promise((r) => requestAnimationFrame(r)); }
+async function prepaint() {
+  if (!HAS_PAGE || failed) { report('paint', 1); return; }
+  let t = await nextFrameTime();
+  const base = [];
+  for (let i = 0; i < 6; i++) { const n = await nextFrameTime(); base.push(n - t); t = n; }
+  base.sort((a, b) => a - b);
+  const calmMs = Math.max(40, base[3] * 1.6 + 8);
+  const t0 = performance.now();
+  let frames = 0;
+  // wait until frames come at their usual pace again (the browser's drawing work is done), at most 1.5 s a view
+  const settle = async (from, to) => {
+    const s0 = performance.now();
+    let n = 0, calm = 0;
+    while (performance.now() - s0 < 1500) {
+      const now = await nextFrameTime();
+      const dt = now - t; t = now; n++; frames++;
+      calm = dt < calmMs ? calm + 1 : 0;
+      report('paint', from + (to - from) * Math.min(0.95, n / 8));
+      if (n >= (CFG.prepaintMin || 2) && calm >= 2) break;
+    }
+    report('paint', to);
+  };
+  // the desk as the reader first meets it (with its title card, then alone: the page's layers split differently
+  // without the card), then the page's own views
+  let views = [
+    { name: 'desk and title card', show() { html.classList.add('is-prepaint-title'); }, hide() { html.classList.remove('is-prepaint-title'); } },
+    { name: 'desk', show() {}, hide() {} }
+  ];
+  try { if (pageMod && typeof pageMod.prepaintViews === 'function') views = views.concat(pageMod.prepaintViews()); } catch (e) { /* the desk views still run */ }
+  const log = [];
+  // the sea sound's noise beds too (scene/sound.js): the first click then only opens the audio context
+  try { sound.prepare(); } catch (e) { /* made at the first click instead */ }
+  html.classList.add('is-prepaint');
+  for (let i = 0; i < views.length && performance.now() - t0 < 15000; i++) {
+    const v = views[i], v0 = performance.now(), f0 = frames;
+    let r = null;
+    try { r = await v.show(); } catch (e) { r = 'skip'; }
+    // a quick step (nothing on screen changes) or a view with nothing new to show: no frames spent on it
+    if (v.quick || r === 'skip') {
+      try { v.hide(); } catch (e) { /* put back as far as it goes */ }
+      report('paint', (i + 1) / views.length);
+      continue;
+    }
+    await settle(i / views.length, (i + 1) / views.length);
+    try { v.hide(); } catch (e) { /* put back as far as it goes */ }
+    // before a view of the same boxes in another state, one frame with them gone: they then appear anew instead of
+    // moving (no layout shift)
+    const next = views[i + 1];
+    if (next && v.group && next.group === v.group) { t = await nextFrameTime(); frames++; }
+    log.push([v.name, Math.round(performance.now() - v0), frames - f0]);
+  }
+  // hide it again at once: transitions and animations stay off for that one style change
+  html.classList.add('is-prepaint-off');
+  html.classList.remove('is-prepaint');
+  void doc.body.offsetWidth;
+  html.classList.remove('is-prepaint-off');
+  marks.prepaint = { ms: Math.round(performance.now() - t0), frames, views: log };
+  report('paint', 1);
 }
 
 /* ---------- Leaving the loader ---------- */
@@ -385,6 +457,8 @@ async function boot() {
   }
   if (failed) return;
   await runPage(cabin.api);
+  if (failed) return;
+  await prepaint();
   if (failed) return;
   allDone = true;
   recompute();

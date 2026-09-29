@@ -14,7 +14,8 @@
      label.js    canvas bag labels
      dial.js     the flavour volvelle
      quiz.js     "Join the crew"
-     forms.js    demo dialog and newsletter */
+     forms.js    demo dialog and newsletter
+     prepaint.js the page's views drawn once behind the loader (scene/boot.js reads prepaintViews) */
 
 import { $, LOG, guard } from './dom.js';
 import { createDesk, initDocument } from './desk.js';
@@ -24,6 +25,7 @@ import { initDial } from './dial.js';
 import { initQuiz } from './quiz.js';
 import { initModals, initNewsletter } from './forms.js';
 import { initLightbox } from './lightbox.js';
+export { prepaintViews } from './prepaint.js';
 
 let started = null;
 

@@ -26,6 +26,27 @@ body { margin: 0; }
 /* While the loader covers the page nothing behind it is drawn (the canvas excepted), so deciding between the desk
    and the plain document never counts as a layout shift. */
 html.is-loading body > :not(#loader):not(.scene) { visibility: hidden !important; }
+/* Just before it lets go, the (still opaque) loader holds the finished page and its title card drawn behind it for a
+   few frames, so the browser prepares its drawing for them before the reader arrives (scene/boot.js, prepaint). */
+html.is-loading.is-prepaint body > :not(#loader):not(.scene) { visibility: visible !important; }
+html.is-prepaint-title.desk .titlecard { opacity: 1 !important; visibility: visible !important; }
+html.is-prepaint .sound__hint { display: block !important; }
+html.is-prepaint.desk .objtag { --tx: 50vw; --ty: 50vh; opacity: 1 !important; }
+html.is-prepaint *, html.is-prepaint-off * { transition: none !important; animation: none !important; }
+html.is-prepaint [data-qa="photo"] img:not(.prepaint-swatch) { display: none !important; }
+html.is-prepaint .prepaint-focus { outline: 3px solid var(--focus) !important; outline-offset: 3px; box-shadow: 0 0 0 7px rgba(12, 10, 8, .55) !important; opacity: 1 !important; }
+html.is-prepaint .paper .prepaint-focus { box-shadow: 0 0 0 7px rgba(241, 232, 212, .7) !important; }
+html.is-prepaint .photo__frame.prepaint-focus { outline-color: var(--marker) !important; box-shadow: none !important; }
+html.prepaint-modal dialog[open], html.prepaint-modal dialog::backdrop { opacity: .002 !important; }
+/* hover looks, copied from style.css (a pointer hovering is what first draws them) */
+html.is-prepaint .tag.prepaint-hover { transform: rotate(-3deg); }
+html.is-prepaint .tag.prepaint-hover::before { background-color: #F0E1BF; }
+html.is-prepaint .stampbtn.prepaint-hover { transform: rotate(-1deg) scale(1.04); }
+html.is-prepaint .stamp.prepaint-hover, html.is-prepaint .photo.prepaint-hover { transform: rotate(0deg) scale(1.03); }
+html.is-prepaint .opt.prepaint-hover { background: rgba(207, 224, 216, .5); }
+html.is-prepaint .prepaint-moving { will-change: transform; }
+html.prepaint-modal-anim dialog[open] { will-change: opacity, transform; transform: scale(.98); }
+html.is-prepaint #loader { opacity: .999; will-change: opacity; }
 #loader { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; touch-action: none;
   background: radial-gradient(120% 90% at 50% 46%, #221912 0%, #140f0b 48%, #0a0806 100%); transition: opacity .55s ease; }
 html:not(.is-loading) #loader, #loader.is-gone { display: none; }
@@ -59,7 +80,7 @@ html:not(.is-loading) #loader, #loader.is-gone { display: none; }
   }
 }
 </script>
-<script type="application/json" id="rl-manifest">{"files":[{"url":"style.css","bytes":62435},{"url":"app/main.js","bytes":4522},{"url":"app/bearing.js","bytes":1370},{"url":"app/data.js","bytes":16195},{"url":"app/desk.js","bytes":35160},{"url":"app/dial.js","bytes":9973},{"url":"app/dom.js","bytes":4203},{"url":"app/forms.js","bytes":2138},{"url":"app/label.js","bytes":9362},{"url":"app/lightbox.js","bytes":2382},{"url":"app/quiz.js","bytes":4450}]}</script>
+<script type="application/json" id="rl-manifest">{"files":[{"url":"style.css","bytes":62435},{"url":"app/main.js","bytes":4767},{"url":"app/bearing.js","bytes":1370},{"url":"app/data.js","bytes":16195},{"url":"app/desk.js","bytes":35160},{"url":"app/dial.js","bytes":9973},{"url":"app/dom.js","bytes":4203},{"url":"app/forms.js","bytes":2138},{"url":"app/label.js","bytes":9362},{"url":"app/lightbox.js","bytes":2382},{"url":"app/prepaint.js","bytes":13268},{"url":"app/quiz.js","bytes":4450}]}</script>
 <script>
 /* Loader chart geometry, shared with the 3D harbour chart (scene/) so the hand-off lines up.
    Units: a 1400 x 1000 sheet; land top-left, sea to the bottom-right. The SVG below is drawn from this object. */

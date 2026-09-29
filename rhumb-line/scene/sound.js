@@ -4,8 +4,11 @@
      [data-qa="sound-hint"]    shown (hidden attribute removed) only after the page is entered, until sound starts
    Layers: swell (brown noise breathing with the hull's roll), surf wash, wind, rain, dry sand hiss (dust), wood creaks
    at the ends of a roll, a distant bell buoy (in port), thunder after lightning.
-   Rules: the AudioContext is created only inside the first pointerdown / keydown (unless the reader chose Off before),
-   it fades up over 4 s to a quiet bed, a hidden tab fades it out, the choice is kept in localStorage['rhumbline.sound'].
+   Rules: sound starts only at the first pointerdown / keydown / click (unless the reader chose Off before), fades up over 4 s
+   to a quiet bed, a hidden tab fades it out, the choice is kept in localStorage['rhumbline.sound']. The AudioContext
+   and its graph are made while the loader is up (prepare) and kept suspended, so that first click only resumes it:
+   opening an AudioContext took 30-60 ms of the main thread, a visible stall at the first click (2026-09-29). A browser
+   that has not had a click yet notes in its console that the context may not start before one; it starts at the click.
    Works without the 3D scene: if nobody drives tick(), a slow built-in swell takes over. */
 
 const KEY = 'rhumbline.sound';
@@ -44,14 +47,28 @@ export function createSound(opts = {}) {
   // so `want` is what the button shows and `on` is whether the sound is actually playing.
   let want = pref() !== 'off';
 
-  function buffer(kind) {
-    const len = Math.round(ctx.sampleRate * 3), b = ctx.createBuffer(1, len, ctx.sampleRate), d = b.getChannelData(0);
+  // 3 s of noise. `rate` without a context: made ahead (prepare), so the first click has less to do
+  function fill(d, kind) {
     let last = 0;
-    for (let i = 0; i < len; i++) {
+    for (let i = 0; i < d.length; i++) {
       const w = Math.random() * 2 - 1;
       if (kind === 'brown') { last = (last + 0.02 * w) / 1.02; d[i] = last * 3.5; } else d[i] = w;
     }
+  }
+  function buffer(kind, rate) {
+    const sr = rate || ctx.sampleRate, len = Math.round(sr * 3);
+    const b = rate ? new AudioBuffer({ length: len, numberOfChannels: 1, sampleRate: sr }) : ctx.createBuffer(1, len, sr);
+    fill(b.getChannelData(0), kind);
     return b;
+  }
+  // Both noise beds, made while the loader is up (no audio context is needed for that, and none is created: the
+  // browser only lets sound start from a click, tap or key). The click then only opens the context and wires it.
+  let ready = null;
+  function prepare() {
+    if (ready || typeof AudioBuffer !== 'function') return;
+    try { ready = { white: buffer('white', 48000), brown: buffer('brown', 48000) }; } catch (e) { ready = null; }
+    // the context and its graph as well, silent and suspended until the first click (the reader chose On)
+    if (want && !ctx && !on && build() && ctx.state !== 'suspended') ctx.suspend().catch(() => {});
   }
   const node = (type, props) => { const n = ctx[type](); for (const k in props) { if (n[k] instanceof AudioParam) n[k].value = props[k]; else n[k] = props[k]; } return n; };
   const chain = (...nodes) => { for (let i = 0; i < nodes.length - 1; i++) nodes[i].connect(nodes[i + 1]); return nodes[nodes.length - 1]; };
@@ -61,7 +78,8 @@ export function createSound(opts = {}) {
     const AC = window.AudioContext || window.webkitAudioContext;
     if (!AC) return false;
     try { ctx = new AC(); } catch (e) { ctx = null; return false; }
-    white = buffer('white'); brown = buffer('brown');
+    // (a bed made at 48 kHz plays resampled in a 44.1 kHz context: noise sounds the same)
+    white = ready ? ready.white : buffer('white'); brown = ready ? ready.brown : buffer('brown');
     master = node('createGain', { gain: 0 });
     chain(master, node('createDynamicsCompressor', { threshold: -18, ratio: 3 }), ctx.destination);
     L = {
@@ -117,13 +135,15 @@ export function createSound(opts = {}) {
   }
 
   function gesture(e) {
-    if (on || !want) return;
-    if (ctx && ctx.state === 'running') return;
+    if (!want) return;
+    // playing already; or started but refused by the browser (a gesture it did not count): this one tries again
+    if (on && (!ctx || ctx.state === 'running')) return;
     if (toggle && e.target && e.target.closest && e.target.closest('[data-qa="sound-toggle"]')) return;
     start(4);
   }
   window.addEventListener('pointerdown', gesture, true);
   window.addEventListener('keydown', gesture, true);
+  window.addEventListener('click', gesture, true);
   if (toggle) toggle.addEventListener('click', () => { if (want) { setPref('off'); stop(); } else { setPref('on'); start(2.5); } });
   document.addEventListener('visibilitychange', () => {
     if (!ctx || !on) return;
@@ -213,6 +233,7 @@ export function createSound(opts = {}) {
   return {
     tick, creak, thunder,
     arm() { armed = true; ui(); },
+    prepare,
     setWeather(k) {
       if (!SOUND_MIX[k] || k === weather) return;
       weather = k;
