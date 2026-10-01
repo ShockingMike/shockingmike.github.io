@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Studio Kōzō · Cultural buildings in Japan</title>
+<meta name="description" content="An architecture office in Japan: museums, tea houses, shrine archives, village halls. Every part is cut for one place in one building.">
+<script>
+  // chọn bản không khí trước khi vẽ gì — để màn chờ và nền trang đúng màu ngay từ khung đầu
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var l = (q.get('look') || 'a').toLowerCase();
+    document.documentElement.dataset.look = /^[abc]$/.test(l) ? l : 'a';
+    // màu nhấn = màu của PHÉP ĐO (rokusho | bengara | shu); không có thì trang giữ xám mực như cũ
+    var a = (q.get('accent') || 'rokusho').toLowerCase();
+    if (a !== 'none') document.documentElement.dataset.accent = 'rokusho';
+    // phần 7 (29/9): trang KHÔNG cuộn thật — đi từng chương (page/buoc.js); lớp này chỉ còn để khoá cuộn của trình duyệt
+    document.documentElement.classList.add('khoa-cuon');
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+    // một tệp mã không tải được (máy chủ xem thử `python -m http.server` thỉnh thoảng từ chối kết nối khi trình duyệt xin
+    // nhiều tệp cùng lúc) → màn chờ đứng ở 0% mãi. Tự tải lại trang MỘT lần; tải được rồi thì app.js xoá dấu.
+    window.__kozoRetry = function () {
+      try { if (!sessionStorage.getItem('kozo-retry')) { sessionStorage.setItem('kozo-retry', '1'); location.reload(); } } catch (e) { /* không có bộ nhớ phiên: thôi */ }
+    };
+  })();
+</script>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Shippori+Mincho:wght@500&display=swap">
+<!-- import map PHẢI đứng trước mọi modulepreload (29/9: đặt sau thì F5 hỏng hẳn cảnh 3D, "Failed to resolve module specifier three") -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/",
+    "postprocessing": "https://cdn.jsdelivr.net/npm/postprocessing@6.39.5/build/index.js"
+  }
+}
+</script>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.core.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/postprocessing@6.39.5/build/index.js">
+<!-- biểu tượng tab: con dấu 構 (白文印, nền 緑青) — viết sẵn trong trang để hiện ngay cả trước khi mã chạy (page/page.js vẽ lại y hệt) -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%20shape-rendering%3D%22crispEdges%22%3E%3Crect%20x%3D%220%22%20y%3D%220%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%233E9A80%22%2F%3E%3Ctext%20x%3D%228%22%20y%3D%228.6%22%20font-family%3D%22'Shippori%20Mincho'%2C'Yu%20Mincho'%2C'Hiragino%20Mincho%20ProN'%2C'Noto%20Serif%20CJK%20JP'%2C'Songti%20SC'%2Cserif%22%20font-weight%3D%22700%22%20font-size%3D%2213%22%20text-anchor%3D%22middle%22%20dominant-baseline%3D%22central%22%20fill%3D%22%23ebeae5%22%20shape-rendering%3D%22auto%22%3E%E6%A7%8B%3C%2Ftext%3E%3C%2Fsvg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ── cảnh 3D: nền của cả trang, máy đọc màn hình bỏ qua ───────────────────── -->
+<canvas id="scene" aria-hidden="true"></canvas>
+<svg id="plex" aria-hidden="true"></svg>
+<!-- phần 3: chiều cao thật của trang (trang cuộn thật; mọi lớp khác đứng yên, cảnh chạy theo vị trí cuộn) -->
+<!-- khung vát góc kiểu hubtown (hiện khi vào chương) -->
+<svg id="khung" aria-hidden="true"><path id="khung-path"/></svg>
+
+<!-- ── lớp sương phẳng của màn mở (giây 0–1) ─────────────────────────────────── -->
+<div id="mist" class="mist" aria-hidden="true"></div>
+
+<!-- ── màn chờ: nền đá tự xếp theo phần trăm tải THẬT ───────────────────────── -->
+<div id="load" class="load">
+  <div class="load-in">
+    <!-- MÀN CHỌN TIẾNG — hiện SAU KHI TẢI XONG (Mike 29/9, lần 3: "load xong mới hỏi"). Trước đó là màn tải bên dưới; tải
+         xong thì màn tải tan, màn này hiện (lớp .cho). Bấm là vào thẳng màn mở. Chữ lấy nguyên văn ô s0 của
+         docs/content/kozo-copy.md. Cú bấm cũng là cú chạm trình duyệt đòi để được phát tiếng. -->
+    <div class="load-chon" id="load-pick" role="group" aria-label="Sound">
+      <p class="chon-ten">Studio <span lang="ja">構造</span> Kōzō</p>
+      <div class="chon-nut">
+        <button type="button" class="pick pick-on" id="pick-on" aria-pressed="false"><span class="pick-nen" aria-hidden="true"></span><svg class="pick-i" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7.6h3.1L10.4 4v12L6.1 12.4H3z"/><path d="M13.3 7.3a3.9 3.9 0 0 1 0 5.4M15.7 5.1a7 7 0 0 1 0 9.8"/></svg><span class="pick-t">Enter with sound</span></button>
+        <button type="button" class="pick pick-off" id="pick-off" aria-pressed="false"><span class="pick-nen" aria-hidden="true"></span><svg class="pick-i" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 7.6h3.1L10.4 4v12L6.1 12.4H3z"/><path d="M13.6 8.1l3.8 3.8M17.4 8.1l-3.8 3.8"/></svg><span class="pick-t">Enter in silence</span></button>
+      </div>
+      <p class="pick-note">Best with headphones</p>
+    </div>
+    <!-- MÀN TẢI: màn đầu tiên người xem thấy (hàng đá tự xếp theo phần trăm tải THẬT); tải xong thì nhường chỗ cho màn chọn -->
+    <div class="load-tai">
+      <p class="load-brand">Studio <span lang="ja">構造</span> Kōzō</p>
+      <svg id="load-wall" class="load-wall" viewBox="0 0 240 104" aria-hidden="true"></svg>
+      <p class="load-read">
+        <span class="load-num"><span id="load-n">0</span>%</span>
+        <span class="load-lab" id="load-lab">starting</span>
+      </p>
+    </div>
+    <p class="load-sr">Loading the building.</p>
+    <script>
+      // nút chỉ hiện khi đã tải xong, nên bình thường window.__kozoPick (page/page.js) đã có sẵn. Phòng khi chưa có: nhớ lựa
+      // chọn, với "có tiếng" thì mở AudioContext ngay trong cú bấm (luật trình duyệt: tiếng chỉ được mở trong một cú bấm).
+      // Tải lại trong cùng phiên: tô sẵn lựa chọn cũ (vẫn phải bấm).
+      (function () {
+        var on = document.getElementById('pick-on'), off = document.getElementById('pick-off');
+        try { var cu = sessionStorage.getItem('kozo-am'); if (cu === 'on') on.classList.add('cu'); if (cu === 'off') off.classList.add('cu'); } catch (e) { /* không có bộ nhớ phiên */ }
+        function pick(v) {
+          if (window.__kozoPick) { window.__kozoPick(v); return; }
+          window.__kozoChon = v;
+          if (v === 'on' && !window.__kozoAC) {
+            try { var AC = window.AudioContext || window.webkitAudioContext; window.__kozoAC = new AC({ latencyHint: 'playback' }); window.__kozoAC.resume(); } catch (e) { /* trình duyệt không có Web Audio */ }
+          }
+          on.setAttribute('aria-pressed', String(v === 'on')); off.setAttribute('aria-pressed', String(v === 'off'));
+          document.getElementById('load').classList.add('da-chon');
+        }
+        on.addEventListener('click', function () { pick('on'); });
+        off.addEventListener('click', function () { pick('off'); });
+      })();
+    </script>
+  </div>
+</div>
+
+<!-- ── màn đầu: lớp chữ kiểu igloo — chữ đơn cách nhỏ đặt THẲNG trên cảnh, ở bốn góc,
+     không khung, không tấm lót. Chữ HTML thật: máy đọc màn hình đọc được. ─────────── -->
+<main id="main">
+  <section class="s1" id="s1" aria-labelledby="s1h">
+    <div class="c-tl">
+      <h1 id="s1h" class="logo"><a class="logo-link" href="#s1"><span class="seal" id="seal" aria-hidden="true"></span><span data-copy="s1.name" data-decode="0,0.6,0,1">Studio Kōzō</span></a></h1>
+      <p class="sub" data-decode="0.3,0.4,0.75"><span lang="ja" class="ja">構造</span><span aria-hidden="true">·</span><span data-copy="s1.sub"></span></p>
+    </div>
+    <div class="c-tr">
+      <p class="lbl" data-decode="0.2,0.4,0.75"><span data-copy="s1.label">Manifesto</span></p>
+      <p class="mani" data-copy="s1.lead" data-decode="0.4,0.7,1.31"></p>
+    </div>
+    <div class="c-bl">
+      <p class="hint" data-copy="s1.hint" data-decode="1.0,0.4,0.75"></p>
+      <p class="sound" data-decode="1.1,0.4,0.75"><button type="button" class="sound-btn" aria-pressed="false" tabindex="-1"><span data-copy="s1.sound">Sound:</span> <span class="off" data-tt data-copy="s1.sound_off">Off</span></button></p>
+    </div>
+    <p class="c-br" aria-hidden="true" data-decode="1.2,0.5,0,1"><span lang="ja">構造</span></p>
+    <!-- nhãn đo mẫu trên nền đá: đường dẫn gãy khúc + số đo THẬT lấy từ số dựng hình (scene/app.js) -->
+    <div class="tag" id="tag" hidden>
+      <p class="tag-k"><span lang="ja">石垣</span> · <span data-copy="s1.tag_k">Base</span></p>
+      <p class="tag-v" id="tag-size"></p>
+      <p class="tag-v" id="tag-batter"></p>
+    </div>
+  </section>
+
+  <!-- ── PHẦN 3: lớp giao diện chương (kiểu hubtown, hệ chữ Kōzō). Hiện dần khi mực loang sang thung lũng. ─────── -->
+  <a class="ch-logo" id="ch-logo" href="#s1" tabindex="-1"><span class="ch-seal" id="ch-seal" aria-hidden="true"></span><span data-copy="s1.name">Studio Kōzō</span></a>
+  <!-- đổi chương thì báo cho máy đọc màn hình (soát p7a B9) -->
+  <p id="ch-live" class="dc-sr" aria-live="polite" aria-atomic="true"></p>
+  <nav class="chap" id="chap" aria-label="Chapters">
+    <ol>
+      <li class="on"><a href="#ch-dat" data-chuong="1" tabindex="-1" aria-current="step"><span lang="ja">地</span><span data-copy="ch.ground">Ground</span></a></li>
+      <li><a href="#ch-da" data-chuong="2" tabindex="-1"><span lang="ja">石垣</span><span data-copy="ch.bearing">Bearing</span></a></li>
+      <li><a href="#ch-rung" data-chuong="3" tabindex="-1"><span lang="ja">骨</span><span data-copy="ch.frame">Frame</span></a></li>
+      <li><a href="#ch-lang" data-chuong="4" tabindex="-1"><span lang="ja">皮</span><span data-copy="ch.skin">Skin</span></a></li>
+      <li><a href="#ch-viec" data-chuong="5" tabindex="-1"><span lang="ja">仕事</span><span data-copy="ch.work">Work</span></a></li>
+      <li><a href="#ch-lienhe" data-chuong="6" tabindex="-1"><span lang="ja">連絡</span><span data-copy="ch.contact">Contact</span></a></li>
+    </ol>
+  </nav>
+  <section class="ch" id="ch-dat" aria-labelledby="ch-dat-h">
+    <h2 class="ch-head" id="ch-dat-h" data-copy="s2.head">The site is the brief</h2>
+    <p class="ch-body" id="ch-dat-p" data-copy="s2.body"></p>
+  </section>
+  <section class="ch" id="ch-da" aria-labelledby="ch-da-h">
+    <h2 class="ch-head" id="ch-da-h" data-copy="s3.head">Four hundred years, no mortar</h2>
+    <p class="ch-body" id="ch-da-p" data-copy="s3.body"></p>
+  </section>
+  <section class="ch" id="ch-rung" aria-labelledby="ch-rung-h">
+    <h2 class="ch-head" id="ch-rung-h" data-copy="s4.head">Built to move</h2>
+    <p class="ch-body" id="ch-rung-p" data-copy="s4.body"></p>
+  </section>
+  <section class="ch" id="ch-lang" aria-labelledby="ch-lang-h">
+    <h2 class="ch-head" id="ch-lang-h" data-copy="s5.head">A wall is a filter</h2>
+    <p class="ch-body" id="ch-lang-p" data-copy="s5.body"></p>
+  </section>
+  <section class="ch" id="ch-viec" aria-labelledby="ch-viec-h">
+    <h2 class="ch-head" id="ch-viec-h" data-copy="s6.head">Finished, and in progress</h2>
+    <p class="ch-body" id="ch-viec-p" data-copy="s6.intro"></p>
+    <!-- bản đọc chữ (máy không vẽ được 3D): năm công trình thành danh sách thường; bản 3D dùng thẻ hình vẽ của scene/viec.js -->
+    <ul class="viec-doc">
+      <li><b>Mulberry House · Village museum · 2019</b>Damp ruins paper. The collection is sealed away; only the gallery sees the sky.</li>
+      <li><b>Pine Room · Restoration · 2021</b>The crawl door is 66 × 63 cm. We kept it, so everyone still kneels.</li>
+      <li><b>Dry Store · Shrine archive · 2023</b>The ground is wet all year, so the floor sits 1 200 mm above it.</li>
+      <li><b>Snow Hall · Village theatre · 2024</b>Three metres of snow a winter. The roof is pitched 60° to shed it.</li>
+      <li><b>Open Field · Memorial · 2026 —</b>One path across the site. Where it ends, nothing stands.</li>
+    </ul>
+  </section>
+  <!-- ── PHẦN 9 (30/9): chương 連絡 — tiêu đề + dẫn ở góc trên phải (cùng lưới lề với logo và "Sound"), form là "đường mặt đất" chạy
+       ngang đáy khung, dòng chân trang ở góc dưới trái. Form demo: bấm Send chỉ hiện câu s8.demo, không gửi gì đi đâu, không lưu gì. -->
+  <section class="ch ch-lh" id="ch-lienhe" aria-labelledby="ch-lienhe-h" inert>
+    <div class="lh-dau" id="lh-dau">
+      <h2 class="ch-head" id="ch-lienhe-h" data-copy="s8.head">Send us what you have</h2>
+      <p class="ch-body" id="ch-lienhe-p" data-copy="s8.lead"></p>
+    </div>
+    <form class="lh-dat" id="lh-form" novalidate aria-labelledby="ch-lienhe-h" inert>
+      <div class="hang">
+        <label class="o" for="lh-name"><span class="nhan" data-copy="s8.f_name">Name</span><input id="lh-name" name="name" type="text" autocomplete="name" enterkeyhint="next"></label>
+        <label class="o" for="lh-email"><span class="nhan" data-copy="s8.f_email">Email</span><input id="lh-email" name="email" type="email" autocomplete="email" inputmode="email" enterkeyhint="next"></label>
+        <label class="o" for="lh-site"><span class="nhan" data-copy="s8.f_site">Where the site is</span><input id="lh-site" name="site" type="text" autocomplete="off" enterkeyhint="next"></label>
+        <label class="o" for="lh-msg"><span class="nhan" data-copy="s8.f_msg">What is there now</span><input id="lh-msg" name="msg" type="text" autocomplete="off" enterkeyhint="send"></label>
+        <div class="gui"><button class="pick lh-gui" id="lh-gui" type="submit"><svg class="pk-vien" aria-hidden="true"><path/></svg><span class="pick-nen" aria-hidden="true"></span><span class="pick-t" data-copy="s8.button">Send</span><svg class="pick-i" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10 H16 M11.5 5.5 L16 10 L11.5 14.5"/></svg></button></div>
+      </div>
+      <p class="lh-demo" id="lh-demo" role="status" aria-live="polite" tabindex="-1"></p>
+    </form>
+    <p class="ch-chan" data-copy="footer.line">Designed &amp; built by Shocking Mike</p>
+  </section>
+  <p class="ch-sound" id="ch-sound"><button type="button" class="sound-btn" aria-pressed="false" tabindex="-1"><span data-copy="s1.sound">Sound:</span> <span data-tt data-copy="s1.sound_off">Off</span></button></p>
+</main>
+
+<script type="module" src="page/page.js" onerror="__kozoRetry()"></script>
+<script type="module" src="scene/app.js" onerror="__kozoRetry()"></script>
+</body>
+</html>

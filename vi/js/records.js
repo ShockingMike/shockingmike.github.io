@@ -1,5 +1,9 @@
 /* records.js — the six records: numbers, links, art, colours. Words live in copy.js.
    Chớm went live on 22/9 (https://shockingmike.github.io/chom/, Vietnamese only); its clip and still were captured from the live page.
+   Studio Kōzō opens with its own site (https://shockingmike.github.io/kozo/, English only). Its clip, still and art were
+   captured from the build Mike approved on 30/9 (p11b), at the page's top quality step: day castle → dusk → ink bleeding
+   into the terraces, then the shoji turning into the map of the studio's work. The sleeve is the last chapter (the castle
+   at night, every layer lit, the plot staked out) printed in sumi and rokushō; the open view is the site's night.
    `sleeve` = the house sleeve's colours: paper (board), ink, accent (second ink of the halftone), foil (title stamped in foil).
    `theme` = the open view: one flat colour that fills the whole screen behind the record (Stripe Press), and the
    colour of the words on it. The colour is far from the sleeve's own board, so the sleeve stands off it. */
@@ -32,9 +36,12 @@ export const RECORDS = [
     disc: { vinyl: '#8e2f3c', label: '#efe6da', labelInk: '#3a2030' }
   },
   {
-    id: 'kozo', cat: 'SMR 004', name: 'Studio Kōzō', sealed: true,
-    sleeve: { paper: '#dedbd2', ink: '#1d2742', accent: '#1d2742', foil: true, sub: 'Architecture studio', field: '#1d2742' },
-    theme: { bg: '#1d2742', bg2: '#1d2742', fg: '#e7eaf3' }
+    id: 'kozo', cat: 'SMR 004', name: 'Studio Kōzō',
+    url: 'https://shockingmike.github.io/kozo/', video: 'media/kozo.mp4', poster: 'media/kozo.jpg',
+    art: 'media/art-kozo.jpg', pick: 'custom',
+    sleeve: { paper: '#e4e2da', ink: '#1c2420', accent: '#3e9a80', foil: true, sub: 'Architecture studio' },
+    theme: { bg: '#12261e', bg2: '#12261e', fg: '#e2eee8' },
+    disc: { vinyl: '#2f7a64', label: '#e4e2da', labelInk: '#1c2420' }
   },
   {
     id: 'hadal', cat: 'SMR 005', name: 'Hadal', sealed: true,

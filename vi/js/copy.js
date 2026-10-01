@@ -67,9 +67,12 @@ export const COPY = {
       },
       kozo: {
         subtitle: 'Văn phòng kiến trúc',
-        story: ['Kiến trúc sư nghĩ bằng bản vẽ trước, khối nhà sau. Nên trang này cũng thế: mặt bằng tự hiện ra, rồi dựng lên thành khối 3D.'],
-        details: { role: 'Tên, logo, thiết kế, code', tech: 'Chưa chọn', status: 'Còn nằm trên bàn vẽ' },
-        cta: { pricing: 'Muốn một trang như thế này?' }
+        story: [
+          'Kōzō trong tiếng Nhật là kết cấu, đúng cái phần của toà nhà chẳng ai dừng lại ngắm. Thước đo của studio là một bức tường thành cổ: bốn trăm năm không vữa, và không viên đá nào đặt sang chỗ khác mà vừa.',
+          'Sáu kiến trúc sư, hai thợ mộc, chung một xưởng cưa cũ ở Nagano.'
+        ],
+        details: { role: 'Tên, logo, thế giới 3D, âm thanh, code', tech: 'three.js, shader nét mực tự viết, Web Audio', year: '2026', status: 'Đã phát hành' },
+        cta: { visit: 'Vào xem (tiếng Anh)', preview: 'Xem đoạn demo', pricing: 'Muốn dựng cả một thế giới như thế này?' }
       },
       hadal: {
         subtitle: 'Viện hải dương học',

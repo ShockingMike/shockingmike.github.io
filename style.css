@@ -204,10 +204,11 @@ html:not(.has-3d) .top { position: absolute; }
 .more .page__tracks div:first-child { border-top: 0; }
 .rows li + li { border-top: 1px solid currentColor; }
 /* a row holds a label on the left and a note on the right. Vietnamese runs longer than English, so the row is
-   allowed to wrap and grow instead of letting the two ever run into each other. */
+   allowed to wrap and grow instead of letting the two ever run into each other. The note keeps its one line
+   (on a phone a long label used to squeeze it to a letter a line); the label is the one that wraps. */
 .row {
   width: 100%; min-height: 48px; margin: 0; padding: 8px 0 8px 16px; border: 0; background: transparent; color: inherit;
-  display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr) 48px; align-items: center; column-gap: 14px;
+  display: grid; grid-template-columns: minmax(0, auto) minmax(max-content, 1fr) 48px; align-items: center; column-gap: 14px;
   text-align: left; text-decoration: none;
   transition: background-color 0.2s ease;
 }

@@ -183,7 +183,7 @@ function frameText(ctx, S, rec, c, foilCtx) {
 }
 
 /** The picture windows, one per record: every one a screened picture (duotone or CMYK) of the site itself; the
-    sealed three a plain field with the smallest sign of what is coming. Foil is never here: only the title carries it. */
+    sealed two a plain field with the smallest sign of what is coming. Foil is never here: only the title carries it. */
 const ART = {
   kern(ctx, S, x0, y0, w, h, c, foilCtx, img) {
     // the foundry's own headline, caught mid-variation on the live page, screened in black and blue
@@ -203,23 +203,11 @@ const ART = {
     ctx.fillRect(x0, y0, w, h);
     cmyk(ctx, img, x0, y0, w, h, { cell: S * 0.0056 });
   },
-  kozo(ctx, S, x0, y0, w, h, c) {
-    // an architect's plan, light ink on a dark field
-    ctx.fillStyle = c.field; ctx.fillRect(x0, y0, w, h);
-    ctx.save(); ctx.strokeStyle = '#cfcabf'; ctx.fillStyle = '#cfcabf'; ctx.lineWidth = Math.max(1.5, S * 0.004);
-    const u = w / 20, ox = x0 + 3 * u, oy = y0 + h * 0.2;
-    ctx.strokeRect(ox, oy, 14 * u, h * 0.6);
-    ctx.beginPath();
-    ctx.moveTo(ox + 6 * u, oy); ctx.lineTo(ox + 6 * u, oy + h * 0.32);
-    ctx.moveTo(ox + 6 * u, oy + h * 0.42); ctx.lineTo(ox + 14 * u, oy + h * 0.42);
-    ctx.moveTo(ox, oy + h * 0.28); ctx.lineTo(ox + 3.5 * u, oy + h * 0.28);
-    ctx.moveTo(ox + 10 * u, oy + h * 0.42); ctx.lineTo(ox + 10 * u, oy + h * 0.6);
-    ctx.stroke();
-    ctx.beginPath(); ctx.arc(ox + 6 * u, oy + h * 0.42, 1.9 * u, -Math.PI / 2, 0); ctx.stroke();
-    ctx.globalAlpha = 0.28; ctx.lineWidth = 1;
-    for (let i = 1; i < 20; i++) { const px = x0 + i * u; ctx.beginPath(); ctx.moveTo(px, y0); ctx.lineTo(px, y0 + h); ctx.stroke(); }
-    for (let j = 1; j < 14; j++) { const py = y0 + j * (h / 14); ctx.beginPath(); ctx.moveTo(x0, py); ctx.lineTo(x0 + w, py); ctx.stroke(); }
-    ctx.restore();
+  kozo(ctx, S, x0, y0, w, h, c, foilCtx, img) {
+    // the castle on the site's last night: every layer lit, the plot staked out, a duotone in sumi and rokushō on washi
+    ctx.fillStyle = c.paper;
+    ctx.fillRect(x0, y0, w, h);
+    duotone(ctx, img, x0, y0, w, h, { ink: c.ink, ink2: c.accent, cell: S * 0.0052 });
   },
   hadal(ctx, S, x0, y0, w, h) {
     // depth lines going down into the dark; the creatures' own light

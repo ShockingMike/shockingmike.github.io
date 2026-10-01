@@ -28,7 +28,7 @@ export const COPY = {
       help: 'Every record here is a site I made. Pick one to read how it came together.',
       comingSoon: 'Coming soon', pricing: 'Prices', record: 'Open {title}', home: 'Back to the start',
       loading: 'Getting the record up to speed', loadingPct: '{p}% loaded', loadingDone: '33⅓ rpm. Here we go.',
-      // the three unmade records: the write-up is under the wrap, so all anyone gets is this line
+      // the two unmade records: the write-up is under the wrap, so all anyone gets is this line
       sealed: 'Still sealed. The write-up opens when the site does.',
       details: 'Credits', flip: 'Turn {title} over',
       want: 'Want a page like this?', wantPrice: 'See prices',
@@ -66,9 +66,12 @@ export const COPY = {
       },
       kozo: {
         subtitle: 'Architecture studio',
-        story: ['Architects think in plans, then in volumes. So the floor plan draws itself first, then rises into 3D blocks.'],
-        details: { role: 'Name, logo, design, code', tech: 'Not picked yet', status: 'Still on the drawing board' },
-        cta: { pricing: 'Want a page like this?' }
+        story: [
+          'Kōzō is Japanese for structure, the part of a building nobody stops to admire. The studio’s yardstick is an old castle wall: four hundred years without mortar, and no stone that fits anywhere else.',
+          'Six architects and two carpenters share a former sawmill in Nagano.'
+        ],
+        details: { role: 'Name, logo, 3D world, sound, code', tech: 'three.js, custom ink shader, Web Audio', year: '2026', status: 'Out now' },
+        cta: { visit: 'Visit the site', preview: 'Watch a clip', pricing: 'Want a whole world like this?' }
       },
       hadal: {
         subtitle: 'Oceanography institute',
