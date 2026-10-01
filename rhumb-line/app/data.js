@@ -7,7 +7,7 @@ export const RAD = Math.PI / 180;
 export const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 export const lerp = (a, b, t) => a + (b - a) * t;
 
-// The roastery's harbour town (fictional). Printed as port.coordinates: 44°48′N 62°37′W.
+// The roastery's harbour town. Printed as port.coordinates: 44°48′N 62°37′W.
 export const ROASTERY = { id: 'merrowick', lat: 44.8, lon: -62.6167 };
 
 // Things on the desk (desk contract v2, section 2). The first six open a panel; the porthole and the lamp act in place.
