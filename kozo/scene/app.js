@@ -2385,8 +2385,9 @@ try {
     if (JX.on && JX.day && !JX.swap && Z.p >= 1) chUpdate(JX.k, dt, zones(J.sIn, ZJ));
     // cửa giấy 3D: dựng tư thế + vẽ vào khung đệm riêng (lượt ShojiEffect đặt lên ảnh cảnh)
     if (DOOR.on) { cua.update(DOOR.x, dts); cua.render(renderer); }
-    // dấu 緑青 trên cột chương đổi ĐÚNG LÚC cảnh mới hiện (không chờ chữ chương — soát p7a A9)
-    if (nv.mode === 'trans') { const shown = Z.p6 >= (W0 + W1) / 2 ? 6 : Z.p5 >= GSW ? 5 : Z.p4 >= 0.5 ? 4 : Z.p3 >= 0.5 ? 3 : Z.p2 >= 1 ? 2 : Z.p >= 1 ? 1 : 0; if (shown > 0) Z.navCur = shown; }
+    // dấu 緑青 trên cột chương: sang chương đích ngay khi trang nhận cú cuộn và GIỮ ở đó suốt chuyển cảnh (Mike 1/10: trước đây nó sang
+    // chương mới lúc nhận cú cuộn, rồi nhảy về chương cũ khi chuyển cảnh bắt đầu, tới giữa chuyển cảnh mới sang lại)
+    if (nv.mode === 'trans' && nv.to >= 1) Z.navCur = nv.to;
     // (soát p9a B2) bấm tên chương mà chương ấy còn đang dựng: ô 緑青 sang chương đích NGAY lúc bấm — trang đã nhận cú bấm
     if (nv.pend >= 1 && (nv.mode === 'idle' || nv.mode === 'play')) Z.navCur = nv.pend;
     // (soát p10a B4) ở MÀN ĐẦU cột chương chưa hiện: có cú bấm đang chờ (End, Contact…) thì cột chương hiện lên ngay với ô 緑青 ở chương
