@@ -331,16 +331,10 @@ document.addEventListener('keydown', (e) => {
   if (!stage || document.body.classList.contains('has-layer')) return;
   const tag = (e.target.tagName || '').toLowerCase();
   if (tag === 'input' || tag === 'textarea') return;
-  if (stage.mode === 'open') {
-    if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); stage.nudgeOpen(1); }
-    else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); stage.nudgeOpen(-1); }
-  }
-  if (stage.mode === 'stack') {
-    if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); stage.nudge(1); }
-    else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); stage.nudge(-1); }
-    else if ((e.key === 'Enter' || e.key === ' ') && (e.target === document.body || e.target.closest('#ticks'))) {
-      e.preventDefault(); stage.open(stage.items[stage.focus]);
-    }
+  // ↑ ↓ PageUp PageDown Home End (and Space with a record open) are read by steps.js: one press, one record
+  if (stage.mode === 'stack' && (e.key === 'Enter' || e.key === ' ') && (e.target === document.body || e.target.closest('#ticks'))) {
+    e.preventDefault();
+    if (stage.focus < stage.items.length) stage.tick(stage.focus);   // the record in view (once the crate has landed)
   }
 });
 $('#listenBack').addEventListener('click', closePreview);
@@ -430,17 +424,15 @@ async function boot() {
   $('#ticks').addEventListener('click', (e) => {
     const b = e.target.closest('button[data-tick]');
     if (!b) return;
-    if (b.dataset.tick === 'flyer') { if (stage.mode === 'stack') stage.setFocus(stage.flyerFocus); else stage.close(); return; }
-    const i = Number(b.dataset.tick);
-    const id = stage.items[i];
-    if (stage.mode === 'stack') { if (stage.focus === i) stage.open(id); else stage.setFocus(i); }
-    else if (stage.mode === 'open' && stage.active !== id) stage.goTo(i);
+    // in the crate: flip to that record, or take it out if it is the one in view; with a record open: slide to it.
+    // A click while a record is opening or closing is remembered and runs when that is done (stage.tick).
+    stage.tick(b.dataset.tick === 'flyer' ? 'flyer' : Number(b.dataset.tick));
   });
   $('#back').addEventListener('click', () => stage.close());
   // the label's mark: a record in hand goes back in the crate, the price sheet folds away, the crate returns to the first record
   $('#home').addEventListener('click', () => {
     if (stage.mode === 'open' || stage.mode === 'opening') stage.close(0);
-    else stage.setFocus(0);
+    else stage.go('first');
   });
   // ?open=kern opens that record straight away; ?at=flyer starts at the open price flyer
   const qs = new URLSearchParams(location.search);

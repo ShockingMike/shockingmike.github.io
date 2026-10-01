@@ -11,6 +11,7 @@ import * as K from './covers.js';
 import * as A from './album.js';
 import { buildRoom } from './room.js';
 import { makeGovernor } from './quality.js';
+import { createSteps } from './steps.js';
 
 const DEG = Math.PI / 180;
 const clamp01 = (x) => Math.max(0, Math.min(1, x));
@@ -607,6 +608,7 @@ export async function createStage({ canvas, records, images, credits, flyerPrint
         onState && onState('switch', active.id);
       }
     }
+    if (ready && navFrame(now)) moving = true;   // a remembered click has just run
 
     // with a record in hand, the crate and the others fade away; behind the record in view, the queue dims with depth
     const others = active ? 1 - clamp01((openT - 0.02) / 0.3) : 1;
@@ -700,13 +702,7 @@ export async function createStage({ canvas, records, images, credits, flyerPrint
 
   /* ---------- actions ---------- */
   const snap = (f) => (f > LAST ? (f > LAST + FSPAN / 2 ? FMAX : LAST) : Math.round(f));
-  function setFocus(i) { if (mode === 'stack') { focusTarget = Math.max(0, Math.min(FMAX, i)); dirty = true; } }
-  function nudge(d) {
-    if (mode !== 'stack') return;
-    let nx = snap(focusTarget) + d;
-    if (nx > LAST && nx < FMAX) nx = d > 0 ? FMAX : LAST;
-    focusTarget = Math.max(0, Math.min(FMAX, nx));
-  }
+  function setFocus(i) { if (mode === 'stack') { focusTarget = Math.max(0, Math.min(FMAX, i)); NAV.openNear = null; dirty = true; } }
   function open(id) {
     if (mode !== 'stack') return false;
     const it = items.find((x) => x.id === id);
@@ -742,30 +738,97 @@ export async function createStage({ canvas, records, images, credits, flyerPrint
     osTarget = Math.max(0, Math.min(LAST, i));
     return true;
   }
-  /** one record on or back, from wherever we are already headed */
-  function nudgeOpen(d) { if (mode === 'open' || mode === 'opening') stepOpen(d > 0 ? 1 : -1); }
-  /* The wheel in the open view. A notch and a trackpad's stream of small deltas both mean the same thing —
-     "next record" — so the deltas add up until they pass a step, one step is taken, and then the wheel has to go
-     quiet for a moment before the next one. A step that arrives while the last one is still gliding is queued,
-     never dropped: the target simply moves one record further. */
-  const WHEEL = { acc: 0, quiet: 0, locked: false, STEP: 70, QUIET: 130 };
-  function openWheel(dy) {
-    clearTimeout(WHEEL.quiet);
-    WHEEL.quiet = setTimeout(() => { WHEEL.locked = false; WHEEL.acc = 0; }, WHEEL.QUIET);
-    if (WHEEL.locked) return;
-    WHEEL.acc += dy;
-    if (Math.abs(WHEEL.acc) < WHEEL.STEP) return;
-    const dir = WHEEL.acc > 0 ? 1 : -1;
-    WHEEL.acc = 0;
-    WHEEL.locked = true;
-    stepOpen(dir);
+  /* ---------- one gesture, one record ----------
+     Mike, 1/10/2026: the scroll slipped too easily — make it step the way Studio Kōzō does. steps.js reads the hands (a wheel notch,
+     a whole trackpad flick, a swipe, a key = one step); this is what a step does. It moves the target exactly one stop
+     on — the records, then the price flyer — and the springs carry the crate or the open view there exactly as before.
+     While that move is under way (until the spring has all but landed) and for LOCK_MS after, another step is DROPPED,
+     never queued — except a gesture the other way, BACK_MS or more into the move, which turns it back to where it came
+     from. Opening and closing a record lock the same way. A click is never dropped: a tick, the mark or Home / End
+     re-aims a moving crate or open view at once (the spring simply carries on to the new place); one that cannot run
+     in the middle of a move — opening the record in view while the crate still settles, anything while a record opens
+     or closes — is remembered, the last one wins, and runs the moment that move is over. */
+  const NAV = { lockUntil: 0, was: false, dir: 0, t0: 0, queue: null, openNear: null, log: [] };
+  const NEAR = { stack: 0.06, open: 0.12 };   // how close the spring has to be to count as landed, in records
+  const LOCK_MS = 150, BACK_MS = 200;
+  const navLog = (...e) => { NAV.log.push([Math.round(performance.now()), ...e]); if (NAV.log.length > 200) NAV.log.shift(); };
+  function inMotion() {
+    if (mode === 'opening' || mode === 'closing') return true;
+    if (mode === 'stack') return Math.abs(focus - focusTarget) > NEAR.stack || Math.abs(focusV) > 0.5;
+    return Math.abs(os - osTarget) > NEAR.open || Math.abs(osV) > 0.6;
   }
-  /** move one record on from wherever we are already headed (so gestures stack up) */
-  function stepOpen(dir) {
-    const from = Math.max(0, Math.min(LAST, Math.round(osTarget)));
-    const nx = from + dir;
-    if (nx > LAST) { close(FMAX); return; }
-    osTarget = Math.max(0, Math.min(LAST, nx));
+  const locked = () => inMotion() || performance.now() < NAV.lockUntil;
+  /** one stop on (dir 1) or back (dir -1) */
+  function step(dir) {
+    if (mode !== 'stack' && mode !== 'open') { navLog('drop', dir, mode); return false; }
+    if (locked()) {
+      const back = NAV.dir === -dir && inMotion() && performance.now() - NAV.t0 >= BACK_MS;
+      if (!back) { navLog('drop', dir); return false; }
+    }
+    if (mode === 'stack') {
+      const from = snap(focusTarget);
+      let nx = from + dir;
+      if (nx > LAST && nx < FMAX) nx = dir > 0 ? FMAX : LAST;
+      nx = Math.max(0, Math.min(FMAX, nx));
+      if (nx === from) return false;
+      focusTarget = nx;
+    } else {
+      const nx = Math.max(0, Math.min(LAST, Math.round(osTarget))) + dir;
+      if (nx < 0) return false;
+      if (nx > LAST) close(FMAX);   // past the last record: it goes back in the crate and the price flyer comes up
+      else osTarget = nx;
+    }
+    NAV.dir = dir; NAV.t0 = performance.now(); NAV.queue = null; NAV.openNear = null;
+    dirty = true;
+    navLog('step', dir, mode === 'open' ? osTarget : mode === 'stack' ? focusTarget : mode);
+    return true;
+  }
+  /** Home / End: the first or the last stop of the view we are in */
+  function go(where) {
+    if (mode === 'opening' || mode === 'closing') { NAV.queue = { go: where }; navLog('remember', where); return false; }
+    NAV.openNear = null; NAV.dir = 0;
+    if (mode === 'stack') focusTarget = where === 'first' ? 0 : FMAX;
+    else osTarget = where === 'first' ? 0 : LAST;
+    dirty = true;
+    navLog('go', where);
+    return true;
+  }
+  /** a tick on the rail — a record's number, or 'flyer' (Enter / Space on the crate comes here too) */
+  function tick(i) {
+    if (mode === 'closing' || (mode === 'opening' && i !== 'flyer')) { NAV.queue = { tick: i }; navLog('remember', i); return false; }
+    NAV.openNear = null; NAV.dir = 0;
+    dirty = true;
+    navLog('tick', i);
+    if (i === 'flyer') { if (mode === 'stack') focusTarget = FMAX; else close(); return true; }
+    if (!items[i]) return false;
+    if (mode === 'open') { osTarget = i; return true; }
+    if (snap(focusTarget) !== i) { focusTarget = i; return true; }
+    return pickUp(items[i]);
+  }
+  /** the record in view, picked: out of the crate now if the crate stands still, else the moment it has landed */
+  function pickUp(it) {
+    if (Math.abs(focus - it.index) < 0.02 && Math.abs(focusV) < 0.05) return open(it.id);
+    focusTarget = it.index; NAV.openNear = it.id; dirty = true;
+    navLog('remember', it.id);
+    return true;
+  }
+  /** every frame, after the springs: a move that has just landed locks for a moment; a remembered click runs */
+  function navFrame(now) {
+    const mv = inMotion();
+    if (NAV.was && !mv) { NAV.lockUntil = now + LOCK_MS; navLog('landed', mode === 'open' ? osTarget : focusTarget); }
+    NAV.was = mv;
+    if (NAV.openNear !== null) {
+      const it = items.find((x) => x.id === NAV.openNear);
+      if (mode !== 'stack' || !it || snap(focusTarget) !== it.index) NAV.openNear = null;
+      else if (Math.abs(focus - it.index) < 0.02) { NAV.openNear = null; open(it.id); return true; }
+    }
+    if (NAV.queue && (mode === 'stack' || mode === 'open')) {
+      const q = NAV.queue;
+      NAV.queue = null;
+      if (q.go) go(q.go); else tick(q.tick);
+      return true;
+    }
+    return false;
   }
   function flip() {
     if (!active || mode !== 'open') return false;
@@ -791,36 +854,28 @@ export async function createStage({ canvas, records, images, credits, flyerPrint
   /** in the crate only the record in view (or the next one peeking) can be picked */
   const current = () => items[Math.min(LAST, Math.max(0, Math.round(focus)))];
 
-  let wheelIdle = 0;
-  /** the wheel's deltas in pixels, whatever unit the browser used */
-  const wheelPx = (e) => (e.deltaMode === 1 ? e.deltaY * 16 : e.deltaMode === 2 ? e.deltaY * L.vh : e.deltaY);
-  // listened for on the way down (capture), so the wheel works over the words and over the rows of buttons too
-  window.addEventListener('wheel', (e) => {
-    if (document.body.classList.contains('has-layer')) return;
-    const dy = wheelPx(e);
-    if (mode === 'open' || mode === 'opening') {
-      // a column taller than the screen scrolls itself first; once it is at its end, the wheel turns to the next record
-      const col = e.target.closest && e.target.closest('.page__rec');
-      if (col) {
-        const over = col.scrollHeight - col.clientHeight;
-        if (over > 2) {
-          const atTop = col.scrollTop <= 0.5, atEnd = col.scrollTop >= over - 0.5;
-          if ((dy > 0 && !atEnd) || (dy < 0 && !atTop)) return;
-        }
-      }
-      e.preventDefault();
-      openWheel(dy);
-      return;
-    }
-    if (mode !== 'stack') return;
-    e.preventDefault();
-    focusTarget = Math.max(0, Math.min(FMAX, focusTarget + dy * 0.0035));
-    clearTimeout(wheelIdle);
-    wheelIdle = setTimeout(() => { focusTarget = snap(focusTarget); }, 220);
-  }, { passive: false, capture: true });
+  let ready = false;   // the hands are read from the moment the shop is built
+  /** a record's words taller than the screen scroll themselves first, the way dir goes, until they reach their end */
+  function colScrolls(el, dir) {
+    if (mode !== 'open' && mode !== 'opening') return false;
+    const col = el && el.closest && el.closest('.page__rec');
+    if (!col) return false;
+    const over = col.scrollHeight - col.clientHeight;
+    if (over <= 2) return false;
+    return dir > 0 ? col.scrollTop < over - 0.5 : col.scrollTop > 0.5;
+  }
+  createSteps({
+    canInput: () => ready && !document.body.classList.contains('has-layer'),
+    step, go,
+    ownWheel: (e, dy) => colScrolls(e.target, dy > 0 ? 1 : -1),
+    ownTouch: colScrolls,
+    spaceSteps: () => mode === 'open'
+  });
 
+  // the mouse (or a pen) dragged over the shop is a gesture like any other: one record, once it has gone far enough.
+  // A finger is read by steps.js; here it only has to tell a tap from a swipe.
   let drag = null;
-  canvas.addEventListener('pointerdown', (e) => { drag = { y: e.clientY, f: mode === 'open' ? osTarget : focusTarget, moved: false, id: e.pointerId }; });
+  canvas.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, moved: false, done: e.pointerType === 'touch', id: e.pointerId }; });
   const pointTilt = (e) => {
     TILT.tx = ((e.clientX / L.vw) * 2 - 1) * TILT.yaw;
     TILT.ty = ((e.clientY / L.vh) * 2 - 1) * TILT.pitch;
@@ -838,12 +893,10 @@ export async function createStage({ canvas, records, images, credits, flyerPrint
   if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission !== 'function') { window.addEventListener('deviceorientation', gyro); gyroOn = true; }
   canvas.addEventListener('pointermove', (e) => {
     if (drag && drag.id === e.pointerId && (mode === 'stack' || mode === 'open')) {
-      const dy = e.clientY - drag.y;
-      if (Math.abs(dy) > 8 || drag.moved) {
-        drag.moved = true;
-        if (mode === 'open') osTarget = Math.max(-0.12, Math.min(LAST + 0.6, drag.f - dy / (L.portrait ? 260 : 400)));
-        else focusTarget = Math.max(0, Math.min(FMAX, drag.f - dy / (L.portrait ? 90 : 140)));
-      }
+      const dy = e.clientY - drag.y, dx = e.clientX - drag.x;
+      if (Math.abs(dy) > 8) drag.moved = true;
+      // dragged up = on, like a finger
+      if (!drag.done && ready && Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx) * 1.2) { drag.done = true; step(dy < 0 ? 1 : -1); }
       return;
     }
     if (e.pointerType !== 'mouse') return;
@@ -859,16 +912,13 @@ export async function createStage({ canvas, records, images, credits, flyerPrint
     if (!drag || drag.id !== e.pointerId) return;
     const moved = drag.moved;
     drag = null;
-    if (moved) {
-      if (mode === 'open') { if (osTarget > LAST + 0.3) close(FMAX); else osTarget = Math.max(0, Math.min(LAST, Math.round(osTarget))); }
-      else focusTarget = snap(focusTarget);
-      return;
-    }
+    if (moved) return;
     if (mode === 'stack' && pickFlyer(e.clientX, e.clientY)) { onFlyer && onFlyer(); return; }
     const it = pick(e.clientX, e.clientY);
     if (mode === 'stack' && it) {
-      if (it === current() && Math.abs(focus - it.index) < 0.02) open(it.id);
-      else focusTarget = it.index; // a record further back: flip to it first
+      // the record in view comes out of the crate (once the crate has landed, if it is still settling)
+      if (it === current()) pickUp(it);
+      else { focusTarget = it.index; NAV.openNear = null; dirty = true; } // a record further back: flip to it first
     } else if (mode === 'open' && it === active) flip();
   });
   canvas.addEventListener('pointercancel', () => { drag = null; });
@@ -963,10 +1013,16 @@ export async function createStage({ canvas, records, images, credits, flyerPrint
   renderer.render(scene, camera);
   dirty = true;
   requestAnimationFrame(frame);
+  ready = true;
 
   return {
     items: items.map((it) => it.id),
-    open, close, flip, setFocus, nudge, setFlyerLang, goTo, nudgeOpen,
+    open, close, flip, setFocus, setFlyerLang, goTo, step, go, tick,
+    /** where the stepping stands — for the checking tools */
+    nav() {
+      return { mode, locked: locked(), moving: inMotion(), focus: +focus.toFixed(4), focusTarget, os: +os.toFixed(4), osTarget,
+        queue: NAV.queue, openNear: NAV.openNear, log: NAV.log.slice(-40) };
+    },
     renderer, scene,   // for the frame-time and picture-checking tools only
     /** the four corners of every cover that is on screen, in screen pixels — for the picture-checking tools */
     faceQuads() {
