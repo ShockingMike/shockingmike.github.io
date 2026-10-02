@@ -92,14 +92,31 @@ export const COPY = {
       meta: { title: 'Prices · Shocking Mike', description: 'Landing pages for brands, designed and coded by Shocking Mike. Three packages with clear prices from $1,500. Replies within 2 working days.' },
       back: 'Back to portfolio',
       hero: { title: 'Prices', lead: 'I design and code landing pages for brands. Every price is on this page, so you don’t have to ask. If you do write, I reply within 2 working days.' },
-      label: { plan: 'Package', plans: 'Packages', price: 'Price', timeline: 'Timeline', example: 'Sample page', includes: 'Includes', sample: 'See sample page' },
+      label: { plan: 'Package', plans: 'Packages', price: 'Price', timeline: 'Timeline', example: 'Sample page', includes: 'What you get', sample: 'See sample page' },
       // the figures that close each package block: printed big, with these small labels under them
-      stats: { weeks: 'weeks', sections: 'sections at most', rounds: 'rounds of revisions', fix: 'days of free bug fixes' },
+      stats: { weeks: 'weeks', sections: 'parts at most', rounds: 'rounds of changes', fix: 'days of free fixes' },
       notes: ['Your quote is a fixed price for the scope it sets out. Every package works smoothly on phones.'],
+      /* plan copy, rewritten 2/10 from Mike's brief (D:\Rando\De_xuat_noi_dung_3_goi_gia.md): the same prices, clearer words.
+         tagline: the italic line under the name; fit: who it's right for (card line one, and the home page shelf);
+         for: "who it's for"; plus: the line that opens the list on the two upper packages; includes: what you get;
+         timeNote: what the weeks count from; honest / upgrade: the two short notes under the figures. */
       plans: {
-        standard: { name: 'Standard', fit: 'A clean, clear page to run ads to or send to customers', for: 'If you just need a clean, clear page to run ads to or send to customers, this is enough. I won’t suggest paying for more than you need.', includes: ['One memorable moment', 'Up to 6 sections', 'Loading screen with real progress', 'Background sound when it fits', 'A sketch of the opening to approve first', '2 rounds of revisions', '30 days of free bug fixes'], timeline: '2–3 weeks', price: '$1,500–2,500', example: 'Kern Society', cta: 'Choose Standard' },
-        advanced: { name: 'Advanced', fit: 'A story worth hearing, and visitors who stay to explore', for: 'If your brand has a story worth hearing — what makes you different, why you’re worth more — an ordinary scrolling page runs out of room to tell it. This package turns that story into a place visitors step into, explore, and remember. It’s the one I recommend for most brands.', includes: ['A place to explore, not just scroll', 'Up to 10 sections', 'Page story planned with you before design', 'Loading screen with real progress, plus a version for older phones', 'Background sound where it fits', '3 rounds of revisions', '30 days of free bug fixes'], timeline: '4–6 weeks', price: 'From $5,000', example: 'Rhumb Line', cta: 'Choose Advanced' },
-        custom: { name: 'Custom', fit: 'A big picture no template can hold', for: 'For when you have a big picture in mind that no template can hold. It doesn’t stop at one space: the visual style, every scene, every movement is made for your brand alone, joined into one complete story. I work with you from the first idea until it looks the way you pictured it.', includes: ['A world: several scenes joined into one story', 'Visual style, scenes and motion made for your brand alone', 'With you from the first idea', '4 rounds of revisions', '60 days of free bug fixes'], timeline: '6–10 weeks', price: 'From $10,000', example: 'Chớm', cta: 'Choose Custom' }
+        standard: { name: 'Standard', tagline: 'One memorable moment', fit: 'Right for running ads or launching one product', priceNote: 'Price depends on how many parts need 3D.',
+          for: 'You’re running ads, launching a product, or need a page you can send to customers with pride. You don’t need a long story. You need one clear page that looks like it cost more than it did.',
+          plus: '', includes: ['One page with room for up to 6 parts: usually a striking opening, your product, a short story, reviews, and a way to contact or order', 'One memorable moment: a single piece of motion or 3D that people remember', 'A loading screen that shows real progress', 'Background sound where it fits, with a mute button', 'A sketch of the opening to approve before I build anything'],
+          timeline: '2–3 weeks', timeNote: 'Counted from the day you approve the sketch.', price: '$1,500–2,500', example: 'Kern Society', cta: 'Choose Standard',
+          honest: ['Honestly, is this enough?', 'If your goal is a clean page to send ad traffic to, yes. I won’t suggest paying for more than you need. If your brand needs to explain why it’s worth more, Advanced is built for that.'],
+          upgrade: ['Start small, grow later', 'Upgrade to Advanced within 6 months of launch and what you paid for Standard counts toward it.'] },
+        advanced: { name: 'Advanced', tagline: 'A place to explore', fit: 'Right for brands that need to show why they’re worth more', priceNote: 'Price depends on the number of 3D scenes and custom animation.',
+          for: 'Your brand has a story worth hearing: what makes you different, why you cost more than the shop next door. An ordinary scrolling page runs out of room to tell it. You need visitors to stay, look around, and leave understanding why you’re worth it.',
+          plus: 'Everything in Standard, plus:', includes: ['A 60-minute story session with me, turned into a written storyline you approve before any design starts', 'A page built as a place to explore, with room for up to 10 parts', 'Your first month of care included: text and photo updates, on me'],
+          timeline: '4–6 weeks', timeNote: 'Counted from the day you approve the storyline.', price: 'From $5,000', example: 'Rhumb Line', cta: 'Choose Advanced',
+          honest: ['Why I recommend this one', 'Most brands don’t have a design problem. They have a “why us” problem. Standard gives you a good-looking page. Advanced gives visitors a reason to choose you. If you only need a page for ads, Standard is enough and I’ll tell you so.'] },
+        custom: { name: 'Custom', tagline: 'A world', fit: 'Right for a launch or flagship moment your brand will be known for', priceNote: 'Price depends on how big the world is; I quote it after we talk.',
+          for: 'You have a big picture in mind that no template can hold: a launch, a flagship product, the page your brand will be known for. You don’t want a page that looks like a good version of someone else’s.',
+          plus: 'Everything in Advanced, plus:', includes: ['A visual style made only for your brand: every scene and every movement designed for you, nothing reused', 'Two visual directions to choose from before I build. You approve the storyline, then the look, then the full page', 'As many parts as the story needs, across more than one space', 'Your first 3 months of care included'],
+          timeline: '6–10 weeks', timeNote: 'Counted from the day you approve the storyline.', price: 'From $10,000', example: 'Chớm', cta: 'Talk to me about Custom',
+          honest: ['Honestly, do you need this?', 'If you can’t yet picture what you want, start with Advanced. Custom is for when you already know the page has to be unlike anything else.'] }
       },
       /* the table at the head of the page: three packages side by side, rows gathered in groups. A cell that
          starts with ✓ is drawn as a tick (anything after it is a small note), — as a dash, @sample as the link
@@ -107,22 +124,31 @@ export const COPY = {
       compare: {
         caption: 'The three packages side by side', recommend: 'What I recommend', details: 'See details',
         title: 'Compare packages',
-        // the four lines on each card: the ones that differ most between the packages
-        cards: { standard: ['One memorable moment', 'Up to 6 sections', '2 rounds of revisions', '30 days of free bug fixes'], advanced: ['A place to explore', 'Up to 10 sections', 'Story planned with you', '3 rounds of revisions'], custom: ['A world', 'Own art direction', '4 rounds of revisions', '60 days of free bug fixes'] },
+        // the four lines on each card, answering the same four questions in the same order: is it for me, what do
+        // I get, what if I don't like it, what if it breaks later
+        cards: {
+          standard: ['Right for running ads or launching one product', 'Room for the essentials: a striking opening, your product, your story, reviews, contact', 'You approve a sketch before I build, plus 2 rounds of changes', 'If anything I built breaks in the first 30 days, I fix it free'],
+          advanced: ['Right for brands that need to show why they’re worth more', 'A page visitors explore, not just scroll, with room for up to 10 parts', 'A 60-minute story session, written up as a storyline you approve, plus 3 rounds of changes', 'Free fixes for 60 days, and your first month of care on me'],
+          custom: ['Right for a launch or flagship moment your brand will be known for', 'A visual style made only for your brand, with as many parts as the story needs', 'You choose the look from 2 directions before I build, plus 4 rounds of changes', 'Free fixes for 90 days, and your first 3 months of care on me']
+        },
         yes: 'included', no: 'not included',
         groups: [
           { name: 'The page', rows: [
+            ['Right for', 'Ads, one product launch', 'Brands that need to show why they’re worth more', 'A launch or flagship moment'],
             ['Experience', 'One memorable moment', 'A place to explore', 'A world'],
-            ['Sections', 'up to 6', 'up to 10', 'as the story needs'],
+            ['Parts of the page', 'up to 6', 'up to 10', 'as the story needs'],
             ['Sample page', '@sample', '@sample', '@sample'],
-            ['Loading screen with real progress', '✓', '✓', '✓'],
-            ['Background sound, with a mute button', 'when needed', 'where it fits', 'where it fits'],
-            ['Own art direction', '—', '—', '✓']
+            ['A visual style made for you alone', '—', '—', '✓'],
+            ['Background sound, with a mute button', 'where it fits', 'where it fits', 'where it fits'],
+            ['Loading screen with real progress', '✓', '✓', '✓']
           ] },
           { name: 'How we work', rows: [
-            ['Story planned with you', 'a sketch of the opening to approve', '✓', '✓'],
-            ['Rounds of revisions', '2', '3', '4'],
-            ['Free bug fixes after launch', '30 days', '30 days', '60 days']
+            ['Story planning', 'a sketch of the opening', '60-minute session and written storyline', 'storyline, plus 2 visual directions'],
+            ['Rounds of changes', '2', '3', '4'],
+            ['Free fixes after launch', '30 days', '60 days', '90 days'],
+            ['Months of care included', '—', '1', '3'],
+            ['Upgrade credit', 'counts toward Advanced within 6 months of launch', '—', '—'],
+            ['Time', '2–3 weeks', '4–6 weeks', '6–10 weeks']
           ] },
           { name: 'Every package', all: true, rows: ['Designed from scratch, no templates', 'Works on phone, tablet and desktop', 'A lighter version for older phones', 'Gentle motion across the page', 'A contact or order form that reaches your inbox', 'Basic SEO and a proper image when shared', 'Your own domain, free hosting, visitor stats', 'Every account in your name', 'Full source code handed over'] }
         ],
@@ -131,13 +157,13 @@ export const COPY = {
       // what every package has, said once under the three of them rather than repeated inside each
       shared: { title: 'Every package includes', items: ['Designed from scratch, no templates', 'Works on phone, tablet and desktop', 'A contact or order form that reaches your inbox', 'Basic SEO and a proper image when the page is shared', 'Live on your own domain, on free hosting (no monthly fee), with visitor stats', 'Every account in your name', 'Full source code handed over'],
         text: 'You provide the text. Copywriting is quoted separately.', notTitle: 'Not included (quoted separately)', not: ['online checkout', 'a blog or self-editing system', 'extra pages', 'extra languages', 'photography', 'logo and brand identity', 'the domain and third-party fees'] },
-      care: { name: 'Monthly care', description: 'Text and photo updates, seasonal sections, and keeping the page running well as browsers change. We agree the scope together.', price: '$300–600/month', cta: 'Add monthly care' },
+      care: { name: 'Monthly care', description: 'Text and photo updates, seasonal changes, and keeping the page running well as browsers change. We agree the scope together.', price: '$300–600/month', cta: 'Add monthly care' },
       addon: { name: 'Copywriting', description: 'No words for the page yet? I can write them.', price: 'Quoted separately', cta: 'Add copywriting' },
-      process: { title: 'How it works', steps: ['You email me your brand, current website, deadline and budget.', 'Within 2 working days, I send a fixed quote with exactly what’s included.', 'You pay 50% upfront. I sketch the opening section for approval, then build. The number of revision rounds depends on the package.', 'The page goes live on your domain and account; you pay the other 50%.'] },
-      terms: { title: 'Terms', items: ['You provide the text and images. Copywriting is quoted separately.', 'The finished page and all its source code belong to you.', 'Changes beyond your package’s rounds of revisions are quoted before any work begins.', 'Payment by bank transfer in Vietnam, or PayPal from abroad.', 'We work over email at shockingmikedesign@gmail.com, with calls when needed.'] },
+      process: { title: 'How it works', steps: ['You email me your brand, current website, deadline and budget.', 'Within 2 working days, I send a fixed quote with exactly what’s included.', 'You pay 50% upfront. We agree the plan first (a sketch of the opening on Standard; a story session and written storyline on Advanced and Custom, plus two visual directions to choose from on Custom), then I build. The number of rounds of changes depends on the package.', 'The page goes live on your domain and account; you pay the other 50%.'] },
+      terms: { title: 'Terms', items: ['You provide the text and images. Copywriting is quoted separately.', 'The finished page and all its source code belong to you.', 'Changes beyond your package’s rounds of changes are quoted before any work begins.', 'Payment by bank transfer in Vietnam, or PayPal from abroad.', 'We work over email at shockingmikedesign@gmail.com, with calls when needed.'] },
       faq: { title: 'Common questions', items: [
         ['What do I need to prepare?', 'Your brand name, the product to feature, any text and photos you have, and a few websites you like. I’ll tell you if anything’s missing.'],
-        ['Can the page be changed after handover?', 'Yes. Free bug fixes for 30 or 60 days after launch, depending on the package. After that, monthly care covers updates and seasonal pages.'],
+        ['Can the page be changed after handover?', 'Yes. If anything I built breaks, I fix it free for 30, 60 or 90 days after launch, depending on the package. Advanced includes your first month of care and Custom your first 3 months; after that, monthly care covers updates and seasonal pages.'],
         ['Will it work well and load fast on phones?', 'Yes. I test every page on phones and large monitors before handover. 3D pages take a few seconds to load on a phone, so they open with a loading screen that shows real progress.']
       ] },
       contact: { title: 'Not sure which package fits?', text: 'Tell me your budget and what the page needs to do. I’ll suggest the package that fits, even when a smaller one will do.', email: 'shockingmikedesign@gmail.com',
@@ -158,11 +184,11 @@ export const COPY = {
       estimate: {
         title: 'ESTIMATE', from: 'Shocking Mike · Landing page design and development',
         date: 'Date', client: 'Brand', site: 'Current website', deadline: 'Needed by', budget: 'Budget', empty: 'Not provided',
-        item: { standard: 'Standard package: one memorable moment, up to 6 sections', advanced: 'Advanced package: a place to explore, up to 10 sections', custom: 'Custom package: a world of scenes joined into one story', care: 'Monthly care × {n} months', copywriting: 'Copywriting', copywritingAmount: 'Quoted separately' },
+        item: { standard: 'Standard package: one memorable moment, room for up to 6 parts', advanced: 'Advanced package: a place to explore, up to 10 parts, first month of care included', custom: 'Custom package: a world made for your brand, first 3 months of care included', care: 'Monthly care × {n} months', copywriting: 'Copywriting', copywritingAmount: 'Quoted separately' },
         total: 'Estimated total', totalFrom: 'From', excludes: 'Excludes copywriting (quoted separately).',
         note: 'This is a preliminary estimate based on published prices. Mike will confirm the final price and scope within 2 working days.',
         termsTitle: 'Terms in brief',
-        terms: ['50% deposit to start; the other 50% when the page goes live.', 'Opening section sketched for approval before build; {rounds} rounds of revisions.', 'The client provides text and images.', 'The page and source code belong to the client, hosted on the client’s own domain and accounts.', 'Payment by bank transfer (Vietnam) or PayPal (international).', 'Free bug fixes for {days} days after launch.'],
+        terms: ['50% deposit to start; the other 50% when the page goes live.', 'The plan is approved before the build starts; {rounds} rounds of changes.', 'The client provides text and images.', 'The page and source code belong to the client, hosted on the client’s own domain and accounts.', 'Payment by bank transfer (Vietnam) or PayPal (international).', 'Free fixes for {days} days after launch if anything Mike built breaks.'],
         contactLabel: 'Contact', contact: 'shockingmikedesign@gmail.com'
       },
       button: { send: 'Send request to Mike', copy: 'Copy estimate', copied: 'Copied', edit: 'Edit details', print: 'Print or save as PDF', close: 'Close' },

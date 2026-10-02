@@ -11,19 +11,19 @@ export const PLAN_ORDER = ['standard', 'advanced', 'custom'];
    Vietnamese files hold no dollar figure — not on screen, and not in the source either. */
 export const PACKAGES = {
   standard: {
-    id: 'standard', sections: 6, rounds: 2, fixDays: 30,   // most sections (none for Custom: as many as the story needs), rounds of revisions, days of free bug fixes
+    id: 'standard', sections: 6, rounds: 2, fixDays: 30,   // most sections (none for Custom: as many as the story needs), rounds of changes, days of free fixes
     
      usd: [1500, 2500], 
     exampleUrl: 'https://shockingmike.github.io/kern-society/', theme: { bg: '#e8e4da', fg: '#161616' }
   },
   advanced: {
-    id: 'advanced', sections: 10, rounds: 3, fixDays: 30,   // most sections (none for Custom: as many as the story needs), rounds of revisions, days of free bug fixes
+    id: 'advanced', sections: 10, rounds: 3, fixDays: 60,   // most sections (none for Custom: as many as the story needs), rounds of changes, days of free fixes
     
      usd: [5000, null], 
     exampleUrl: 'https://shockingmike.github.io/rhumb-line/', theme: { bg: '#1e2a35', fg: '#ecdcbc' }
   },
   custom: {
-    id: 'custom', sections: null, rounds: 4, fixDays: 60,   // most sections (none for Custom: as many as the story needs), rounds of revisions, days of free bug fixes
+    id: 'custom', sections: null, rounds: 4, fixDays: 90,   // most sections (none for Custom: as many as the story needs), rounds of changes, days of free fixes
     
      usd: [10000, null], 
     exampleUrl: 'https://shockingmike.github.io/chom/', theme: { bg: '#e6d3c8', fg: '#3a2030' }

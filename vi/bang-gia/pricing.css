@@ -113,7 +113,9 @@ body { animation: pageIn 0.45s ease both; }
 .card__price { margin: 18px 0 0; font: 400 17px/1.1 var(--serif); color: var(--ink-soft); }
 .card__price b { font-family: var(--display); font-weight: 700; font-size: 44px; line-height: 1; letter-spacing: -0.02em; color: var(--do); font-variant-numeric: lining-nums; }
 .card__time { margin: 10px 0 0; font: 500 13px/1.4 var(--mono); letter-spacing: 0.04em; color: var(--ink-soft); }
-.card__fit { margin: 12px 0 0; min-height: 3em; font: italic 400 16.5px/1.5 var(--serif); }   /* two lines kept, so the lists of the three cards start level */
+.card__fit { margin: 12px 0 0; font: italic 400 16.5px/1.5 var(--serif); }
+/* the line that says the two upper cards hold everything below them; Standard keeps it empty, so the three lists start level */
+.card__plus { margin: 4px 0 0; min-height: 1.4em; font: 600 13px/1.4 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-p); }
 .card__list { margin: 20px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--rule-2); }
 .card__list li { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: baseline; padding: 8px 0 9px; border-bottom: 1px solid var(--rule); font: 400 16.5px/1.45 var(--serif); }
 .card__list li svg { position: relative; top: 1px; color: var(--ink-p); }
@@ -129,7 +131,7 @@ body { animation: pageIn 0.45s ease both; }
 .cmp { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; font-variant-numeric: lining-nums tabular-nums; }
 .cmp__labcol { width: 34%; }
 .cmp th, .cmp td { padding: 0; vertical-align: middle; text-align: left; font-weight: 400; }
-.cmp thead > tr > * { position: sticky; top: 0; z-index: 2; background: var(--paper); border-top: 2px solid var(--ink-p); border-bottom: 1px solid var(--ink-p); padding: 14px 16px 14px; vertical-align: bottom; }
+.cmp thead > tr > * { position: sticky; top: var(--bar-h, 66px); z-index: 2; background: var(--paper); border-top: 2px solid var(--ink-p); border-bottom: 1px solid var(--ink-p); padding: 14px 16px 14px; vertical-align: bottom; }
 .cmp thead .cmp__c { text-align: center; border-left: 1px solid var(--rule); }
 .cmp__name { display: block; font-family: var(--display); font-weight: 700; font-size: 22px; line-height: 1.15; }
 .cmp__price { display: block; margin-top: 4px; font-family: var(--display); font-weight: 700; font-size: 16px; line-height: 1.2; color: var(--do); }
@@ -159,6 +161,15 @@ body { animation: pageIn 0.45s ease both; }
 .addon-box__go:hover { color: var(--do); }
 
 /* narrower than three cards can hold: the cards stack, the recommended one first */
+/* three across: each card's seven lines share one set of rows, so the three lists start level even when a tag or
+   the "plus" line wraps on a narrower screen (2/10, measured 51 px apart at 1024 px before) */
+@media (min-width: 981px) {
+  .cards { grid-template-rows: repeat(7, auto); }
+  .card { display: grid; grid-row: span 7; grid-template-rows: subgrid; row-gap: 0; }
+  .card__foot { align-self: end; }
+  .card__head { align-self: start; }
+  .card__price b { font-size: clamp(32px, 3.1vw, 44px); }
+}
 @media (max-width: 980px) {
   .cards { grid-template-columns: minmax(0, 1fr); }
   .card.is-pick { order: -1; }
@@ -208,6 +219,18 @@ body { animation: pageIn 0.45s ease both; }
 .plan__kicker { margin: 26px 0 0; color: var(--ink-p); }
 .plan__for { margin: 10px 0 0; max-width: 31em; font: 400 18.5px/1.55 var(--serif); text-wrap: pretty; }
 .plan__note { color: var(--ink-soft); }
+.plan__pnote { margin: 8px 0 0; max-width: 24em; font: italic 400 15.5px/1.45 var(--serif); color: var(--ink-soft); }
+/* the list of what each package gives: the same ticked lines as the cards, a little larger; the upper packages open with the line that says they hold everything below them */
+.plan__gets { margin: 22px 0 0; max-width: 34em; }
+.plan__plus { margin: 0 0 6px; font: 600 13px/1.4 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-p); }
+.plan__gets ul { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--rule-2); }
+.plan__gets li { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: baseline; padding: 7px 0 8px; border-bottom: 1px solid var(--rule); font: 400 17px/1.5 var(--serif); }
+.plan__gets li svg { position: relative; top: 1px; color: var(--ink-p); }
+.plan__when { margin: 10px 0 0; font: 500 13px/1.4 var(--mono); letter-spacing: 0.04em; color: var(--ink-soft); }
+/* the two short notes under the figures: an honest word on whether you need this package, and the upgrade credit */
+.plan__aside { margin: 18px 0 0; max-width: 34em; }
+.plan__aside-k { margin: 0 0 4px; font: 600 13px/1.4 var(--sans); letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-p); }
+.plan__aside p { margin: 0; font: 400 16.5px/1.55 var(--serif); text-wrap: pretty; }
 /* the figures: printed big in ink, a small label under each; three or four across */
 .facts { margin: 26px 0 0; padding: 16px 0 0; list-style: none; border-top: 1px solid var(--rule-2);
   display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); column-gap: 18px; }
@@ -222,6 +245,8 @@ body { animation: pageIn 0.45s ease both; }
 
 /* the sample page in a thin browser frame: one hairline round it, three rings and the address in the bar */
 .shot { grid-area: shot; align-self: center; margin: 0; }
+/* the package text grew taller than the frame (2/10), so on a wide sheet the frame rides along beside it while it is read */
+@media (min-width: 981px) { .plan--pkg .shot { align-self: start; position: sticky; top: 88px; } }
 .browser { border: 1px solid var(--ink-p); background: var(--paper-2); }
 .browser__bar { position: relative; display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-bottom: 1px solid var(--ink-p); }
 .browser__bar i { flex: none; width: 9px; height: 9px; border-radius: 50%; border: 1px solid var(--rule-2); }
@@ -486,6 +511,8 @@ body { animation: pageIn 0.45s ease both; }
   .shared { margin-top: 150px; }
   .plan--add .plan__price b { font-size: 30px; }
   .plan__for { font-size: 18px; max-width: none; text-wrap: wrap; }
+  .plan__gets, .plan__aside { max-width: none; }
+  .plan__gets li, .plan__aside p { font-size: 16px; }
   .plan--pkg .shot { margin-top: 20px; }
   /* a phone: the figures two by two, the two buttons one under the other at full width */
   .facts { grid-auto-flow: row; grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 16px; }
@@ -517,7 +544,7 @@ body { animation: pageIn 0.45s ease both; }
   /* a phone: the cards stack (the recommended one first); the table shows one package at a time, chosen with
      the three buttons over it, which stay at the top while the table scrolls past. Without JavaScript all three
      columns stay. */
-  .cmp__tabs { position: sticky; top: 0; z-index: 3; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--paper); border-top: 2px solid var(--ink-p); }
+  .cmp__tabs { position: sticky; top: var(--bar-h, 60px); z-index: 3; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); background: var(--paper); border-top: 2px solid var(--ink-p); }
   .cmp__tab { appearance: none; margin: 0; border: 0; border-bottom: 1px solid var(--ink-p); background: none; color: var(--ink-soft);
     padding: 10px 8px 11px; text-align: left; font: inherit; cursor: pointer; display: flex; flex-direction: column; align-items: flex-start; }
   .cmp__tab[aria-pressed="true"] { color: var(--ink-p); box-shadow: inset 0 -3px 0 var(--ink-p); }

@@ -179,7 +179,7 @@ function renderShelf() {
   }).join('');
   const P = t.pricing;
   $('#shelfPrices').innerHTML = `<h2>${esc(t.ui.flyer.title)}</h2>
-    ${PLAN_ORDER.map((id) => `<p><b>${esc(P.plans[id].name)}</b> ${esc(P.plans[id].price)} · ${esc(P.plans[id].for)}</p>`).join('')}
+    ${PLAN_ORDER.map((id) => `<p><b>${esc(P.plans[id].name)}</b> ${esc(P.plans[id].price)} · ${esc(P.plans[id].fit)}</p>`).join('')}
     <p><b>${esc(P.care.name)}</b> ${esc(P.care.price)}</p>
     <p><a href="pricing/">${esc(t.ui.flyer.more)} ↗</a></p>`;
   $('.shelf__foot').innerHTML = `<a href="pricing/">${esc(t.ui.pricing)}</a> · <a href="mailto:${t.ui.email}">${esc(t.ui.email)}</a>`;
@@ -409,7 +409,7 @@ async function boot() {
     return [l, { eyebrow: t.ui.flyer.eyebrow, title: t.ui.flyer.title, more: t.ui.flyer.more, year: '2026',
       labels: { plan: P.label.plan, care: P.care.name, timeline: P.label.timeline, example: P.label.example },
       // a flyer has room for one line a package: the first thing each one includes is what it is, in a few words
-      rows: PLAN_ORDER.map((id) => ({ name: P.plans[id].name, for: P.plans[id].includes[0], price: P.plans[id].price, timeline: P.plans[id].timeline, example: P.plans[id].example })),
+      rows: PLAN_ORDER.map((id) => ({ name: P.plans[id].name, for: P.plans[id].tagline, price: P.plans[id].price, timeline: P.plans[id].timeline, example: P.plans[id].example })),
       // and one line for care too: the first sentence of its description, what the care is (the second is how
       // the scope gets agreed, which belongs on the pricing page, not squeezed under a price)
       care: { name: P.care.name, price: P.care.price, for: P.care.description.split(/(?<=\.)\s/)[0] } }];

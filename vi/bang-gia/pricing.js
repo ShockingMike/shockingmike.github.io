@@ -101,12 +101,19 @@ function renderPage() {
         <span class="plan__n">${n}</span>
         <div class="plan__title"><h3 class="plan__name">${esc(c.name)}</h3>${id === PICK ? `<span class="card__tag">${esc(C.recommend)}</span>` : ''}</div>
         <p class="plan__price">${priceHTML(c.price)}</p>
+        ${c.priceNote ? `<p class="plan__pnote">${esc(c.priceNote)}</p>` : ''}
       </div>
       ${frame(id, c.name, `${c.example} · ${P.label.example}`)}
       <div class="plan__body">
-        <p class="k plan__kicker" data-entry>${esc(C.cards[id][0])}</p>
+        <p class="k plan__kicker" data-entry>${esc(c.tagline)}</p>
         <p class="plan__for">${esc(c.for)}${c.note ? ` <span class="plan__note">${esc(c.note)}</span>` : ''}</p>
+        <div class="plan__gets">
+          <p class="plan__plus">${esc(c.plus || P.label.includes)}</p>
+          <ul>${c.includes.map((x) => `<li>${TICK}<span>${esc(x)}</span></li>`).join('')}</ul>
+        </div>
         <ul class="facts">${facts}</ul>
+        ${c.timeNote ? `<p class="plan__when">${esc(c.timeNote)}</p>` : ''}
+        ${[c.honest, c.upgrade].filter(Boolean).map(([h, t]) => `<div class="plan__aside"><h4 class="plan__aside-k">${esc(h)}</h4><p>${esc(t)}</p></div>`).join('')}
         <div class="plan__acts">${cta(id, c.cta)}${sample}</div>
       </div>
     </article></li>`;
@@ -180,12 +187,15 @@ function renderCompare(P) {
   const cards = ids.map((id) => {
     const c = P.plans[id];
     const pick = id === PICK;
-    const lines = C.cards[id].map((x, i) => `<li${i === 0 ? ' class="card__lead"' : ''}>${TICK}<span>${esc(x)}</span></li>`).join('');
+    const lines = C.cards[id].map((x) => `<li>${TICK}<span>${esc(x)}</span></li>`).join('');
+    // the italic line says what the package is; the two upper ones then say they hold everything below them.
+    // Standard keeps an empty line in that place, so the three lists start level.
     return `<article class="card${pick ? ' is-pick' : ''}" data-plan="${id}">
       <div class="card__head"><h3 class="card__name">${esc(c.name)}</h3>${pick ? `<span class="card__tag">${esc(C.recommend)}</span>` : ''}</div>
       <p class="card__price">${priceHTML(c.price)}</p>
       <p class="card__time">${esc(c.timeline)}</p>
-      <p class="card__fit">${esc(c.fit)}</p>
+      <p class="card__fit">${esc(c.tagline)}</p>
+      <p class="card__plus"${c.plus ? '' : ' aria-hidden="true"'}>${c.plus ? esc(c.plus) : '&nbsp;'}</p>
       <ul class="card__list">${lines}</ul>
       <div class="card__foot">${go(id, C.details, pick)}</div>
     </article>`;
