@@ -107,7 +107,7 @@ export const COPY = {
           upgrade: ['Làm gọn trước, nâng cấp sau', 'Trong 6 tháng sau khi trang lên mạng, nếu lên gói Nâng cao thì số tiền gói Tiêu chuẩn được trừ vào.'] },
         advanced: { name: 'Nâng cao', tagline: 'Một nơi để khám phá', fit: 'Hợp với thương hiệu cần cho khách thấy vì sao đáng giá hơn', priceNote: 'Giá tuỳ số cảnh 3D và chuyển động làm riêng.',
           for: 'Thương hiệu của bạn có một câu chuyện đáng nghe: điều làm bạn khác, lý do bạn đắt hơn tiệm bên cạnh. Một trang cuộn bình thường kể không hết. Bạn cần khách ở lại, ngó nghiêng, và lúc rời trang thì đã hiểu vì sao bạn đáng giá như vậy.',
-          plus: 'Đủ mọi thứ của gói Tiêu chuẩn, cộng thêm:', includes: ['Một buổi 60 phút cùng mình tìm câu chuyện, viết thành kịch bản để bạn duyệt trước khi thiết kế', 'Trang dựng thành một nơi để khám phá, đủ chỗ cho tối đa 10 phần', 'Tặng 1 tháng chăm sóc đầu tiên: cập nhật chữ và ảnh, mình lo'],
+          plus: 'Đủ mọi thứ của gói Tiêu chuẩn, cộng thêm:', includes: ['Mình cùng bạn lên câu chuyện, viết thành kịch bản để bạn duyệt trước khi thiết kế', 'Trang dựng thành một nơi để khám phá, đủ chỗ cho tối đa 10 phần', 'Tặng 1 tháng chăm sóc đầu tiên: cập nhật chữ và ảnh, mình lo'],
           timeline: '4–6 tuần', timeNote: 'Tính từ ngày bạn duyệt kịch bản.', price: 'Từ 40 triệu đồng', example: 'Rhumb Line', cta: 'Chọn gói Nâng cao',
           honest: ['Vì sao mình khuyên gói này', 'Phần lớn thương hiệu không thiếu thiết kế đẹp, mà thiếu câu trả lời cho “sao lại chọn bạn”. Gói Tiêu chuẩn cho bạn một trang đẹp. Gói Nâng cao cho khách một lý do để chọn bạn. Nếu bạn chỉ cần trang chạy quảng cáo thì gói Tiêu chuẩn là đủ, và mình sẽ nói thẳng như vậy.'] },
         custom: { name: 'Đặt riêng', tagline: 'Một thế giới', fit: 'Hợp với lần ra mắt hay sản phẩm chủ lực làm nên tên tuổi thương hiệu', priceNote: 'Giá tuỳ thế giới rộng đến đâu; mình báo giá sau khi trao đổi.',
@@ -126,7 +126,7 @@ export const COPY = {
         // lỡ không ưng thì sao, lỡ sau này hỏng thì sao
         cards: {
           standard: ['Hợp khi chạy quảng cáo hay ra mắt một sản phẩm', 'Đủ chỗ cho phần cốt lõi: mở đầu ấn tượng, sản phẩm, câu chuyện, đánh giá, liên hệ', 'Bạn duyệt bản phác trước khi mình dựng, kèm 2 vòng sửa', 'Phần mình làm mà hỏng trong 30 ngày đầu, mình sửa miễn phí'],
-          advanced: ['Hợp với thương hiệu cần cho khách thấy vì sao đáng giá hơn', 'Một trang để khám phá, không chỉ để cuộn, đủ chỗ cho tối đa 10 phần', 'Buổi 60 phút tìm câu chuyện, viết thành kịch bản để bạn duyệt, kèm 3 vòng sửa', 'Sửa lỗi miễn phí 60 ngày, tặng 1 tháng chăm sóc đầu tiên'],
+          advanced: ['Hợp với thương hiệu cần cho khách thấy vì sao đáng giá hơn', 'Một trang để khám phá, không chỉ để cuộn, đủ chỗ cho tối đa 10 phần', 'Câu chuyện viết thành kịch bản để bạn duyệt, kèm 3 vòng sửa', 'Sửa lỗi miễn phí 60 ngày, tặng 1 tháng chăm sóc đầu tiên'],
           custom: ['Hợp với lần ra mắt hay sản phẩm chủ lực làm nên tên tuổi thương hiệu', 'Phong cách hình ảnh làm riêng, bao nhiêu phần tuỳ câu chuyện', 'Bạn chọn 1 trong 2 hướng hình ảnh trước khi mình dựng, kèm 4 vòng sửa', 'Sửa lỗi miễn phí 90 ngày, tặng 3 tháng chăm sóc đầu tiên']
         },
         yes: 'có', no: 'không có',
@@ -141,7 +141,7 @@ export const COPY = {
             ['Màn chờ theo tiến độ tải thật', '✓', '✓', '✓']
           ] },
           { name: 'Cách làm', rows: [
-            ['Lên câu chuyện', 'phác phần mở đầu', 'buổi 60 phút và kịch bản viết ra', 'kịch bản, thêm 2 hướng hình ảnh'],
+            ['Lên câu chuyện', 'phác phần mở đầu', 'kịch bản viết ra để bạn duyệt', 'kịch bản, thêm 2 hướng hình ảnh'],
             ['Vòng sửa', '2', '3', '4'],
             ['Sửa lỗi miễn phí sau bàn giao', '30 ngày', '60 ngày', '90 ngày'],
             ['Tháng chăm sóc được tặng', '—', '1', '3'],
@@ -156,7 +156,7 @@ export const COPY = {
         text: 'Chữ trên trang do bạn gửi; cần viết hộ thì báo giá riêng.', notTitle: 'Không bao gồm (báo giá riêng)', not: ['bán hàng có giỏ hàng và thanh toán', 'blog hay hệ thống tự sửa nội dung', 'thêm trang', 'thêm ngôn ngữ', 'chụp ảnh', 'logo, nhận diện thương hiệu', 'tên miền và phí dịch vụ bên ngoài'] },
       care: { name: 'Chăm sóc hằng tháng', description: 'Cập nhật chữ và ảnh, đổi nội dung theo mùa, giữ trang chạy ổn khi trình duyệt thay đổi. Làm gì thì mình bàn theo nhu cầu của bạn.', price: '2–4 triệu đồng/tháng', cta: 'Thêm chăm sóc hằng tháng' },
       addon: { name: 'Viết nội dung', description: 'Chưa có sẵn chữ cho trang thì mình viết giúp.', price: 'Báo giá riêng', cta: 'Thêm viết nội dung' },
-      process: { title: 'Quy trình làm việc', steps: ['Bạn gửi email cho mình: thương hiệu, trang hiện có, thời hạn và ngân sách.', 'Trong 2 ngày làm việc, mình gửi báo giá trọn gói, ghi rõ những việc sẽ làm.', 'Bạn đặt cọc 50%. Mình với bạn chốt kế hoạch trước (gói Tiêu chuẩn: bản phác phần mở đầu; gói Nâng cao và Đặt riêng: buổi tìm câu chuyện và kịch bản viết ra, gói Đặt riêng thêm 2 hướng hình ảnh để chọn), rồi mình mới dựng. Số vòng sửa theo gói.', 'Thanh toán 50% còn lại khi trang lên mạng, trên tên miền và tài khoản của bạn.'] },
+      process: { title: 'Quy trình làm việc', steps: ['Bạn gửi email cho mình: thương hiệu, trang hiện có, thời hạn và ngân sách.', 'Trong 2 ngày làm việc, mình gửi báo giá trọn gói, ghi rõ những việc sẽ làm.', 'Bạn đặt cọc 50%. Mình với bạn chốt kế hoạch trước (gói Tiêu chuẩn: bản phác phần mở đầu; gói Nâng cao và Đặt riêng: kịch bản viết ra để bạn duyệt, gói Đặt riêng thêm 2 hướng hình ảnh để chọn), rồi mình mới dựng. Số vòng sửa theo gói.', 'Thanh toán 50% còn lại khi trang lên mạng, trên tên miền và tài khoản của bạn.'] },
       terms: { title: 'Điều khoản', items: ['Bạn cung cấp nội dung chữ và hình ảnh. Cần viết hộ thì mình báo giá thêm.', 'Toàn bộ trang và mã nguồn thuộc về bạn.', 'Sửa quá số vòng của gói thì mình báo giá trước khi làm.', 'Khách trong nước thanh toán bằng chuyển khoản, khách nước ngoài qua PayPal.', 'Trao đổi qua email shockingmikedesign@gmail.com, cần thì hẹn gọi.'] },
       faq: { title: 'Câu hỏi thường gặp', items: [
         ['Cần chuẩn bị gì trước khi bắt đầu?', 'Tên thương hiệu, sản phẩm muốn giới thiệu, chữ và ảnh đang có, cùng vài trang web bạn thích. Còn thiếu gì, mình sẽ nói rõ.'],

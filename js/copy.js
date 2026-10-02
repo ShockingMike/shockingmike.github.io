@@ -109,7 +109,7 @@ export const COPY = {
           upgrade: ['Start small, grow later', 'Upgrade to Advanced within 6 months of launch and what you paid for Standard counts toward it.'] },
         advanced: { name: 'Advanced', tagline: 'A place to explore', fit: 'Right for brands that need to show why they’re worth more', priceNote: 'Price depends on the number of 3D scenes and custom animation.',
           for: 'Your brand has a story worth hearing: what makes you different, why you cost more than the shop next door. An ordinary scrolling page runs out of room to tell it. You need visitors to stay, look around, and leave understanding why you’re worth it.',
-          plus: 'Everything in Standard, plus:', includes: ['A 60-minute story session with me, turned into a written storyline you approve before any design starts', 'A page built as a place to explore, with room for up to 10 parts', 'Your first month of care included: text and photo updates, on me'],
+          plus: 'Everything in Standard, plus:', includes: ['Your story planned with me and written up as a storyline you approve before any design starts', 'A page built as a place to explore, with room for up to 10 parts', 'Your first month of care included: text and photo updates, on me'],
           timeline: '4–6 weeks', timeNote: 'Counted from the day you approve the storyline.', price: 'From $5,000', example: 'Rhumb Line', cta: 'Choose Advanced',
           honest: ['Why I recommend this one', 'Most brands don’t have a design problem. They have a “why us” problem. Standard gives you a good-looking page. Advanced gives visitors a reason to choose you. If you only need a page for ads, Standard is enough and I’ll tell you so.'] },
         custom: { name: 'Custom', tagline: 'A world', fit: 'Right for a launch or flagship moment your brand will be known for', priceNote: 'Price depends on how big the world is; I quote it after we talk.',
@@ -128,7 +128,7 @@ export const COPY = {
         // I get, what if I don't like it, what if it breaks later
         cards: {
           standard: ['Right for running ads or launching one product', 'Room for the essentials: a striking opening, your product, your story, reviews, contact', 'You approve a sketch before I build, plus 2 rounds of changes', 'If anything I built breaks in the first 30 days, I fix it free'],
-          advanced: ['Right for brands that need to show why they’re worth more', 'A page visitors explore, not just scroll, with room for up to 10 parts', 'A 60-minute story session, written up as a storyline you approve, plus 3 rounds of changes', 'Free fixes for 60 days, and your first month of care on me'],
+          advanced: ['Right for brands that need to show why they’re worth more', 'A page visitors explore, not just scroll, with room for up to 10 parts', 'Your story written up as a storyline you approve, plus 3 rounds of changes', 'Free fixes for 60 days, and your first month of care on me'],
           custom: ['Right for a launch or flagship moment your brand will be known for', 'A visual style made only for your brand, with as many parts as the story needs', 'You choose the look from 2 directions before I build, plus 4 rounds of changes', 'Free fixes for 90 days, and your first 3 months of care on me']
         },
         yes: 'included', no: 'not included',
@@ -143,7 +143,7 @@ export const COPY = {
             ['Loading screen with real progress', '✓', '✓', '✓']
           ] },
           { name: 'How we work', rows: [
-            ['Story planning', 'a sketch of the opening', '60-minute session and written storyline', 'storyline, plus 2 visual directions'],
+            ['Story planning', 'a sketch of the opening', 'a written storyline you approve', 'storyline, plus 2 visual directions'],
             ['Rounds of changes', '2', '3', '4'],
             ['Free fixes after launch', '30 days', '60 days', '90 days'],
             ['Months of care included', '—', '1', '3'],
@@ -159,7 +159,7 @@ export const COPY = {
         text: 'You provide the text. Copywriting is quoted separately.', notTitle: 'Not included (quoted separately)', not: ['online checkout', 'a blog or self-editing system', 'extra pages', 'extra languages', 'photography', 'logo and brand identity', 'the domain and third-party fees'] },
       care: { name: 'Monthly care', description: 'Text and photo updates, seasonal changes, and keeping the page running well as browsers change. We agree the scope together.', price: '$300–600/month', cta: 'Add monthly care' },
       addon: { name: 'Copywriting', description: 'No words for the page yet? I can write them.', price: 'Quoted separately', cta: 'Add copywriting' },
-      process: { title: 'How it works', steps: ['You email me your brand, current website, deadline and budget.', 'Within 2 working days, I send a fixed quote with exactly what’s included.', 'You pay 50% upfront. We agree the plan first (a sketch of the opening on Standard; a story session and written storyline on Advanced and Custom, plus two visual directions to choose from on Custom), then I build. The number of rounds of changes depends on the package.', 'The page goes live on your domain and account; you pay the other 50%.'] },
+      process: { title: 'How it works', steps: ['You email me your brand, current website, deadline and budget.', 'Within 2 working days, I send a fixed quote with exactly what’s included.', 'You pay 50% upfront. We agree the plan first (a sketch of the opening on Standard; a written storyline on Advanced and Custom, plus two visual directions to choose from on Custom), then I build. The number of rounds of changes depends on the package.', 'The page goes live on your domain and account; you pay the other 50%.'] },
       terms: { title: 'Terms', items: ['You provide the text and images. Copywriting is quoted separately.', 'The finished page and all its source code belong to you.', 'Changes beyond your package’s rounds of changes are quoted before any work begins.', 'Payment by bank transfer in Vietnam, or PayPal from abroad.', 'We work over email at shockingmikedesign@gmail.com, with calls when needed.'] },
       faq: { title: 'Common questions', items: [
         ['What do I need to prepare?', 'Your brand name, the product to feature, any text and photos you have, and a few websites you like. I’ll tell you if anything’s missing.'],
