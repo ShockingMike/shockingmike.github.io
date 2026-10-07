@@ -1,4 +1,4 @@
-// 骨 FRAME — RỪNG TUYẾT TÙNG 杉 TRONG ĐÊM, HƯỚNG A 墨付け (28/9, Mike duyệt ảnh chi tiết: "còn lại thì ok rồi").
+// 骨 FRAME — RỪNG TUYẾT TÙNG 杉 TRONG ĐÊM, HƯỚNG A 墨付け (28/9, ảnh chi tiết đã duyệt).
 // Chương thứ ba của "chuyến đi tìm gốc từng lớp kết cấu": nơi sinh ra KHUNG GỖ. Giữa khoảng trống trong rừng tuyết tùng, một
 // khúc gỗ vừa hạ nằm trên hai giá chéo 馬, gốc cây của chính nó còn tươi bên cạnh. Theo cuộn, thợ mộc đánh dấu mực 墨付け:
 //   · ba DÂY MỰC 墨壺 hiện lần lượt dọc thân như nét ở các chương khác: đầu nét chạy từ đầu gốc tới đầu ngọn theo cuộn, phần đã

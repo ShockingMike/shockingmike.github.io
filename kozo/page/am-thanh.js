@@ -419,7 +419,7 @@ function motDe(rnd) {
 
 
 // vồ gỗ 掛矢 đóng cọc 遣り方 ở xa (chương 連絡): tiếng "CỐC" gỗ khô — các mode cộng hưởng của thớ gỗ (sine tắt nhanh, 0,6–3 kHz,
-// dải loa laptop / điện thoại phát được) + một chạm rất ngắn, rồi tiếng "thịch" trầm của cọc lún đất nhỏ hơn hẳn (soát p10a B8: bản
+// dải loa laptop / điện thoại phát được) + một chạm rất ngắn, rồi tiếng "thịch" trầm của cọc lún đất nhỏ hơn hẳn (p10a B8: bản
 // cũ 98% năng lượng dưới 200 Hz — loa nhỏ gần như không phát). Xa nên mất dải cao trên ~3,6 kHz. Không tiếng gió, không "xì"
 function* voCoc(a, sr, rnd, k) {
   const t0 = 0.004, n0 = Math.floor(t0 * sr);
@@ -976,7 +976,7 @@ export function taoAmThanh() {
     const bay = performance.now(); if (bay - lanMo < 900) return; lanMo = bay;
     const tram = co('tram'); if (!tram) return;
     const now = ctx.currentTime, rate = Math.pow(2, NHAC[kep(toi, 0, CUOI)].goc / 12);
-    // (soát p11a B8) nốt nhẹ phải kêu NGAY lúc bắt đầu mờ (≤ 0,1 s): nửa phách kế còn xa hơn 0,1 s thì phát luôn (nốt trầm ngân,
+    // (p11a B8) nốt nhẹ phải kêu NGAY lúc bắt đầu mờ (≤ 0,1 s): nửa phách kế còn xa hơn 0,1 s thì phát luôn (nốt trầm ngân,
     // lệch phách nhỏ khó nghe ra) — bản cũ đợi tới nửa phách kế, trễ tới 0,96 s, có lần kêu khi hình đã mờ xong
     let t = phachToi ? phachToi - PHACH : now; while (t < now + 0.03) t += PHACH / 2;
     if (t > now + 0.1) t = now + 0.03;

@@ -1,5 +1,5 @@
 // Chớm page layer: hand-painted bits drawn from the real brush scans in ../tex/strokes.png
-// (CC0, docs/content/chom-brush-sources.md). No other image is used.
+// (CC0). No other image is used.
 //   loadBrushes()      cuts the scan into single strokes (alpha from brightness), makes the CSS edge masks
 //   tint(stamp, col)   a stroke in one colour
 //   drawBottle(...)    a labelled Chớm bottle in the same painted manner as the scene

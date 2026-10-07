@@ -1,4 +1,4 @@
-// Lớp giao diện CHƯƠNG (phần 3, 25/9) — theo cách hubtown bày chương (docs/research/hubtown-ref/hubtown-toan-trang.md
+// Lớp giao diện CHƯƠNG (phần 3, 25/9) — theo cách hubtown bày chương (bản nghiên cứu hubtown,
 // mục 3.3, 3.4, 7.3), bằng hệ chữ Kōzō:
 //   · chữ bốn góc của màn đầu tắt nhẹ khi trời ngả chạng vạng (chữ vẫn là HTML thật — chỉ đổi độ đục);
 //   · khi mực loang sang thung lũng: khung vát góc SVG, logo nhỏ, cột chương dọc bên trái (chương đang đứng có ô 緑青
@@ -48,7 +48,7 @@ export function createChuong() {
   drawFrame();
   addEventListener('resize', drawFrame);
 
-  // logo nhỏ: về màn đầu (một chuyển cảnh gọn, không nhảy cụt). Bấm bằng CHUỘT thì bỏ viền focus ngay (soát p7a B9: viền đọng
+  // logo nhỏ: về màn đầu (một chuyển cảnh gọn, không nhảy cụt). Bấm bằng CHUỘT thì bỏ viền focus ngay (p7a B9: viền đọng
   // lại ở tên chương cũ trong khi dấu chương đã sang chỗ khác); bấm bằng phím Enter thì giữ focus như thường
   const unfocus = (e, el) => { if (e.detail > 0) el.blur(); };
   if (logo) logo.addEventListener('click', (e) => { e.preventDefault(); unfocus(e, logo); const n = window.__kozoNav; if (n) n.go(0); });
@@ -91,7 +91,7 @@ export function createChuong() {
       if (logo) { logo.style.opacity = v; logo.style.pointerEvents = u > 0.5 ? 'auto' : 'none'; logo.tabIndex = u > 0.5 ? 0 : -1; }
       if (sound) sound.style.opacity = v;
     }
-    // cột chương: như trên — (soát p10a B4) và hiện cả khi có cú bấm đang chờ ở màn đầu (Z.pendUi: ô 緑青 ở chương đích = trang đã nhận)
+    // cột chương: như trên — (p10a B4) và hiện cả khi có cú bấm đang chờ ở màn đầu (Z.pendUi: ô 緑青 ở chương đích = trang đã nhận)
     const uc = Math.round(Math.max(Z.ui, Z.pendUi || 0) * 1000) / 1000;
     if (uc !== last.uc && chap) {
       last.uc = uc;
@@ -116,12 +116,12 @@ export function createChuong() {
         c.el.style.transition = '';
         c.el.style.opacity = '1';
         c.el.style.visibility = '';
-        // giảm chuyển động: không xáo ký tự, chỉ hiện dần (soát p7a B10)
+        // giảm chuyển động: không xáo ký tự, chỉ hiện dần (p7a B10)
         if (c.head) decode(c.head, { delay: 0.05, show: 0.5, scramble: 0.9, noScramble: REDUCED });
         if (c.body) decode(c.body, { delay: 0.3, show: 0.7, scramble: 1.1, noScramble: REDUCED });
       } else if (c.shown && (sc < g.out || sc > g.leave)) {
         c.shown = false;
-        // (soát p11a A2 / B3) MỜ CHUYỂN: chữ chương cũ tắt gọn trong 0,18 s (app.js giữ chữ chương mới tới khi chữ cũ đã tắt hẳn —
+        // (p11a A2 / B3) MỜ CHUYỂN: chữ chương cũ tắt gọn trong 0,18 s (app.js giữ chữ chương mới tới khi chữ cũ đã tắt hẳn —
         // không bao giờ hai tiêu đề chồng nhau); rời chương bằng chuyển cảnh thì tan 0,8 s như cũ
         c.el.style.transition = Z.textFast ? 'opacity 0.18s linear' : '';
         c.el.style.opacity = '0';
@@ -154,11 +154,11 @@ export function createChuong() {
       // (bấm lại lần nữa: đặt lại chữ để máy đọc màn hình đọc lại câu demo)
       demo.textContent = '';
       requestAnimationFrame(() => { demo.textContent = DEMO; });
-      // (soát p10a B1) gửi xong: con trỏ rời nút / ô, sang câu demo (đứng đúng chỗ trong thứ tự Tab) — bàn phím ảo đóng, phím và vuốt
+      // (p10a B1) gửi xong: con trỏ rời nút / ô, sang câu demo (đứng đúng chỗ trong thứ tự Tab) — bàn phím ảo đóng, phím và vuốt
       // lại đổi chương được
       if (form.contains(document.activeElement)) demo.focus({ preventScroll: true });
     });
-    // (soát p10a B7) Enter / phím "Next" trong ô: sang ô sau (ô cuối mới gửi — như form thật); Esc: nhả ô
+    // (p10a B7) Enter / phím "Next" trong ô: sang ô sau (ô cuối mới gửi — như form thật); Esc: nhả ô
     const oNhap = [...form.querySelectorAll('input, textarea')];
     form.addEventListener('keydown', (e) => {
       if (e.isComposing || e.keyCode === 229) return;
@@ -177,7 +177,7 @@ export function createChuong() {
     }
     // điện thoại: tiêu đề ngay trên form; bàn phím ảo → form lên trên bàn phím, tiêu đề nhường chỗ
     const vv = window.visualViewport;
-    // (soát p10a B2) trạng thái cho lớp cảnh (app.js): đang gõ trên điện thoại + mép trên của form (toạ độ khung trang = toạ độ khung
+    // (p10a B2) trạng thái cho lớp cảnh (app.js): đang gõ trên điện thoại + mép trên của form (toạ độ khung trang = toạ độ khung
     // vẽ) — cảnh dời lên để sau form luôn là đúng phần tối như lúc nghỉ, không phải bãi đất có nét sáng
     const DO = { typing: false, formTop: 0 };
     function place() {
@@ -193,7 +193,7 @@ export function createChuong() {
       dau.style.bottom = hb + 'px';
       const dh = dau.getBoundingClientRect().height;
       // chỗ trên form không đủ cho tiêu đề + dẫn (dưới logo ~70 px), hoặc ĐANG GÕ (bàn phím ảo mở — kiểu nào cũng vậy: khung nhìn chồng
-      // lên trang, khung trang co lại, hay trang cuộn lên): tiêu đề + dẫn nhường chỗ (soát p10a B2: ngưỡng 70 px để lọt khung 508 px)
+      // lên trang, khung trang co lại, hay trang cuộn lên): tiêu đề + dẫn nhường chỗ (p10a B2: ngưỡng 70 px để lọt khung 508 px)
       sec.classList.toggle('chat', innerHeight - hb - dh < 70 || typing);
       DO.typing = typing; DO.formTop = form.getBoundingClientRect().top;
     }

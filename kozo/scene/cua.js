@@ -1,4 +1,4 @@
-// CHUYỂN CẢNH 4 (rừng 骨 → làng giấy 皮) — CỬA GIẤY LÙA 障子 TRONG KHÔNG GIAN 3D (bản p7b, soát p7a lỗi A1: bản trước là hai
+// CHUYỂN CẢNH 4 (rừng 骨 → làng giấy 皮) — CỬA GIẤY LÙA 障子 TRONG KHÔNG GIAN 3D (bản p7b, p7a lỗi A1: bản trước là hai
 // tấm phẳng dán kín màn, "đúng lỗi mảng phẳng dán đè Mike đã chê").
 // Một khung cửa thật đứng trong một căn phòng tối: tường đất sẫm, cột gỗ 柱, xà trên 鴨居 và ngưỡng dưới 敷居 có hai rãnh trượt,
 // sàn ván chạy về phía cửa (phối cảnh). Hai cánh shoji (khung gỗ tối, bậu gỗ 腰板 dưới chân, lưới nan 組子 bằng gỗ thật đứng TRƯỚC
@@ -119,7 +119,7 @@ void main() {
   const room = new THREE.Group(); scene.add(room);
   const WZ = 0.03;   // mặt tường phía máy
   const plane = (w, h, x, y, z, m, rx = 0) => { const o = new THREE.Mesh(new THREE.PlaneGeometry(w, h), m); o.position.set(x, y, z); o.rotation.x = rx; return o; };
-  // (Sếp 29/9 sau p9b: tường phải còn trống) — bên phải cửa là HỐC TƯỜNG 床の間: cột hốc 床柱 (gỗ tròn cạnh), xà trên hốc 落掛,
+  // (29/9 sau p9b: tường phải còn trống) — bên phải cửa là HỐC TƯỜNG 床の間: cột hốc 床柱 (gỗ tròn cạnh), xà trên hốc 落掛,
   // bậc gỗ 床框 + ván sàn hốc 床板 cao hơn sàn phòng, lòng hốc lùi sâu 0,5 m, trên vách lòng hốc treo một bức 掛軸 tranh mực núi xa.
   // Tường phải chia quanh miệng hốc (x 1,42 → 2,42, y 0,16 → 1,86)
   const NX0 = OW / 2 + 0.52, NX1 = NX0 + 1.0, NY0 = 0.16, NY1 = 1.86, ND = 0.5, RX0 = OW / 2 + 0.12;

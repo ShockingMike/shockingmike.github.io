@@ -1,5 +1,5 @@
 /* copy.js — every word on the portfolio and the pricing page, in English and Vietnamese.
-   Portfolio: docs/content/portfolio-records.md (+ -vi). Pricing: docs/content/pricing-serious.md (+ -vi);
+   Portfolio: the records copy (en + vi). Pricing: the pricing copy (en + vi);
    the rows that lead from a record to pricing: portfolio_cta.* in the same files.
    Edits agreed by the lead (22/9): English brand.note uses the writer's alternative line; the English Kern and
    Rhumb stories lose the sentence the writer marked; the Vietnamese role line uses the writer's alternative;
@@ -88,7 +88,7 @@ export const COPY = {
       }
     },
     pricing: {
-      /* docs/content/pricing-serious-vi.md. Sếp chốt (22/9): đầu trang dùng câu không nêu ngành; "Chạy tốt trên điện thoại"
+      /* Chữ trang giá. Chốt ngày 22/9: đầu trang dùng câu không nêu ngành; "Chạy tốt trên điện thoại"
          gom từ ba gói thành một ghi chú chung; giữ plans.example_note. */
       meta: { title: 'Bảng giá · Shocking Mike', description: 'Landing page cho thương hiệu, do Shocking Mike tự thiết kế và tự code. Ba gói giá rõ ràng từ 12 triệu đồng, trả lời trong 2 ngày làm việc.' },
       back: 'Về trang portfolio',

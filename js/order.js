@@ -1,7 +1,7 @@
 /* order.js — packages, money, the preliminary estimate and the e-mail. No DOM, no drawing.
-   Words: copy.js (pricing.*, from docs/content/pricing-serious*.md). Each published copy of the site carries
+   Words: copy.js (pricing.*, from the pricing copy). Each published copy of the site carries
    one price list only; the bands for both live below, between the build marks, and the build keeps one.
-   (Source of the bands: docs/superpowers/specs/2026-09-21-work-with-mike-design.md, section 3.) */
+   (Source of the bands: the work-with-Mike design, section 3.) */
 
 import { COPY } from './copy.js';
 

@@ -941,7 +941,7 @@ async function build() {
   setProgress(0.9);
 }
 
-// the notes panel text comes from the season (docs/content/chom-copy.md)
+// the notes panel text comes from the season (the copy file)
 function fillNotes(n, l = 'en') {
   const panel = document.getElementById('notes');
   if (!n || !panel) return;
@@ -1329,7 +1329,7 @@ function focusSet(narrow) {
 // life-size bottle). The bottle is three times bigger now, so a camera left where the season put it is three times
 // closer to the glass than anyone checked.
 //
-// THE MEASURED THRESHOLD (21/9, the seasons' agent, full faces.mjs):
+// THE MEASURED THRESHOLD (21/9, the seasons layer, full faces.mjs):
 //   ×1.0  shows a face — 4 px of the Xuân customer's face, on a computer only, pointer in the bottom-right corner, in
 //         the first 10% of the flight to the bottle: 1 camera out of about 2,160
 //   ×1.1  clean on both frames, in all four seasons                                    <- SET HERE

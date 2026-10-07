@@ -1,6 +1,6 @@
 /* Rhumb Line · scene/copy.js
    The only words printed on 3D objects (chart sheets, tags, plate, labels). Every string is approved copy from
-   docs/content/rhumb-line-copy.md, keyed as there. Do not add words here that are not in that file. */
+   the approved copy file, keyed as there. Do not add words here that are not in that file. */
 export const COPY = {
   'hero.wordmark': 'RHUMB LINE',
   'hero.sub': 'Coffee Roasters',

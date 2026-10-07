@@ -3,7 +3,7 @@
 // On the near pavement, under the eaves of the low houses, a tea stall: the bamboo bed, the kettle on its coal stove, the
 // glasses, and a bare bulb on a bamboo pole. Beside it a corn seller turns her cobs on a brazier while two people hold
 // their hands over the coals. The Chớm bottle stands on the tea bed beside the kettle, under the bulb.
-// Contract: docs/superpowers/specs/2026-09-17-chom-world-contract.md. The main people are people/dong (see peopleLayout).
+// The main people are people/dong (see peopleLayout).
 //
 // URL switches (this season): ?smoke12=0  the kettle's and the brazier's smoke and the sparks run smooth, not on twelves
 //                             ?embers12=0 only the sparks run smooth
@@ -451,7 +451,7 @@ export default {
     // AND IT KEEPS OFF THE PEOPLE. Three people sit round this fire and people are never see-through (README 6c), so
     // the column is held upright and thin while it is at their height; the lean is carried by `drift`, which the core
     // applies as pow(s, 1.5) — almost nothing low down, all of it up top. Measured, not eyeballed:
-    // scratchpad/dong/smoke-check.mjs paints the three of them flat magenta in place and counts every pixel the smoke
+    // a check script paints the three of them flat magenta in place and counts every pixel the smoke
     // changes inside them, at every step of their loop, at four depths of the scroll, and with the cursor breeze pushed
     // to both its ends. It has to be 0.
     // One root, one rise, many ribbons. `sway` is the core's cursor-breeze group, and -1 means this ribbon does not
@@ -470,7 +470,7 @@ export default {
     const stallSmoke = core.fx.ribbonSmoke({ sources: [
       // THE KETTLE: a small curl off the spout, and it is small for a reason that is not taste. The stall stands a
       // metre and a half NEARER the lens than the three at the fire, so anything that climbs out of this spout crosses
-      // them, and people are never see-through. Measured on the built scene (scratchpad/dong/freedir.mjs walks a grid
+      // them, and people are never see-through. Measured on the built scene (a check script walks a grid
       // of offsets out of the spout and asks, at every step of their loop and four depths of the scroll, whether that
       // point lands on a person): straight up there is barely 25 px of open picture before the seller's leg swings
       // through, and there is no lane up past her at all — left runs into the man warming his hands, right into her.

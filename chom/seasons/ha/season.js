@@ -4,7 +4,7 @@
 // Out on the pond a small boat is poled along a channel; the picker bends over the side for flowers. Dragonflies. Along the road:
 // old trees, iron lamps just lit, bicycles with lotus in their baskets, schoolgirls in white áo dài, people stopping at the
 // parapet to watch the sun go down; far across the water the Trấn Quốc pagoda stands against the sunset.
-// The contract: docs/superpowers/specs/2026-09-17-chom-world-contract.md (sections 4-6). The core: core/README.md.
+// The core: core/README.md.
 //
 // HOUSE RULE for this season: anything this season builds that somebody else has to measure — the boat's hull, the leaves
 // the picker reaches past, the table, the tray, the lamp — is PUBLISHED in peopleLayout (and exported from the file that
@@ -67,7 +67,7 @@ const tw = ([x, z]) => { const [a, b] = rotY(x, z, TABLE.ry); return [TABLE.at[0
 const SEAT_L = [0.3, -0.76];
 const TEA_MAKER = { at: tw(SEAT_L), face: tw([SEAT_L[0], SEAT_L[1] + 1]) };
 // the basket of fresh lotus beside her left knee, on a small stool (rim 0.47 m); table-local (0.76, -0.58), world
-// (1.344, -2.531), r 0.18, as the people agent asked (at the old spot it touched her left knee)
+// (1.344, -2.531), r 0.18, as the people layer asked (at the old spot it touched her left knee)
 const BASKET = tw([0.76, -0.58]), BASKET_R = 0.18;
 // (the evening light for her work is a small kerosene lamp standing on the tray just behind the bottle: bank.js TRAY.lamp.
 // The bottle's glass reads against its glow)
@@ -91,7 +91,7 @@ export default {
   // who plays the main roles (folders in people/). TẠM: chờ people/haisen for the picker; a role nobody plays gets the
   // stand-in from figures.js (test with ?people=picker:<folder>)
   people: { teaMaker: 'uongtra', picker: 'haisen' },
-  // the roles this season needs, for the core and the people agent (see peopleLayout below)
+  // the roles this season needs, for the core and the people layer (see peopleLayout below)
   roles: ['teaMaker', 'picker'],
   label: 'A painted, living scene of West Lake in Hanoi at a hot summer dusk, seen from the bank of Thanh Niên road: the low sun lays a path of gold across the water; on the bank a woman in a conical hat sits at a low table, opening lotus flowers, tucking green tea inside and tying the petals shut; a Chớm perfume bottle stands on her tray of lotus tea; out on the lotus pond a woman poles a small boat and bends to pick flowers; dragonflies hover over the leaves; along the road people cycle home with lotus in their baskets and stop at the parapet to watch the sunset, and far across the lake the old pagoda stands dark against the sky',
   notes: {
@@ -415,7 +415,7 @@ export default {
     return {
       layers: { foreground: [layer0], middle: [pondMesh, boat.group, ...(maker ? [maker.P.group] : []), ...tea.heroes], background: [kMesh, fTrunk, crownMesh, farMesh, pondFarMesh, lake.mesh] },
       crowd: null,
-      // where the main people are and what they hold (for the people agent). Loops: 6 s (tea), 64 s (boat, 3.2 s poling rhythm)
+      // where the main people are and what they hold (for the people layer). Loops: 6 s (tea), 64 s (boat, 3.2 s poling rhythm)
       peopleLayout: {
         roles: ['teaMaker', 'picker'],
         // world points (V3); table-local values are in bank.js TRAY (table at TABLE.at, turned TABLE.ry; top y 0.34)

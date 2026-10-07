@@ -70,7 +70,7 @@ const FG = {
   clear: { col: '#123c40', col2: '#5aa8a4', gloss: 1, hilite: 1.2, erode: 0.2, scale: 10, bump: 0.4 },
   stop: { col: '#0b3238', col2: '#59a8a4', gloss: 1, hilite: 1.15, erode: 0.2, scale: 8, bump: 0.5 },
 };
-// the label Agent Logo drew, the one Mike chose (2026-09-18): layout D at 90 mm (brand/chom/nhan/, the drawing is
+// the drawn label, the one Mike chose (2026-09-18): layout D at 90 mm (brand/chom/nhan/, the drawing is
 // 1600 x 1600), with the accent colour of the season
 const LABEL_SEASON = { xuan: 'xuan', ha: 'ha', thu: 'thu', dong: 'dong', mocua: 'xuan' };
 // Mike chose the large square (2026-09-18): 90 mm on a body 98 mm across, so 4 mm of glass shows each side.
@@ -132,7 +132,7 @@ function flaconBottle(labelTex, { capOff = false, season = 'xuan' } = {}) {
     g.userData.cap = cm;                         // the opening scene sets it down beside the bottle
   }
 
-  // the label: Agent Logo's paper, centred on the straight part of the body — from the top of the thick base (y = BASE) to
+  // the label: the drawn paper, centred on the straight part of the body — from the top of the thick base (y = BASE) to
   // where the shoulder starts (yTop). A 90 mm square then leaves 6 mm of glass above and below, and never rides onto the
   // sloping shoulder or over the edge of the base.
   const labelMid = (BASE + yTop) / 2;
@@ -175,7 +175,7 @@ export function labelTexture(season = 'X U Â N') {
 // ---------------------------------------------------------------- the pieces every bottle is made of
 // the paper label: brushed paper with the wordmark burned into it, lit by the world's key light (the world may point it at a
 // lamp instead: see `bottle.labelLight`)
-// `paper`: a drawn label to use instead of the burned-in one — the url of a PNG with a see-through background (Agent Logo's
+// `paper`: a drawn label to use instead of the burned-in one — the url of a PNG with a see-through background (the drawn
 // labels live in brand/chom/nhan/png/). It arrives after the first frame; until then the burned-in label is drawn, so the
 // bottle is never blank. The paper keeps its own colours, and the world's light still falls on it.
 export function bottleLabel(labelTex, w = 0.07, h = 0.05, paper = null) {

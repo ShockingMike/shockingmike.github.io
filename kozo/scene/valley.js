@@ -112,7 +112,7 @@ varying vec3 vW; varying vec4 vP; varying vec3 vSt;
 
 // NÉT CỌ i tại điểm có khoảng cách ngang x (m) và quãng dọc s (m từ đầu nét). fw = cỡ một điểm ảnh (m).
 // cỡ một điểm ảnh DỌC nét (m) — đặt trước khi gọi brushAt. Nhìn sượt, một điểm ảnh phủ vài mét dọc nét: hạt bột màu và hạt khô
-// sáng lấm tấm (tần số cao dọc nét) phải mịn đi, không thì thành chuỗi hạt nhấp nháy kiểu khoá kéo (29/9, vòng soát p7a)
+// sáng lấm tấm (tần số cao dọc nét) phải mịn đi, không thì thành chuỗi hạt nhấp nháy kiểu khoá kéo (29/9, vòng sửa p7a)
 float gFwS = 0.0;
 void brushAt(int i, float x, float s, float fw, out float body, out float bleed, out float dens, out float core, out float streak, out float wet, out float spark) {
   body = 0.0; bleed = 0.0; dens = 0.0; core = 0.0; streak = 1.0; wet = 0.0; spark = 0.0;
@@ -123,7 +123,7 @@ void brushAt(int i, float x, float s, float fw, out float body, out float bleed,
   float t = clamp(s / len, 0.0, 1.0);
   float sw = s / Wd, seed = B.y;
   // 送筆: lực tay — phình ở đầu, dao động chậm, thon dần khi cọ cạn; 払い vuốt nhọn ở cuối
-  // (Sếp 29/9 sau p9b, lỗi cũ A10 của p7b) mọi nhiễu DỌC nét cũng mờ theo cỡ điểm ảnh dọc nét: nhìn sượt ở xa một điểm ảnh trùm
+  // (29/9 sau p9b, lỗi cũ A10 của p7b) mọi nhiễu DỌC nét cũng mờ theo cỡ điểm ảnh dọc nét: nhìn sượt ở xa một điểm ảnh trùm
   // nhiều mét dọc nét → nhiễu mép / lực tay dao động nhanh hơn điểm ảnh thành chuỗi hạt sáng tối xen kẽ (lớp làm nét + tách màu
   // viền đỏ xanh lên). lodA = 1 khi một chu kỳ nhiễu mép (≈ 1,8 bề ngang) ngắn hơn ~2 điểm ảnh dọc nét
   float lodA = smoothstep(0.15, 0.5, gFwS / Wd * 0.55);
@@ -150,7 +150,7 @@ void brushAt(int i, float x, float s, float fw, out float body, out float bleed,
   D *= 1.0 - 0.35 * wet;
   float Dl = D * (1.0 + 0.6 * xn * xn);
   // thớ cọ mịn dần khi nhỏ hơn ~3 điểm ảnh (10 sợi trên bề ngang nét) — nhìn sượt ở xa không thành chuỗi hạt lấm tấm
-  // (29/9, vòng soát p7a: 19 sợi nén vào vài điểm ảnh thành dải "khoá kéo", lớp làm nét + tách màu viền đỏ xanh lên)
+  // (29/9, vòng sửa p7a: 19 sợi nén vào vài điểm ảnh thành dải "khoá kéo", lớp làm nét + tách màu viền đỏ xanh lên)
   float lod = smoothstep(0.2, 0.6, fw * iw * 10.0);
   // sợi lông cọ: nhiễu DỊ HƯỚNG tần số THẤP — ít sợi to theo bề ngang, kéo rất dài dọc nét
   float fib = vn(vec2(xn * 10.0 + seed, sw * 0.07)) * 0.6 + vn(vec2(xn * 4.0 - seed, sw * 0.035)) * 0.4;
@@ -247,7 +247,7 @@ void main() {
   float amp = 0.16 * (1.0 - smoothstep(0.12, 0.7, fwP));
   if (isFloor && m < 1.5) amp *= 1.8;
   // nhìn sượt (mặt nước gần song song tia nhìn): gợn nén vào vài điểm ảnh → tia phản chiếu nhảy qua lại chân trời mỗi điểm ảnh
-  // thành chuỗi hạt sáng lấm tấm (29/9, vòng soát p7a) — gợn dịu đi theo độ sượt
+  // thành chuỗi hạt sáng lấm tấm (29/9, vòng sửa p7a) — gợn dịu đi theo độ sượt
   amp *= 0.3 + 0.7 * smoothstep(0.025, 0.14, abs(V.y));
   vec3 Nw = normalize(vec3(-g.x * amp, 1.0, -g.y * amp));
   vec3 Rv = reflect(-V, Nw);
@@ -312,11 +312,11 @@ void main() {
     if (i >= uSN) break;
     float x = vSt[i];
     // CỠ ĐIỂM ẢNH: ở mép bậc ruộng (mặt nước gấp xuống vách bậc) một ô 2×2 điểm ảnh nằm trên hai mặt khác độ sâu → đạo hàm màn
-    // hình vọt lên từng ô một → thớ cọ / mép nét nhảy qua lại thành DẢI HẠT kiểu khoá kéo có viền đỏ xanh (29/9, vòng soát p7a).
+    // hình vọt lên từng ô một → thớ cọ / mép nét nhảy qua lại thành DẢI HẠT kiểu khoá kéo có viền đỏ xanh (29/9, vòng sửa p7a).
     // Kẹp trần bằng cỡ điểm ảnh tính theo khoảng cách + độ sượt (liền mạch qua mép bậc).
     float fwA = length(cameraPosition - vW) * 0.0011 / max(abs(V.y), 0.035);
     float fwR = fwidth(x);
-    // (Sếp 29/9 sau p9b, A10) NGANG nét là hướng ngang màn: cỡ điểm ảnh ngang ≈ khoảng cách × 0,0011, KHÔNG chia độ sượt (chỉ chiều
+    // (29/9 sau p9b, A10) NGANG nét là hướng ngang màn: cỡ điểm ảnh ngang ≈ khoảng cách × 0,0011, KHÔNG chia độ sượt (chỉ chiều
     // dọc nét — vào sâu — mới giãn theo độ sượt). Trần cũ fwA × 3 cho phép đạo hàm ngang vọt tới ~30 lần ở ô 2×2 vắt qua mép bậc →
     // ô này mờ hẳn, ô kề sắc → chuỗi hạt sáng tối "khoá kéo". Kẹp chặt quanh cỡ điểm ảnh thật ở cả hai chiều.
     float fwX = length(cameraPosition - vW) * 0.0011;

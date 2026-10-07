@@ -4,7 +4,7 @@
 // the eye while its camera flies on, and the next season's camera arrives from behind its eye; the last layer left of one
 // season is the foreground in front of the next). After the last season the page scrolls on into the page layer's tail.
 //
-// The page layer (page/page.js, owned by the page agent) is mounted here if it exists: mountPage(api), see README section 12.
+// The page layer (page/page.js, built as its own layer) is mounted here if it exists: mountPage(api), see README section 12.
 import { notesFromCopy, loadCopy } from './notes.js';
 import { gpuInfo, forcedTier, firstTier, makeGovernor } from './quality.js';
 const params = new URLSearchParams(location.search);
@@ -572,7 +572,7 @@ function scrollToSeason(i, opt = 'smooth') {
   return cutting;
 }
 
-// ---------------- waiting for a season still being made (Sếp, 29/9) ----------------
+// ---------------- waiting for a season still being made (29/9) ----------------
 // A viewer who reaches a season that is not built yet (a slow machine, or a jump from the bar) is never left standing
 // without knowing why: the page layer shows "Đang pha mùa Hạ… 60%" (onWait) with the season's real progress, and the
 // scene goes on by itself once it is ready. waitFor(-1) = nothing is being waited for.

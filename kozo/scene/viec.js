@@ -3,10 +3,10 @@
 // cao (chuyển cảnh 5 — post/chuyen.js GiayEffect, app.js). Trong thung: năm mô hình nhà nhỏ, mỗi nhà một ánh đèn ngà ấm nhẹ
 // qua cửa; nét cọ 緑青 TỰ VẼ nối năm nhà theo năm tháng (2019 → 2026 —), tắt ở đầu lối đi Open Field ("Where it ends, nothing
 // stands"); tên nhà hiện theo đầu cọ. Rê / bấm một nhà (điện thoại: chạm, hoặc vuốt ngang trên thẻ) → THẺ HÌNH VẼ KỸ THUẬT:
-// không khung, không tấm nền — nét hình vẽ là NÉT CỌ vẽ ở lượt riêng SAU lớp tối sau chữ (post hudPass — soát p9a A2), số đo là
+// không khung, không tấm nền — nét hình vẽ là NÉT CỌ vẽ ở lượt riêng SAU lớp tối sau chữ (post hudPass — p9a A2), số đo là
 // chữ HTML thật; để yên thì thẻ tự đổi MỘT vòng, mỗi thẻ 8 s (người xem đã tự chọn thì thôi). Lớp tối rất mềm sau thẻ nằm TRONG
 // ảnh cảnh (post/chuyen.js KhungEffect, uCard).
-// Bản thử đã duyệt: prototypes/kozo-dem/viec-a.html (+ ảnh chi tiết scratchpad/kozo-look/chuong-viec/_chi-tiet.png).
+// Bản thử đã duyệt: prototypes/kozo-dem/viec-a.html.
 //
 // Máy quay (τ đã qua sine.inOut — app.js tính): τ 0 NHÌN THẲNG XUỐNG (đúng tư thế của bản vẽ quy hoạch lúc giấy tan) → τ 0,5
 // nghiêng về góc bản đồ của ảnh chi tiết, rồi đứng. Nét cọ vẽ τ 0,2 → 0,9 (mỗi chặng giữa hai nhà một nét: cọ chấm mực lại ở
@@ -22,7 +22,7 @@ const cl01 = (x) => (x < 0 ? 0 : x > 1 ? 1 : x);
 const sstep = (a, b, x) => { const t = cl01((x - a) / (b - a)); return t * t * (3 - 2 * t); };
 const col = (hex, k = 1) => new THREE.Color(hex).multiplyScalar(k);
 
-// ── chữ: ô s6 (docs/content/kozo-copy.md) ─────────────────────────────────────────────────────────
+// ── chữ: ô s6 (bản chữ đã duyệt) ─────────────────────────────────────────────────────────
 export const WORKS = [
   { id: 'w1', name: 'Mulberry House', year: '2019', type: 'Village museum', line: 'Damp ruins paper. The collection is sealed away; only the gallery sees the sky.' },
   { id: 'w2', name: 'Pine Room', year: '2021', type: 'Restoration', line: 'The crawl door is 66 × 63 cm. We kept it, so everyone still kneels.' },
@@ -131,7 +131,7 @@ function brushMat({ body = RAMP[400], core = RAMP[200], k = 1.4, fog = true, dep
     polygonOffset: true, polygonOffsetFactor: -6, polygonOffsetUnits: -6,
     uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib.fog, {
       uBody: { value: col(body) }, uCore: { value: col(core) }, uK: { value: k }, uP: { value: 0 }, uDry: { value: dry }, uA: { value: 1 },
-      // (soát p10a A1) nét ra khỏi bản đồ: uTip 1 = đầu cọ đang đi là NGÒI TRÒN thon dần (không cắt vuông), uGlow ≈ 0 = không lõi
+      // (p10a A1) nét ra khỏi bản đồ: uTip 1 = đầu cọ đang đi là NGÒI TRÒN thon dần (không cắt vuông), uGlow ≈ 0 = không lõi
       // trắng ở đầu cọ ướt. Nét năm tháng / nét thẻ giữ 0 / 1 — cùng chương trình, không đổi một điểm ảnh
       uTip: { value: 0 }, uGlow: { value: 1 }, uCoreK: { value: 0.85 }, uDepl: { value: 0 },
       uKo: { value: Array.from({ length: 6 }, () => new THREE.Vector4(-1e4, -1e4, 0, 0)) }, uVP: { value: new THREE.Vector2(1, 1) },
@@ -155,7 +155,7 @@ void main(){
   float lead = (shown - vT) * vL / vW;
   float tailT = drawing ? 1.0 : 1.0 - smoothstep(0.84, 1.0, vT);
   float press = (1.0 + 0.22 * (1.0 - smoothstep(0.0, 2.5, sA))) * (0.6 + 0.58 * vN(vec2(sA * 0.12, vSeed * 13.0)) + 0.16 * vN(vec2(sA * 0.45, vSeed * 5.0)));
-  // (soát p9a A10) đầu nét tròn như ngòi cọ vừa ấn xuống — không cắt vuông
+  // (p9a A10) đầu nét tròn như ngòi cọ vừa ấn xuống — không cắt vuông
   float head = sqrt(clamp(sA / 0.9, 0.0, 1.0));
   float hw = press * head * mix(0.08, 1.0, pow(tailT, 0.75));
   hw *= mix(1.0, sqrt(clamp(lead / 1.3, 0.0, 1.0)), uTip);
@@ -302,7 +302,7 @@ float gWet = 0.0;
   diffuseColor.rgb = mix(diffuseColor.rgb, fC, vK.x);
   gWet = water * (1.0 - bund) * vK.x;
   diffuseColor.rgb *= 0.86 + 0.28 * vN(vWP.xz * 0.2) * (1.0 - vK.x);
-  // tuyết quanh Snow Hall (loang) — tính theo TỪNG ĐIỂM ẢNH (soát p9a A5: tính theo đỉnh lưới 6 m thì mép quầng thành bậc thang)
+  // tuyết quanh Snow Hall (loang) — tính theo TỪNG ĐIỂM ẢNH (p9a A5: tính theo đỉnh lưới 6 m thì mép quầng thành bậc thang)
   { float dS = length(vWP.xz - uSnow.xy) + 18.0 * (0.62 * vN(vWP.xz * 0.06) + 0.38 * vN(vWP.xz * 0.14 + 3.7) - 0.5) + uSnow.z;
     float sn = (1.0 - smoothstep(10.0, 24.0, dS)) * 0.9;
     diffuseColor.rgb = mix(diffuseColor.rgb, vec3(0.3, 0.34, 0.33) * (0.88 + 0.22 * vN(vWP.xz * 0.25)), sn); }
@@ -344,7 +344,7 @@ float gWet = 0.0;
   // (cùng chương trình, không dịch thêm), vật liệu riêng để đếm nét riêng. uP = 0 suốt chương 仕事: không một điểm ảnh nào đổi
   const exitMat = brushMat({ k: 1.6, name: 'viec-duong-ra' });
   exitMat.uniforms.uTip.value = 1; exitMat.uniforms.uGlow.value = 0.08; exitMat.uniforms.uCoreK.value = 0.55; exitMat.uniforms.uDepl.value = 70;
-  // nét hình vẽ của thẻ: vẽ ở LƯỢT RIÊNG SAU lớp tối sau chữ (post hudPass — soát p9a A2: vẽ trong cảnh thì lớp tối + kẹp sáng sau
+  // nét hình vẽ của thẻ: vẽ ở LƯỢT RIÊNG SAU lớp tối sau chữ (post hudPass — p9a A2: vẽ trong cảnh thì lớp tối + kẹp sáng sau
   // thẻ dập nét xuống 1,14:1 trên điện thoại). Nét là chữ của thẻ nên đứng trên lớp tối như chữ; màu ra thẳng (không qua nắn màu)
   // → độ đậm uK đặt theo màu ra màn: thân 緑青 400, lõi 200
   const hudMat = brushMat({ k: 1.2, fog: false, depthTest: false, body: RAMP[400], core: RAMP[200], dry: 0.45, name: 'viec-the-net', ko: true });
@@ -358,7 +358,7 @@ float gWet = 0.0;
   })();
   const haloMat = new THREE.SpriteMaterial({ name: 'viec-quang', map: haloTex, color: col(0xf2e7d4, 0.3), blending: THREE.AdditiveBlending, depthWrite: false });
   // sương: lớp ngang mỏng dần về phía đất (bản đồ độ cao), vân sương lấy từ ảnh nhiễu (rẻ hơn tính nhiễu nhiều tầng)
-  // (soát p9a A5: ảnh nhiễu cũ KHÔNG lặp liền — lớp sương lặp ảnh mỗi 1/uSc mét nên có hai đường thẳng tắp ngang dọc đáy thung.
+  // (p9a A5: ảnh nhiễu cũ KHÔNG lặp liền — lớp sương lặp ảnh mỗi 1/uSc mét nên có hai đường thẳng tắp ngang dọc đáy thung.
   //  Giờ nhiễu tuần hoàn: lưới ô chia hết cỡ ảnh ở mọi tầng)
   const vnP = (x, y, P) => {
     const xi = Math.floor(x), yi = Math.floor(y), fx = x - xi, fy = y - yi, u = fx * fx * (3 - 2 * fx), v = fy * fy * (3 - 2 * fy);
@@ -399,7 +399,7 @@ void main(){
 #include <fog_fragment>
 }`,
   });
-  // bản vẽ QUY HOẠCH cho chuyển cảnh 5 (soát p9a A3: bản cũ là đường đồng mức 1 px xám đều + nhà tô phẳng — "bản đồ vector"):
+  // bản vẽ QUY HOẠCH cho chuyển cảnh 5 (p9a A3: bản cũ là đường đồng mức 1 px xám đều + nhà tô phẳng — "bản đồ vector"):
   // vẽ bằng NÉT CỌ MỰC thật — đường đồng mức, viền + gạch chéo từng nhà, đường đi — mỗi nét có 起筆 đầu ấn tròn, thân dày mỏng theo
   // lực tay, 払い đuôi vuốt, 掠れ khô dần. Vẽ MỘT lần vào khung đệm (kênh: đỏ = độ phủ mực, lục = 1 − thứ tự vẽ (hiện dần theo
   // thời gian), lam = độ đậm), hoà bằng MAX (nét chồng: phủ lấy chỗ đậm, thứ tự lấy nét vẽ trước). Bề ngang nét tính theo điểm ảnh
@@ -643,7 +643,7 @@ void main(){
       const lr = new THREE.Mesh(new THREE.ConeGeometry(0.3, 0.2, 6), M.stone); lr.position.set(tx, 1.0, tz); g.add(lr);
       const pine = new THREE.Group(); pine.position.set(-2.6, 0, -1.4); g.add(pine);
       const tr = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.14, 3.6, 7), M.wood); tr.position.set(0.35, 1.7, 0); tr.rotation.z = -0.22; pine.add(tr);
-      // (soát p9a A8: bốn đĩa cầu dẹt trơn trông như chồng đĩa) — mỗi tầng lá là 3–4 cụm lá đa diện mặt phẳng, lệch nhau, dày mỏng khác nhau
+      // (p9a A8: bốn đĩa cầu dẹt trơn trông như chồng đĩa) — mỗi tầng lá là 3–4 cụm lá đa diện mặt phẳng, lệch nhau, dày mỏng khác nhau
       { const tuftG = new THREE.IcosahedronGeometry(1, 0);
         for (const [x, y, z, r] of [[0.9, 3.5, 0.1, 1.0], [0.2, 2.8, 0.5, 0.85], [1.25, 2.55, -0.4, 0.75], [0.55, 4.05, -0.2, 0.62]]) {
           const n = r > 0.8 ? 4 : 3;
@@ -692,7 +692,7 @@ void main(){
       for (const y of [3.5, 7.5]) { const w = y <= 3.5 ? 13.2 : 13.2 - (y - 3.5) / Math.tan(Math.PI / 3) * 2; box(w, 0.16, 0.2, M.wood, 0, y, 9.08, g); }
       glowAt(g, 0, 3.6, 10, 1.8);
       yield; tY = performance.now();
-      // tuyết trượt khỏi mái dồn dưới hai chân mái: một dải gò thấp, to nhỏ không đều (soát p9a A8: một khối dài trơn như viên thuốc)
+      // tuyết trượt khỏi mái dồn dưới hai chân mái: một dải gò thấp, to nhỏ không đều (p9a A8: một khối dài trơn như viên thuốc)
       { const lump = new THREE.IcosahedronGeometry(1, 2);
         for (const x of [-9.3, 9.3]) for (let k = 0; k < 10; k++) {
           const z = -8.8 + k * 1.95 + rr(-0.4, 0.4), sc = rr(1.3, 2.1);
@@ -734,7 +734,7 @@ void main(){
         const a = BLD[ids[s]].door, b = BLD[ids[s + 1]].door, d = b.clone().sub(a), L = d.length(), nrm = new THREE.Vector3(-d.z, 0, d.x).normalize();
         const ctrl = [a.clone()];
         if (s === 1) {
-          // (Sếp 29/9 sau p9b) chặng Pine Room → Dry Store vốn gần như thẳng tắp: lượn một chữ S rất nhẹ, mỗi điểm uốn còn né về phía đất
+          // (29/9 sau p9b) chặng Pine Room → Dry Store vốn gần như thẳng tắp: lượn một chữ S rất nhẹ, mỗi điểm uốn còn né về phía đất
           // thấp hơn (lối mòn đi vòng quanh gò / bậc ruộng, không leo thẳng qua)
           for (const [f, o] of [[0.3, 0.085], [0.7, -0.065]]) {
             const q = a.clone().addScaledVector(d, f).addScaledVector(nrm, o * L);
@@ -754,7 +754,7 @@ void main(){
       yield;
       // (phần 9) NÉT RA KHỎI BẢN ĐỒ: từ đúng chỗ nét năm tháng dừng (chấm "2026 —" ở đầu lối Open Field) kẻ TIẾP theo đúng hướng chặng
       // Snow Hall → Open Field — dọc lối đá của đài tưởng niệm ("One path across the site. Where it ends, nothing stands.") — qua hết
-      // lối, lượn dần sang tây, leo sườn thung phía tây rồi vượt ra khỏi bản đồ (soát p10a A1: nét cũ kẻ ngược lên bắc, cắt chặng
+      // lối, lượn dần sang tây, leo sườn thung phía tây rồi vượt ra khỏi bản đồ (p10a A1: nét cũ kẻ ngược lên bắc, cắt chặng
       // Pine Room → Dry Store thành dấu "+"). Không cắt chặng nào. Máy bay theo đầu cọ. Không vào ánh hắt, không vào bản vẽ quy hoạch,
       // không vào chỗ tránh của nhãn: chương 仕事 giữ nguyên từng điểm ảnh
       {
@@ -762,7 +762,7 @@ void main(){
         const ax = new THREE.Vector3(SITES.w5.x - SITES.w4.x, 0, SITES.w5.z - SITES.w4.z).normalize();
         const at = (k) => D0.clone().addScaledVector(ax, k);
         // (nét lượn như lối mòn — không kẻ thẳng một đường; khổ ngang và khổ dọc cùng một nét, chỉ máy khác)
-        // (soát p11a A1) máy giờ TIẾN THẲNG (một cú máy), không bay theo đầu cọ → nét phải tự đi tới chỗ nét 道 của 連絡 sẽ mọc: đi tiếp
+        // (p11a A1) máy giờ TIẾN THẲNG (một cú máy), không bay theo đầu cọ → nét phải tự đi tới chỗ nét 道 của 連絡 sẽ mọc: đi tiếp
         // một đoạn theo hướng chặng cũ rồi lượn dần về phía NAM — về phía máy — nên trên màn nó chạy xuống GIỮA ĐÁY khung rồi ra sau lưng
         // máy; vùng đất mới loang ra từ chính đoạn nét ấy (từ đáy lên), đúng chỗ nét 道 đi từ đáy màn vào bãi
         // khổ dọc: máy nhìn về TÂY (đáy màn là phía ĐÔNG) → nét chấm mực lại rồi đi về phía đông, phía nam chặng Snow Hall → Open Field
@@ -787,7 +787,7 @@ void main(){
       }
       yield;
       // ánh hắt: ảnh nhìn từ trên xuống — đỏ = độ sáng (mờ nhoè quanh nét), lục = vị trí dọc đường (0…1) × độ sáng.
-      // (soát p9a B5: bản cũ vẽ bằng canvas 2D có bộ lọc blur — mỗi nét một lượt nhoè cả tấm, card đồ hoạ phải làm hết lúc nạp ảnh
+      // (p9a B5: bản cũ vẽ bằng canvas 2D có bộ lọc blur — mỗi nét một lượt nhoè cả tấm, card đồ hoạ phải làm hết lúc nạp ảnh
       //  lên lần vẽ đầu → khựng 67–133 ms giữa chương 皮. Giờ tính bằng số: in đĩa theo nét, nhoè hộp ba lượt, từng mẩu có nhường
       //  khung, rồi nạp thẳng mảng số lên card)
       const N = 512, [bx, bz, bw, bh] = SPILL_BOX.toArray();
@@ -817,7 +817,7 @@ void main(){
       spillU.uSpill.value = t;
     }
     yield; tY = performance.now();
-    // BẢN VẼ QUY HOẠCH bằng nét cọ (soát p9a A3): đường đồng mức 4 m (20 m nét đậm) · nhà: viền + gạch chéo · đường đi dự kiến
+    // BẢN VẼ QUY HOẠCH bằng nét cọ (p9a A3): đường đồng mức 4 m (20 m nét đậm) · nhà: viền + gạch chéo · đường đi dự kiến
     st.at = 'ban-ve';
     {
       const strokes = [];
@@ -890,7 +890,7 @@ void main(){
         }
         if (due()) yield;
       }
-      // thứ tự vẽ đồng mức: từ đường trong cùng ra ngoài (mực có ngay từ lúc bắt đầu — soát p9a A1: quãng giấy trống phải thật ngắn)
+      // thứ tự vẽ đồng mức: từ đường trong cùng ra ngoài (mực có ngay từ lúc bắt đầu — p9a A1: quãng giấy trống phải thật ngắn)
       { let r0 = 1e9, r1 = -1e9; for (const t of strokes) { r0 = Math.min(r0, t.r); r1 = Math.max(r1, t.r); }
         for (const t of strokes) t.o = 0.005 + 0.42 * (t.r - r0) / Math.max(1e-3, r1 - r0) + 0.05 * R(); }
       // nhà: viền (bốn nét, vượt góc như tay kiến trúc sư) + gạch chéo trong khối — khu đất của từng công trình
@@ -934,7 +934,7 @@ void main(){
     layoutLabels();
     UI.cardsReady();
     scene.traverse((m) => { if (m.isMesh || m.isInstancedMesh) st.meshes++; });
-    // mọi lưới đều có tên (soát p9a B5: nhật ký vẽ đầu ghi 'Mesh' không tên thì không biết lưới nào làm card nghẽn)
+    // mọi lưới đều có tên (p9a B5: nhật ký vẽ đầu ghi 'Mesh' không tên thì không biết lưới nào làm card nghẽn)
     { let q = 0; scene.traverse((o) => { if ((o.isMesh || o.isInstancedMesh || o.isSprite) && !o.name) o.name = (o.parent && o.parent.name ? o.parent.name : 'viec') + '/' + ((o.material && o.material.name) || o.type) + '#' + (q++); }); }
     st.built = true; st.buildMs = Math.round(performance.now() - t0); st.at = 'xong';
   }
@@ -1000,7 +1000,7 @@ void main(){
   // NHỊP CHƯƠNG: đường cọ τ 0,2 → 0,9; tên nhà hiện theo đầu cọ; hết đường thì thẻ đầu tiên mở, rồi tự đổi một vòng (mỗi thẻ 8 s)
   const PATH_T = [0.2, 0.9];
   let pathP = 0, time = 0, uiK = 0, uiOn = false;
-  // (soát p9a B6/B9) tự đổi thẻ: mỗi thẻ đứng ≥ 8 s, chỉ MỘT vòng (1 → 5 rồi về 1 và dừng); người xem đã tự chọn (rê, bấm, chạm,
+  // (p9a B6/B9) tự đổi thẻ: mỗi thẻ đứng ≥ 8 s, chỉ MỘT vòng (1 → 5 rồi về 1 và dừng); người xem đã tự chọn (rê, bấm, chạm,
   // bàn phím — kể cả chỉ Tab tới nhãn) thì thôi hẳn. (B7) đổi thẻ: thẻ cũ tắt nhanh, thẻ mới đợi WAIT rồi mới hiện + giải mã
   const CARD = { sel: -1, t: 0, prog: 0, lastInput: -1e9, doneAt: -1, hud: null, n: 0, dirty: true, user: false, autoN: 0, wait: 0 };
   const HOLD = 8, AUTO_MAX = 5, WAIT = 0.16;
@@ -1008,7 +1008,7 @@ void main(){
   const scr = (v, out = [0, 0]) => { vA.copy(v).project(camera); out[0] = (vA.x * 0.5 + 0.5) * W_; out[1] = (-vA.y * 0.5 + 0.5) * H_; return out; };
   // tauPath (tuỳ chọn): nhịp riêng cho đường cọ — lúc lùi khỏi chương (app.js tua máy về đầu chương) máy và đường cọ tua theo hai nhịp
   let exNow = 0;
-  // keep (soát p10a A1): chỉ số nhãn còn giữ sáng khi lớp chữ đã tắt — đầu chuyển cảnh 6 giữ "Open Field · 2026 —" thêm chừng 0,6 s
+  // keep (p10a A1): chỉ số nhãn còn giữ sáng khi lớp chữ đã tắt — đầu chuyển cảnh 6 giữ "Open Field · 2026 —" thêm chừng 0,6 s
   // để mắt thấy nét mới đi ra từ chính công trình đang dở
   function update(dt, tau, ui = 1, tauPath = tau, ex = 0, keep = -1) {
     time += dt;
@@ -1093,7 +1093,7 @@ void main(){
     const pxK = 2 * Math.tan(THREE.MathUtils.degToRad(fovFit(POSE[portrait ? 'port' : 'land'].B.fov)) / 2) / H_;
     const strokes = F.polys.map((p, i) => ({ pts: densify(p.pts.map(([x, y]) => [X(x), Y(y)]), 6).map(([x, y]) => pxToCam(x, y)), w: (p.w === 1 ? 3.4 : 1.9) * pxK, i, seed: i * 0.173 + 0.5 }));
     const mesh = new THREE.Mesh(ribbonGeo(strokes, new THREE.Vector3(0, 0, 1)), hudMat); mesh.renderOrder = 20; mesh.frustumCulled = false; mesh.name = 'viec-the-net';
-    // số đo cách đường kích thước ít nhất 11 px (thẻ điện thoại vẽ nhỏ: cách theo tỉ lệ bản vẽ thì chữ đè lên nét — soát p9a)
+    // số đo cách đường kích thước ít nhất 11 px (thẻ điện thoại vẽ nhỏ: cách theo tỉ lệ bản vẽ thì chữ đè lên nét — p9a)
     const nums = F.texts.map((t) => {
       if (!t.dir) return { x: X(t.p[0]), y: Y(t.p[1]), t: t.t, ang: t.ang, a: t.a, after: t.after };
       const o = Math.max(t.off * s, 11);
@@ -1120,7 +1120,7 @@ void main(){
     if (!PATH) return;
     placeCam(1, 0);
     UI.layout();
-    // vùng bận là những ĐĨA TRÒN (tâm, bán kính px): đường cọ tính cả bề dày nét + quầng sáng loang (soát p9a A7: nhãn 'Snow Hall'
+    // vùng bận là những ĐĨA TRÒN (tâm, bán kính px): đường cọ tính cả bề dày nét + quầng sáng loang (p9a A7: nhãn 'Snow Hall'
     // trên điện thoại nằm giữa hai nét sáng — lấy mẫu từng điểm thưa thì lọt khe), nhà tính cả mái + chân
     const busy = [], q0 = new THREE.Vector3();
     PATH.strokes.forEach((s) => {
@@ -1291,7 +1291,7 @@ void main(){
           scr(BLD[WORKS[open].id].top, p);
           ring.setAttribute('cx', p[0]); ring.setAttribute('cy', p[1]); dot.setAttribute('cx', p[0]); dot.setAttribute('cy', p[1]);
           const c = cards[open], h3 = c.h3.getBoundingClientRect();
-          // (soát p9a A6/B8) đường dẫn không được gạch ngang tên nhà khác: thử vài lối, lấy lối đầu tiên không cắt ô nhãn nào
+          // (p9a A6/B8) đường dẫn không được gạch ngang tên nhà khác: thử vài lối, lấy lối đầu tiên không cắt ô nhãn nào
           const boxes = [];
           labels.forEach((l, k) => { if (k !== open && l.vis && l.pos) boxes.push([l.pos[0] - 5, l.pos[1] - 4, l.pos[0] + l.w + 5, l.pos[1] + l.h + 4]); });
           const segHit = (ax, ay, bx, by) => boxes.some(([x0, y0, x1, y1]) => {
@@ -1414,7 +1414,7 @@ void main(){
     // của chuyển cảnh 6 (post/chuyen.js DuongEffect) loang cảnh mới ra từ chính nét này. Trả về số điểm (≤ 16) đã ghi vào out.
     // (Mike 30/9) máy không còn bay theo đầu cọ → đầu cọ ra khỏi khung: lấy PHẦN NÉT CÒN TRÊN MÀN (từ chấm mực lại tới mép khung, dò
     // 48 điểm dọc cả nét, giữ điểm trong khung nới 15%, rồi thưa còn ≤ 16) — cảnh mới thấm ra từ đúng phần nét người xem đang thấy
-    // (soát p11a A1) thứ tự ĐẢO: điểm đầu là phía đáy màn (gần máy), điểm cuối là chấm mực lại — lớp hoà cảnh thấm từ đáy lên theo nét
+    // (p11a A1) thứ tự ĐẢO: điểm đầu là phía đáy màn (gần máy), điểm cuối là chấm mực lại — lớp hoà cảnh thấm từ đáy lên theo nét
     exitScreen(out) {
       if (!EXIT || exNow <= 0) return 0;
       const dTip = EXIT.L * exitDraw(exNow);

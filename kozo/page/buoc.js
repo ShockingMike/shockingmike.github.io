@@ -5,9 +5,9 @@
 //   · (30/9, Mike) chỉ ĐI TỚI chương kế mới chạy chuyển cảnh đủ; lùi, bấm tên chương, logo, Home / End là MỜ CHUYỂN (xem FADE_D).
 //   · cử chỉ MỚI = sự kiện lăn tới sau ≥ 180 ms im lặng: cả chuỗi quán tính của một cú vẩy chỉ tính là một cử chỉ.
 //   · KHOÁ trong lúc chuyển + 0,4 s sau khi tới; cú LĂN tới trong lúc khoá bị BỎ (không xếp hàng). Riêng cú BẤM tên chương /
-//     Home / End trong lúc đang chuyển thì NHỚ cú cuối cùng và đi ngay khi tới nơi (soát p7a, B8).
+//     Home / End trong lúc đang chuyển thì NHỚ cú cuối cùng và đi ngay khi tới nơi (p7a, B8).
 // Mọi thứ chạy THEO THỜI GIAN trên "vị trí ảo" (đơn vị màn — đúng thước dòng thời gian cũ trong app.js, nên hình các chuyển cảnh
-// đã duyệt giữ nguyên, chỉ đổi thứ điều khiển). Bản p7b (soát p7a: B1, B2, B7) — HAI ĐƯỜNG trong lúc chuyển:
+// đã duyệt giữ nguyên, chỉ đổi thứ điều khiển). Bản p7b (p7a: B1, B2, B7) — HAI ĐƯỜNG trong lúc chuyển:
 //   · s  (đường chuyển cảnh): chạy từ mép chương đang đứng tới mép chương đến. Hiệu ứng chuyển cảnh + cảnh ĐẾN đọc theo s.
 //   · sOut (đường của cảnh ĐANG RỜI): đi tiếp từ đúng tư thế đang có, với đà (vận tốc) đang có tắt dần, cộng phần trôi thiết kế
 //     của chuyển cảnh — KHÔNG tua nhanh, không tua ngược cả chương (lăn lúc chương còn chạy: nét vẽ dở cứ để nguyên, lớp chuyển
@@ -64,7 +64,7 @@ export function createBuoc(o) {
     logE('toi-' + where);
     if (o.onArrive) o.onArrive(k);
   }
-  // (soát p11a B1) cú bấm tên chương / Home / End / logo đã NHỚ (rơi vào lúc đang chuyển hay đang mờ): chạy SAU khi đã báo "xong" lần
+  // (p11a B1) cú bấm tên chương / Home / End / logo đã NHỚ (rơi vào lúc đang chuyển hay đang mờ): chạy SAU khi đã báo "xong" lần
   // vừa rồi — báo "xong" đúng chương vừa tới, rồi mới bắt đầu lần mờ mới. Trả về true nếu đã đi tiếp.
   function runQueue() {
     if (S.queue === null) return false;
@@ -90,7 +90,7 @@ export function createBuoc(o) {
       S.m0 = 0; S.m1 = (vPlay(to) * S.D) / Math.max(1e-6, S.s1 - S.s0);
       S.gate = gated ? { s: GATE.s, a: S.s0, D: S.D, phase: 0 } : null;
     } else {
-      S.s0 = c.A; S.s1 = CH[to].B; S.D = TR[to].back ?? TR[to].dur;   // (back: lùi có quãng riêng dài hơn — chuyển cảnh 5, soát p9a B3)
+      S.s0 = c.A; S.s1 = CH[to].B; S.D = TR[to].back ?? TR[to].dur;   // (back: lùi có quãng riêng dài hơn — chuyển cảnh 5, p9a B3)
     }
     // (đường chuyển cảnh bắt đầu ở mép chương — khi đang ở giữa chương thì chỉ cảnh ĐẾN và hiệu ứng đọc theo đường này,
     //  cảnh đang rời đọc theo sOut nên không nhảy tư thế)
@@ -100,7 +100,7 @@ export function createBuoc(o) {
     return true;
   }
   // mờ chuyển: khung đầu (stage 0) trang vẫn vẽ trạng thái cũ và CHỤP nó; khung sau (stage 1) đổi sang đầu chương đích; rồi mờ
-  // (soát p11a A5) mờ VỀ MÀN ĐẦU ban ngày (đêm → ngày, sáng lên rất nhiều): dài hơn, app.js nắn đường cong chậm ở nửa đầu
+  // (p11a A5) mờ VỀ MÀN ĐẦU ban ngày (đêm → ngày, sáng lên rất nhiều): dài hơn, app.js nắn đường cong chậm ở nửa đầu
   const fadeDur = (from, to) => (REDUCED ? 0.4 : to === 0 && from > 0 ? 1.15 : FADE_D);
   function startFade(to, from = S.cur) {
     S.fade = { from, to, stage: 0, t: 0, id: ++S.jid, D: fadeDur(from, to) };
@@ -109,7 +109,7 @@ export function createBuoc(o) {
     emit('bat-dau', from, to, 'mo');
     return true;
   }
-  // (soát p11a B6) LÙI GIỮA LÚC ĐANG CHUYỂN CẢNH ĐI TỚI: cú lăn lên / ↑ / PageUp / vuốt xuống tới sau ≥ 0,2 s kể từ lúc bắt đầu chuyển
+  // (p11a B6) LÙI GIỮA LÚC ĐANG CHUYỂN CẢNH ĐI TỚI: cú lăn lên / ↑ / PageUp / vuốt xuống tới sau ≥ 0,2 s kể từ lúc bắt đầu chuyển
   // (chống đuôi quán tính của chính cú lăn xuống) được nhận NGAY: bỏ chuyển cảnh, MỜ về chương vừa rời (đầu chương, như mọi lần lùi)
   const BACK_MS = 200;
   const canBackOut = () => S.mode === 'trans' && S.dir > 0 && !S.fade && now() - S.tStart >= BACK_MS;
@@ -159,7 +159,7 @@ export function createBuoc(o) {
     step(dy > 0 ? 1 : -1);
   }, { passive: false });
   // (phần 9, chương 連絡) đang GÕ trong Ô NHẬP chữ: mũi tên, PageUp / PageDown, Space, Home / End là của ô nhập, KHÔNG đổi chương.
-  // Chỉ tính ô nhập chữ thật (input chữ, textarea, select, ô sửa chữ) — KHÔNG tính nút (Send…): soát p10a B1, trước đây mọi thứ trong
+  // Chỉ tính ô nhập chữ thật (input chữ, textarea, select, ô sửa chữ) — KHÔNG tính nút (Send…): p10a B1, trước đây mọi thứ trong
   // form đều bị coi là "đang gõ" nên bấm Send xong thì ↑ / PageUp / vuốt đều chết. Lúc đang ghép chữ bằng bộ gõ cũng không đổi chương.
   const KHONG_CHU = /^(button|submit|reset|checkbox|radio|range|color|file|image|hidden)$/i;
   const oNhap = (el) => !!el && (el.isContentEditable || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT' || (el.tagName === 'INPUT' && !KHONG_CHU.test(el.type || 'text')));
@@ -180,7 +180,7 @@ export function createBuoc(o) {
   });
   // điện thoại: vuốt lên / xuống một lần = một chương; trang không cuộn thật
   let ty0 = null, tx0 = 0, tt0 = 0;
-  // (phần 9, soát p10a B1) chỉ cú vuốt BẮT ĐẦU TRÊN Ô NHẬP là của ô (đặt con trỏ, chọn chữ): không đổi chương. Vuốt bắt đầu ở chỗ khác
+  // (phần 9, p10a B1) chỉ cú vuốt BẮT ĐẦU TRÊN Ô NHẬP là của ô (đặt con trỏ, chọn chữ): không đổi chương. Vuốt bắt đầu ở chỗ khác
   // — kể cả khi con trỏ còn nằm trong ô (đóng bàn phím bằng nút Back của Android thì ô vẫn giữ con trỏ) — thì nhả ô rồi đổi chương.
   addEventListener('touchstart', (e) => {
     if (e.touches.length !== 1 || oNhap(e.target)) { ty0 = null; return; }
@@ -225,7 +225,7 @@ export function createBuoc(o) {
           S.fade = null;
           logE('mo-xong');
           emit('xong', F.from, F.to, 'mo');
-          // (soát p11a B1) cú bấm nhớ trong lúc mờ: đi NGAY (mờ tiếp), không đợi khoá 0,4 s; không có thì khoá như thường
+          // (p11a B1) cú bấm nhớ trong lúc mờ: đi NGAY (mờ tiếp), không đợi khoá 0,4 s; không có thì khoá như thường
           if (!runQueue()) S.lockUntil = now() + LOCK_MS;
         }
       }

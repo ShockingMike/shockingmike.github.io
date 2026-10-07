@@ -59,7 +59,7 @@ const stoneBox = [];
   wall.innerHTML = out;
 })();
 const stones = $$('.st', wall);
-// TẢNG ĐANG ĐẶT (Sếp 29/9 sau p9b): tảng kế tiếp thở mờ nhẹ — CSS chỉ đổi độ đục trên một lớp riêng nên chạy ở luồng vẽ của trình
+// TẢNG ĐANG ĐẶT (29/9 sau p9b): tảng kế tiếp thở mờ nhẹ — CSS chỉ đổi độ đục trên một lớp riêng nên chạy ở luồng vẽ của trình
 // duyệt, không phụ thuộc luồng chính: lúc trang bận dịch mã (nạp three.js ~0,3 s) màn tải vẫn có một thứ đang chuyển động, không
 // đứng hình. Là phần tử HTML (không phải hình SVG — hình SVG đổi độ đục thì trình duyệt vẽ lại trên luồng chính).
 const ghost = (() => {
@@ -92,7 +92,7 @@ function decodeAll(clock) {
   document.documentElement.classList.add('ui');
   for (const el of $$('[data-decode]')) {
     const [dl, sh, sc, nos] = el.dataset.decode.split(',').map(Number);
-    // giảm chuyển động: không xáo ký tự, chỉ hiện dần (soát p7a B10)
+    // giảm chuyển động: không xáo ký tự, chỉ hiện dần (p7a B10)
     decode(el, { delay: clock ? dl : dl + 0.35, show: sh, scramble: sc || 0.01, noScramble: !!nos || REDUCED_UI || document.documentElement.classList.contains('doc'), clock });
   }
 }
@@ -197,7 +197,7 @@ setTimeout(function canh() {
   requestAnimationFrame(doiXong);
 })();
 
-// ── 6. ÂM THANH (page/am-thanh.js, bản 2 Mike duyệt hướng 29/9): chọn tiếng ngay trên màn chờ ──────────────────
+// ── 6. ÂM THANH (page/am-thanh.js, bản 2, hướng đã duyệt 29/9): chọn tiếng ngay trên màn chờ ──────────────────
 // Không bấm "with sound" thì không tạo AudioContext nào. Có tiếng: đàn chạy từ màn mở; đổi chương thì am-thanh.js tự nghe
 // sự kiện 'kozo:chuong' / 'kozo:net' của trang. Chữ "Sound: On/Off" ở góc là nút bật tắt thật (lặng dần 0,5 s).
 const am = taoAmThanh();

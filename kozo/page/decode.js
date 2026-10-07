@@ -1,4 +1,4 @@
-// Chữ hiện ra kiểu GIẢI MÃ như igloo (mục 1.4 của docs/research/igloo-ref/igloo-toan-trang.md):
+// Chữ hiện ra kiểu GIẢI MÃ như igloo (mục 1.4 của bản nghiên cứu igloo):
 // hai lớp chạy cùng lúc — gạt độ đục từ trái sang (≈ 0,4 s) và xáo ký tự: mỗi ô chữ nhảy qua vài
 // ký tự khác rồi dừng đúng chữ, chữ bên trái dừng trước (≈ 0,75 s). Đường cong sine.out.
 //

@@ -2,7 +2,7 @@
 // kế mục 15.1): nơi sinh ra đá của nền thành. Một hẻm mỏ đá sâu, vách khai thác có bậc; theo cuộn, MỘT NÉT CỌ ĐỨNG 緑青
 // được vẽ dứt khoát dọc ĐƯỜNG TÁCH đá từ mép vách xuống chân — đường tách là một VẾT NỨT THẬT gấp khúc trên mặt đá (có đoạn
 // đã nứt hở), nét mực đi theo vết nứt; rồi HÀNG LỖ NÊM 矢穴 (lỗ chữ nhật đục thẳng hàng TRÊN CHÍNH đường tách, như vết nêm
-// cũ dọc mép các mảng đã tách) hiện ra từng lỗ như người thợ đang đục (29/9, vòng soát p7a: bỏ dáng thác nước, bỏ chấm cánh hoa). Ánh sáng của nét hắt lên mặt vách hai bên và xuống vũng nước dưới chân (hubtown chương
+// cũ dọc mép các mảng đã tách) hiện ra từng lỗ như người thợ đang đục (29/9, vòng sửa p7a: bỏ dáng thác nước, bỏ chấm cánh hoa). Ánh sáng của nét hắt lên mặt vách hai bên và xuống vũng nước dưới chân (hubtown chương
 // INNOVATION: dòng sáng giữa hẻm núi, đá chỉ sáng ở đoạn dòng đã tới).
 //
 // Làm theo đúng mẫu của scene/valley.js:
@@ -62,7 +62,7 @@ const ST = { s0: 6.5, s1: S_BOT - 19.2, w: 0.95, x0: 4.6, slant: -0.072, sMid: 4
 ST.L = ST.s1 - ST.s0;
 // ── HÀNG LỖ NÊM 矢穴 (30/9): BẢY lỗ chữ nhật đục thẳng hàng, cách đều 1,32 m, TRÊN CHÍNH đường tách ở mặt đứng bậc thứ ba
 // (y 24–34). Lỗ dài theo đường tách (0,96 m), hẹp ngang (0,50 m), sâu 0,45 m, lòng lỗ hình nêm — to hơn lỗ thật (~12 cm) để đọc
-// được từ xa 45–50 m. Ba lỗ DƯỚI CÙNG là lỗ cũ: đá đã tách ở đó (một khe mảnh nối các lỗ, lỗ vẫn vuông góc, rời nhau — soát p11a A3). Bốn lỗ mới được
+// được từ xa 45–50 m. Ba lỗ DƯỚI CÙNG là lỗ cũ: đá đã tách ở đó (một khe mảnh nối các lỗ, lỗ vẫn vuông góc, rời nhau — p11a A3). Bốn lỗ mới được
 // đục lần lượt TỪ DƯỚI LÊN (nối tiếp đoạn đã tách, theo ánh mắt máy quay đang ngước lên) — lỗ tối, lõm vào, không phát sáng.
 const NH = 7, HOLE_Y0 = 33.1, HOLE_GAP = 1.32, HOLE_OLD = 4, HA = 0.25, HB = 0.48, HD = 0.45;
 const HOLE_MID = HOLE_Y0 - HOLE_GAP * (NH - 1) / 2;
@@ -209,7 +209,7 @@ void brushAt(float x, float s, float fw, float rough, out float body, out float 
 void holeAt(vec2 p, vec2 k, float a, float old, float fw, float seed, out float m, out float lit, out float rim, out float d) {
   m = 0.0; lit = 1.0; rim = 0.0; d = 1.0;
   if (a <= 0.0) return;
-  // (soát p11a A3) lỗ cũ cũng giữ GÓC VUÔNG như lỗ mới (trước: góc tròn gấp đôi → ba lỗ dưới tròn lại như chuỗi hạt)
+  // (p11a A3) lỗ cũ cũng giữ GÓC VUÔNG như lỗ mới (trước: góc tròn gấp đôi → ba lỗ dưới tròn lại như chuỗi hạt)
   float r0 = 0.035 + 0.0 * old;
   // mép đục không thẳng tắp: mỗi nhát đục sứt một mẩu (sóng nhỏ cỡ vài cm), góc hơi tròn
   float rough = 0.024 * (vn(vec2(p.y * 11.0 + seed, p.x * 9.0 + 3.0)) - 0.5) + 0.012 * (vn(vec2(p.x * 27.0 + seed, p.y * 23.0)) - 0.5);
@@ -423,7 +423,7 @@ void main() {
     // sứt, mỗi bên còn nửa lỗ nêm (răng lược); trên đó thu thành vết nứt chân tóc chạy qua giữa lỗ, nhọn dần tới mũi. Gợn nhẹ vài
     // cm theo thớ đá — không gãy khúc.
     float fis = 0.0, lipL = 0.0, openK = 0.0;
-    // (soát p11a A3) khe tách chỉ bắt đầu từ MÉP DƯỚI LỖ THẤP NHẤT (không còn đuôi chữ T chạy xuống gờ bậc) và đoạn lỗ cũ chỉ còn một
+    // (p11a A3) khe tách chỉ bắt đầu từ MÉP DƯỚI LỖ THẤP NHẤT (không còn đuôi chữ T chạy xuống gờ bậc) và đoạn lỗ cũ chỉ còn một
     // khe MẢNH (~3,5 cm, trước 12 cm) — giữa hai lỗ là đá liền, lỗ đứng rời nhau từng hình chữ nhật, không dính thành chuỗi hạt
     if (vert && abs(x) < 0.5 && vW.y > ${(HOLE_Y0 - HOLE_GAP * (NH - 1) - HB + 0.12).toFixed(3)} && vW.y < uCrk) {
       float yy = vW.y;
@@ -691,7 +691,7 @@ const CAM = {
   roll: [[0, 0], [0.56, -0.012], [1, 0.03]],
 };
 // nhịp vẽ: nét đứng tới τ 0,56 (cọ chạm xuống ngay lúc nét quét của chuyển cảnh mở ra); bốn lỗ nêm mới đục từ dưới lên 0,60 → 0,835
-// (Sếp 29/9 sau p9b, lỗi cũ p7b: 0,5 s đầu chương vách còn tối — vách chỉ sáng nhờ ánh của đoạn nét đã vẽ. Cọ chạm xuống sớm hơn,
+// (29/9 sau p9b, lỗi cũ p7b: 0,5 s đầu chương vách còn tối — vách chỉ sáng nhờ ánh của đoạn nét đã vẽ. Cọ chạm xuống sớm hơn,
 //  từ giữa quãng chuyển cảnh 2: lúc tới chương đoạn nét đã dài gấp ~1,7 → vách sáng ngay từ khung đầu, cùng một nguồn sáng)
 const HEAD = [-0.12, 0.56];
 // ĐƯỜNG CONG TRƠN QUA CÁC MỐC (Hermite, tiếp tuyến lấy theo hai mốc kề): máy KHÔNG dừng ở mốc giữa chừng. Nối từng đoạn bằng

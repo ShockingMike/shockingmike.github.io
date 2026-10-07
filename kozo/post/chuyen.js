@@ -1,5 +1,5 @@
-// PHẦN 3 (25/9) — hai lượt hậu kỳ mới của Kōzō, theo cách hubtown dựng chuyển cảnh (docs/research/hubtown-ref/
-// hubtown-toan-trang.md mục 3.2 và 5.6), nhưng đổi hình: không hình thoi, không ô vuông lập loè, không nhoè cầu vồng.
+// PHẦN 3 (25/9) — hai lượt hậu kỳ mới của Kōzō, theo cách hubtown dựng chuyển cảnh (bản nghiên cứu hubtown,
+// mục 3.2 và 5.6), nhưng đổi hình: không hình thoi, không ô vuông lập loè, không nhoè cầu vồng.
 //
 // 1. ChuyenEffect — CHUYỂN CẢNH BẰNG MỰC LOANG. Cảnh mới (thung lũng đêm, vẽ sẵn vào một ảnh riêng) hiện ra như một
 //    GIỌT MỰC LOANG TRONG NƯỚC nở từ giữa màn: mép loang có quầng mực 緑青 sẫm, sợi xơ chạy ra ngoài như mực thấm theo
@@ -37,7 +37,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
   }
   vec2 q = (uv - 0.5) * vec2(aspect, 1.0);     // toạ độ vuông, cao màn = 1
   float R = uR;
-  // MỰC THẤM (Sếp 28/9: "mực loang trong nước có mép rách, tua ra nhiều nhánh, đậm ở lõi và nhạt dần theo thớ giấy; mép
+  // MỰC THẤM (28/9: "mực loang trong nước có mép rách, tua ra nhiều nhánh, đậm ở lõi và nhạt dần theo thớ giấy; mép
   // không có quầng phát sáng; cảnh cũ thấm tối dần theo mép"). Không có gì phụ thuộc thời gian: đứng tay là đứng hình.
   //   · MẬT ĐỘ MỰC ρ: một đám nở từ giữa màn, dáng thuỳ + cuộn xoáy (nắn toạ độ bằng nhiễu)
   //   · TUA MỰC: nhiễu "sống núi" (1 − |2n − 1|, nâng mũ) theo hướng toả ra → những sợi mảnh phân nhánh vươn TRƯỚC mép
@@ -281,7 +281,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
   vec3 c = ((b + d + f + h) * w + e) / (1.0 + 4.0 * w);
   // kẹp trong khoảng tối nhất – sáng nhất của 5 điểm (như CAS gốc): không kẹp thì điểm tối giữa các điểm sáng hơn bị đẩy xuống dưới 0
   // → chấm đen đơn lẻ trên nền tối có hạt (đo 29/9, đất trước cửa chương 皮: 1 016 chấm → 0)
-  // uClampK = 1 ở cả trang (Sếp 29/9: mép sắc chỉ đổi 2–4% điểm ảnh > 3 mức, mắt không thấy; chấm đen là lỗi thật); 0 = cách cũ
+  // uClampK = 1 ở cả trang (29/9: mép sắc chỉ đổi 2–4% điểm ảnh > 3 mức, mắt không thấy; chấm đen là lỗi thật); 0 = cách cũ
   outputColor = vec4(mix(clamp(c, 0.0, 1.0), clamp(c, mn, mx), uClampK), inputColor.a);
 }`, {
       blendFunction: BlendFunction.NORMAL,
@@ -403,13 +403,13 @@ uniform float uP;
 uniform vec2 uPts[16];
 uniform int uN;
 uniform float uDim;
-uniform float uFog, uPre;   // (soát p11a A1) bản đồ 仕事 CHÌM VÀO SƯƠNG ĐÊM trước lúc hoà (uPre = 1: ảnh vào là chính cảnh 仕事 đang vẽ)
+uniform float uFog, uPre;   // (p11a A1) bản đồ 仕事 CHÌM VÀO SƯƠNG ĐÊM trước lúc hoà (uPre = 1: ảnh vào là chính cảnh 仕事 đang vẽ)
 uniform vec3 uMistC;
 void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor) {
   vec3 cOld = uPre > 0.5 ? inputColor.rgb : texture2D(tOld, uv).rgb, cRaw = cOld;
   if (uP >= 1.0 && uPre < 0.5) { outputColor = inputColor; return; }
   vec2 A = vec2(aspect, 1.0), q = uv * A;
-  // (soát p10a A2) THẤM DỌC THEO CHÍNH NÉT: điểm gần nhất trên đường nét — khoảng cách d (toạ độ vuông, cao màn = 1) và vị trí t dọc
+  // (p10a A2) THẤM DỌC THEO CHÍNH NÉT: điểm gần nhất trên đường nét — khoảng cách d (toạ độ vuông, cao màn = 1) và vị trí t dọc
   // nét (0 = đầu gần máy, ở đáy màn · 1 = đầu cọ). Chưa có nét trên màn thì lan từ đáy giữa màn.
   float d = 9.0, t = 0.0;
   if (uN > 1) {
@@ -451,7 +451,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
   // viền mực đọng mảnh ngay mép lan (tối nhẹ, không sáng, không đen đặc)
   float tide = exp(-abs(e - 0.01) * 60.0) * (1.0 - m * 0.6);
   vec3 c = mix(cOld, inputColor.rgb, m) * (1.0 - 0.12 * tide);
-  // (soát p11a A1) NÉT CŨ CÒN SÁNG trong lòng vùng đất mới cho tới gần cuối quãng hoà (chỉ phần sáng hơn — không phủ tối cảnh mới): đất
+  // (p11a A1) NÉT CŨ CÒN SÁNG trong lòng vùng đất mới cho tới gần cuối quãng hoà (chỉ phần sáng hơn — không phủ tối cảnh mới): đất
   // mới mọc ra quanh chính nét, rồi nét 道 của 連絡 đi tiếp từ đúng đáy màn ấy — một đường liền, không đứt
   float keepL = exp(-d * 80.0) * (1.0 - smoothstep(0.3, 0.72, uP));
   c = mix(c, max(c, cRaw), keepL);
@@ -473,7 +473,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
   }
 }
 
-// PHẦN 6c (29/9, soát p7a A1): CHUYỂN CẢNH RỪNG → LÀNG GIẤY bằng CỬA GIẤY LÙA 障子 TRONG KHÔNG GIAN 3D — cảnh cửa (scene/cua.js:
+// PHẦN 6c (29/9, p7a A1): CHUYỂN CẢNH RỪNG → LÀNG GIẤY bằng CỬA GIẤY LÙA 障子 TRONG KHÔNG GIAN 3D — cảnh cửa (scene/cua.js:
 // căn phòng tối, khung cửa gỗ, hai cánh shoji trượt trong rãnh, đèn sau giấy, máy tiến tới rồi đi xuyên qua) vẽ riêng vào một khung
 // đệm có kênh trong suốt; lượt này chỉ ĐẶT nó lên ảnh cảnh (ảnh cửa đã nhân sẵn độ đục). Vẽ TRƯỚC loá + nắn màu.
 export class ShojiEffect extends Effect {
@@ -499,7 +499,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
 //   tPlan: đỏ = đồng mức · lục = nhà · lam = đường đi (nét đứt) · alpha = thứ tự trên đường đi. tNew: cảnh thung lũng (tuyến tính).
 // Vẽ TRƯỚC loá + nắn màu (như ShojiEffect): cả tờ giấy lẫn thung lũng qua cùng một lớp nắn màu.
 export class GiayEffect extends Effect {
-  // CHUYỂN CẢNH 5 (soát p9a A1/A3/A4 — bản cũ: gần 2 s cả màn là tờ giấy ngà trơn sáng 0,81; bản vẽ là đường 1 px xám; quãng tan
+  // CHUYỂN CẢNH 5 (p9a A1/A3/A4 — bản cũ: gần 2 s cả màn là tờ giấy ngà trơn sáng 0,81; bản vẽ là đường 1 px xám; quãng tan
   // đục ô-liu). Bản này:
   //   · máy dừng ở khung còn thấy nan 組子 (ba ô giấy), không bao giờ một mặt phẳng trơn phủ màn;
   //   · mọi thứ trên giấy (ánh đèn loang, thớ xơ 楮, nét mực) nằm TRONG TOẠ ĐỘ TỜ GIẤY (uH: điểm ảnh màn → toạ độ khung cuối trên
@@ -555,7 +555,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
   // nhoè bẩn quanh từng nét; lúc uWash = 0 không điểm nào loang)
   float wf = uWash * 1.05 - 0.62 + dens * 0.45 + 0.3 * (1.0 - smoothstep(0.0, 1.4, length((pu - 0.5) * 2.0))) + (cF(pq * 2.4 + 2.0) - 0.5) * 0.4 + 0.04 * fibL;
   // mép loang GỌN (vài điểm ảnh) + viền mực đọng sẫm ở mép như màu nước: giấy đổi thẳng từ ngà sang lục mực, không có dải
-  // "nửa giấy nửa mực" (dải ấy qua lớp nắn màu thành vàng ô-liu — soát p9a A4)
+  // "nửa giấy nửa mực" (dải ấy qua lớp nắn màu thành vàng ô-liu — p9a A4)
   float w = smoothstep(0.0, 0.05, wf) * step(0.001, uWash);
   float tide = exp(-abs(wf - 0.03) * 24.0) * step(0.001, uWash);
   vec3 washed = inked * mix(vec3(1.0), uWashC, w) * (1.0 - 0.38 * tide);

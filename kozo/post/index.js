@@ -92,7 +92,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
   if (any(greaterThanEqual(u, uvec4(0x7f800000u)))) b = vec4(0.0);
   outputColor = clamp(b, vec4(0.0), vec4(6.0e4)) * intensity;
 }`);
-  // (soát p11a B2: 連絡 cứ ~20 s quầng loá quanh nét tắt đúng MỘT khung, vùng toà thành tối 7 %) đo được: khung ấy ảnh nở sáng có
+  // (p11a B2: 連絡 cứ ~20 s quầng loá quanh nét tắt đúng MỘT khung, vùng toà thành tối 7 %) đo được: khung ấy ảnh nở sáng có
   // NaN / Inf trên cả một vùng (thay NaN bằng sáng chói thì khung ấy loé trắng thay vì tối) — lớp cộng nở sáng ở trên coi vùng ấy là
   // "không có loá". Mầm NaN đi vào ở LƯỢT LỌC SÁNG đầu chuỗi nở sáng (đọc ảnh cảnh nửa độ chính xác); hai lớp chặn NaN trước đó
   // lại trộn kiểu NORMAL (ảnh vào × 0 + ảnh chặn — 0 × NaN = NaN, tự đưa NaN trở lại — nay trộn SRC, grade.js). Chặn thêm ngay ở chỗ
@@ -195,7 +195,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
     composer.addPass(khungPass);
   }
   composer.addPass(chromaPass);
-  // PHẦN 8 (soát p9a A2): nét hình vẽ của thẻ 仕事 vẽ SAU lớp tối sau chữ — cùng tầng với chữ, không bị lớp tối dập — và sau tách
+  // PHẦN 8 (p9a A2): nét hình vẽ của thẻ 仕事 vẽ SAU lớp tối sau chữ — cùng tầng với chữ, không bị lớp tối dập — và sau tách
   // màu (nét sáng mảnh ở mép phải màn mà qua tách màu thì viền tím/hồng, lạc bảng màu). Vẽ chồng lên ảnh đang có (không xoá);
   // cảnh + máy quay do app.js gán mỗi khung (viec.hudScene); tắt khi không có thẻ mở. Khử răng cưa + làm nét vẫn đi sau.
   let hudPass = null;
@@ -219,7 +219,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
   let casFx = null, casPass = null;
   if (cas > 0) { casFx = new CasEffect(cas); casPass = new EffectPass(camera, casFx); composer.addPass(casPass); }
 
-  // ── LƯỢT RA MÀN (soát p9a B1): thư viện chỉ đánh dấu "vẽ ra màn" cho lượt THÊM VÀO CUỐI lúc dựng chuỗi, và bỏ qua mọi lượt đang
+  // ── LƯỢT RA MÀN (p9a B1): thư viện chỉ đánh dấu "vẽ ra màn" cho lượt THÊM VÀO CUỐI lúc dựng chuỗi, và bỏ qua mọi lượt đang
   // tắt. Tắt lượt cuối (nấc 2 tắt làm nét CAS; setQuality < 0,3 tắt khử răng cưa) thì KHÔNG lượt nào vẽ ra màn → màn đứng hình
   // ảnh cũ. Hàm này dời dấu sang lượt BẬT cuối cùng; gọi trước mỗi lần vẽ (rẻ: ~20 lượt, chỉ đổi khi khác) nên bật/tắt ở đâu cũng đúng.
   function syncScreen() {

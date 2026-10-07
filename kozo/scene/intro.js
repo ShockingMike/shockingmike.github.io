@@ -35,7 +35,7 @@ export function introState(t) {
     loadText: 1 - cubicInOut(seg(t, 0, 0.25)),
     load: 1 - cubicInOut(seg(t, 0, 0.75)),
     mist: 1 - p3(seg(t, 0, 1.0)),
-    // nét mọc NGAY từ đầu (Sếp 25/9: igloo ở giây 0,47 đã có nét) rồi chậm dần tới chân — ra nhanh, vào chậm
+    // nét mọc NGAY từ đầu (25/9: igloo ở giây 0,47 đã có nét) rồi chậm dần tới chân — ra nhanh, vào chậm
     lineCut: p2out(seg(t, 0, 2.5)),          // 0 = chưa vẽ nét nào, 1 = đã vẽ tới chân
     lineA: 1 - p4(seg(t, 2, 3)),
     ridge: p2(seg(t, 0.7, 3)),
@@ -125,7 +125,7 @@ if (uIntroOn > 0.5) {
   vec3 rp = vRvP;
   // nhanh: mép vòng lệch tối đa ±12,5 m quanh bán kính — trong hẳn vòng thì là cảnh thật, ngoài hẳn thì bỏ, không tính nhiễu
   // GỢN SÓNG như nước, không phải vết mực: cảnh hiện ra TỪ SƯƠNG qua một dải mềm rộng (dải rộng dần theo bán kính),
-  // đỉnh gợn chỉ sáng lên một chút. Không có màu nhấn (Sếp 25/9: "nhạt và mềm như nước").
+  // đỉnh gợn chỉ sáng lên một chút. Không có màu nhấn (25/9: "nhạt và mềm như nước").
   float d0 = length(rp.xz - uRingC);
   if (d0 > uRingI + 13.0) discard;
   float LW = 14.0 + 0.4 * uRingI;

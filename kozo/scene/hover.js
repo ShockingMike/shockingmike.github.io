@@ -1,7 +1,7 @@
 // Phản ứng rê chuột + tháo-lắp theo cuộn của Studio Kōzō.
 //
 // ── RÊ CHUỘT MÀN ĐẦU: CÓ TRỌNG LƯỢNG (Mike 24/9: "cảm giác đang bị chơi vơi") ───────────────────────
-// Luật (Sếp 24/9, bản cuối):
+// Luật (24/9, bản cuối):
 //   1. KHÔNG GÌ NHẤC CẢ KHỐI. Thân tháp, các tầng, mặt đất, mỏm núi, vành đá chân: đứng yên tuyệt đối.
 //      Bản trước cho mái nhấc lên rồi kéo cả chồng tầng lên theo — cả toà nhấp nhô như tháp bóng bay.
 //   2. CHUYỂN ĐỘNG ĐI RA NGOÀI, KHÔNG ĐI LÊN — đúng công thức igloo: mỗi mô-đun giãn ra xa TRỤC ĐỨNG giữa

@@ -4,7 +4,7 @@
 // a street lamp for a girl who wants a bunch; the bottle rides in the bike's front basket, in the lamp's light.
 // Further on, a pavement tea stall: people on low plastic stools, one with a bamboo water pipe. The milk-flower trees along
 // the lake are in bloom and their florets drift down; half the street has shut its windows; people walk home the long way
-// under the trees, or keep to the house side. The contract: docs/superpowers/specs/2026-09-17-chom-world-contract.md.
+// under the trees, or keep to the house side.
 //
 // Stand-ins (TẠM): until people/xehoa exists, the seller and the girl are simple standing figures at their marks
 // (peopleLayout below). The light is in light.js (no sun; core.lamp).
@@ -90,7 +90,7 @@ const POLE_Z = [-13.4, -30.8, -47.6, -64.4, -81.2, -98];
 export const SIGN = { x: -4.6, y: 2.45, z: -35.6 };
 
 // ---------------------------------------------------------------- the main figures' marks (people/xehoa reads peopleLayout)
-// Numbers agreed with the people agent (people/xehoa plays both roles; it builds the moving bike, a copy of bike.js, which
+// Numbers agreed with the people layer (people/xehoa plays both roles; it builds the moving bike, a copy of bike.js, which
 // rides in, stops exactly where the season's parked bike stands, and rides on; the parked bike hides when a folder plays
 // the seller). The bottle is the core's still bottle, standing in the basket at BOTTLE_SEAT.
 // seller: stands on the eye's side of her bike, in front of the rear wheel; conical hat (nón lá), a cloth mask, an old blouse
@@ -98,7 +98,7 @@ export const SIGN = { x: -4.6, y: 2.45, z: -35.6 };
 // customer (the girl): a student walking home, a light blouse, dark trousers, a small shoulder bag, hair in a low knot.
 // GIRL_PATH (kept clear of the crowd and of every thing): in from behind the eye, straight to her mark; out along x = 1.05 past
 //   the bike's tail, across to x = 3.0 in front of the tea stall, on to (3.2, -12.2), and into the near half of the lane.
-// rhythm: on twos, a 36 s loop (the people agent's): the sale at the marks; the girl walks off and is out of sight in the lane
+// rhythm: on twos, a 36 s loop (the people layer's): the sale at the marks; the girl walks off and is out of sight in the lane
 //   from about 28.7 s; the seller fills the gap on her tray (29.3-33 s), then 3 s back to the pose the loop starts from.
 const SELLER = [2.05, -2.52], GIRL = [1.1, -2.5];
 const EXCH = [1.46, 1.03, -2.64];
@@ -124,7 +124,7 @@ const GIRL_PATH = [
   { at: [5.45, -13.22], note: 'the lane mouth: the near half of the lane is hers (its walkers keep to z = -14.2)' },
   { at: [6.9, -13.3], note: 'into the lane (hidden by the corner)' },
 ];
-// the girl's clock (the people agent's 36 s loop): in 0-4.4 s, at her mark until she walks off, out of sight in the lane at 28.7 s
+// the girl's clock (the people layer's 36 s loop): in 0-4.4 s, at her mark until she walks off, out of sight in the lane at 28.7 s
 const GIRL_TIME = { loop: 36, inEnd: 4.4, hidden: 28.7 };
 
 // TẠM (until people/xehoa plays her): the stand-in walks the same way on the same clock, so the clipping check sees her

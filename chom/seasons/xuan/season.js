@@ -1,7 +1,7 @@
 // Chớm world, season Xuân: Hàng Lược in the days before Tết, a low spring sun through drizzle.
 // The flower market: the seller wraps a bouquet, a customer turns a peach branch and pays, a motorbike carries a peach tree
 // down the street, the crowd with branches, kumquat pots and umbrellas; the bottle stands between the flower buckets.
-// Came from paint test G. The contract: docs/superpowers/specs/2026-09-17-chom-world-contract.md (section 4).
+// Came from paint test G.
 //
 // ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────
 // HOW THE BOTTLE WAS MADE TO READ HERE (21/9). This is the METHOD, not the result - the result is the bundles of lá

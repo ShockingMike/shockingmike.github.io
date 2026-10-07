@@ -1,4 +1,4 @@
-// Chớm world, core: the bottle's notes panel words, from the shared copy (the ids of docs/content/chom-copy.md / chom-copy-vi.md).
+// Chớm world, core: the bottle's notes panel words, from the shared copy (the slot ids of the copy file).
 //   notesFromCopy(C, id, lang) -> notes for fillNotes, or null when the copy has no such season
 //   loadCopy() -> { en, vi } from window.CHOM_COPY (the page layer's), else page/copy.js if it exists, else null
 export function notesFromCopy(C, id, l) {

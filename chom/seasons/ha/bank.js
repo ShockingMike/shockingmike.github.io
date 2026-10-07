@@ -10,7 +10,7 @@ import { WATER_Y } from './water.js';
 export const BANK_X = -0.2;
 // the tea table's top, in the table's own space (x along the table, +z toward the camera side; the tea maker sits at -z).
 // The table spans x +-0.48, z +-0.29, its top at y 0.34.
-// (people agent, 17/9: bowl at (0.16, -0.17), no lạt bundle (she brings a tube at (0.28, -0.21)), an empty r 0.10 circle round
+// (people layer, 17/9: bowl at (0.16, -0.17), no lạt bundle (she brings a tube at (0.28, -0.21)), an empty r 0.10 circle round
 // (0, -0.15) on the tray for her small basket. The bowl and that circle are only 0.16 apart, so the tray's rim cannot pass
 // between them: the bowl sits ON the tray, and the tray is a little bigger and further back; it overhangs her edge by 0.05.)
 // (17/9, evening: the main camera now looks at her from her left side, a little behind; the tray is laid out for that view:
@@ -22,7 +22,7 @@ export const TRAY = {
   flowers: [[-0.24, -0.1, 0.9, -0.15]],          // an opened flower in its stand: x, z, size, lean (reach ~0.085)
   lamp: [-0.115, 0.03],                           // the kerosene lamp, 0.15 behind the bottle and 0.17 to its right as the camera sees it (base r 0.055)
   bowl: [0.16, -0.17], bowlR: 0.055,              // the bowl of dry green tea, on the tray by her hand
-  tube: [0.28, -0.21],                            // (her lạt tube, brought by the people agent; the tray rim is 0.037 from it)
+  tube: [0.28, -0.21],                            // (her lạt tube, brought by the people layer; the tray rim is 0.037 from it)
   teapot: [-0.36, -0.18], cups: [[-0.38, 0.05], [-0.3, 0.26]],   // off the tray, at the far end of the table
 };
 

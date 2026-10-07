@@ -183,7 +183,7 @@ html.pg { scrollbar-gutter: stable; background-color: #efe2d2; overflow-x: clip;
    light of the street it stands in (brand/chom/logo/accent.json). */
 /* Mike chose (18/9): the whole name takes the season's colour, not only the tone mark; the mark separates itself
    by being one step darker on a bright street and one step lighter on a dark one. No halo and no sheet behind it —
-   spring reads because the market awning went into the scene. Numbers measured by Agent Logo at 18 px, at the very
+   spring reads because the market awning went into the scene. Numbers measured at 18 px, at the very
    place the name sits (accent.json, "mau_theo_mua"): spring 99,8% of the area at 3:1 or better, summer 100%,
    autumn 99,4%, winter 100%. */
 .pg { --pg-logo-ink: #211A17; --pg-logo-accent: #C2185B; }
@@ -305,7 +305,7 @@ html.pg { scrollbar-gutter: stable; background-color: #efe2d2; overflow-x: clip;
 
 /* ------------------------------------------------------------------ words over the scene
    Steps are stacked in one fixed layer. Only one is on; the one leaving fades out before the next fades in.
-   Places follow the no-go boxes measured per season in docs/content/chom-text-layout.md (bottle, main people). */
+   Places follow the no-go boxes measured per season (bottle, main people). */
 .pg-over { position: fixed; inset: 0; z-index: 30; pointer-events: none; }
 .pg-scene { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 /* A step's own fade is its paper's. Its words are the children of each sheet, and they show only while the step
@@ -443,7 +443,7 @@ html.pg { scrollbar-gutter: stable; background-color: #efe2d2; overflow-x: clip;
 .pg-epi__line + .pg-epi__line { padding-left: 0; }
 /* whoever wrote it stands well under the verse, in the smallest type on the screen, held apart by air alone */
 .pg-epi__by { margin: 14px 0 0; font: 500 13px/1.45 var(--sans); letter-spacing: .06em; color: var(--ink-3); }
-/* the dash belongs to the page, not to the words (docs/content/chom-text-layout.md, epigraph rule 3), so it is drawn
+/* the dash belongs to the page, not to the words (the text layout rules, epigraph rule 3), so it is drawn
    here and never counted as a word */
 .pg-epi__by::before { content: "\2014\00a0"; }
 .pg-epi__gloss { margin: 4px 0 0; font: italic 400 14px/1.5 var(--serif); color: var(--ink-3); max-width: 42ch; }
@@ -549,14 +549,14 @@ html.pg { scrollbar-gutter: stable; background-color: #efe2d2; overflow-x: clip;
    below the bar) and `cardSpots` (the flattest sheet-sized place in each). page-check reads the same file. Spring and
    summer have no such band (`noRoom`): their places are Mike's own choice, below. */
 /* Spring and summer: the places Mike chose on 21/9 ("Hạ chọn A, xuân B"), out of the ones the season layer measured
-   on the running page (scratchpad/cho-dat-chu/), on the ground the people leave free to the right of them; what each
+   on the running page, on the ground the people leave free to the right of them; what each
    one costs, and what Mike accepted, is in page/qa/page-check.mjs MIKE_OK.
    The right edge (Mike, 22/9: "2 bảng chữ của mùa xuân và hạ căn lại cho bằng mép phải của nút 'Mùi của riêng bạn'"):
    the paper ends where the bar's last button ends. The bar stands --gutter in from the page's edge and its end tag has
    12 px of padding; the button's torn edge reaches ~5 px past its box and a sheet's ~11 px, so the sheet's box stands
    6 px further in. page/qa/right-edge.mjs measures the two papers on the picture (±2 px at 1280, 1440, 1920).
    The left edge: moved with the right one, both sheets covered people (the flower seller, the tea woman's back), so
-   they became narrower instead (Sếp, 22/9). The left edge is tied to the person it must stay clear of, not to the
+   they became narrower instead (22/9). The left edge is tied to the person it must stay clear of, not to the
    window: the picture keeps its height, so a thing at x in the season's 1440×900 frame stands on the page at
    50% + (x − 720) / 900 × 100vh (the same carrying page-check does). A sheet is never wider than its usual width;
    where the window is narrower than that allows, it narrows further and grows downward.

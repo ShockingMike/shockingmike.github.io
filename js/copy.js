@@ -1,5 +1,5 @@
 /* copy.js — every word on the portfolio and the pricing page, in English and Vietnamese.
-   Portfolio: docs/content/portfolio-records.md (+ -vi). Pricing: docs/content/pricing-serious.md (+ -vi);
+   Portfolio: the records copy (en + vi). Pricing: the pricing copy (en + vi);
    the rows that lead from a record to pricing: portfolio_cta.* in the same files.
    Edits agreed by the lead (22/9): English brand.note uses the writer's alternative line; the English Kern and
    Rhumb stories lose the sentence the writer marked; the Vietnamese role line uses the writer's alternative;
@@ -87,7 +87,7 @@ export const COPY = {
       }
     },
     pricing: {
-      /* docs/content/pricing-serious.md. Lead's calls (22/9): hero without the list of industries; "Works smoothly
+      /* Pricing copy. Lead's calls (22/9): hero without the list of industries; "Works smoothly
          on phones" moved from the three plans into one shared note; plans.example_note kept. */
       meta: { title: 'Prices · Shocking Mike', description: 'Landing pages for brands, designed and coded by Shocking Mike. Three packages with clear prices from $1,500. Replies within 2 working days.' },
       back: 'Back to portfolio',

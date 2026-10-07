@@ -1,4 +1,4 @@
-// 皮 SKIN — LÀNG LÀM GIẤY DÓ 和紙 TRONG ĐÊM (29/9, Mike duyệt ảnh chi tiết bố cục A: "ok").
+// 皮 SKIN — LÀNG LÀM GIẤY DÓ 和紙 TRONG ĐÊM (29/9, ảnh chi tiết bố cục A đã duyệt).
 // Chương thứ tư của "chuyến đi tìm gốc từng lớp kết cấu": nơi sinh ra LỚP DA của toà thành. Một ngõ làng giấy: hai dãy nhà dân dã
 // 民家 (vách đất, ván dọc, mái tranh / mái ngói, hiên sâu), dọc tường là ván phơi 板干し dán giấy dó, mương nước bên phải, sào tre
 // phơi vỏ 楮, đèn lồng 提灯 dưới hiên. Cuối ngõ là xưởng xeo giấy quay ĐẦU HỒI ra ngõ; trong khung cửa xưởng dựng một tấm giấy lớn,

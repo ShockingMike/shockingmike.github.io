@@ -410,7 +410,7 @@ export function createInk({ camera, pick, resolve, svg, plane, gaps = [] }) {
     // điểm chạm nối tiếp khúc đang vẽ: chưa đủ xa thì chỉ dời ĐỈNH TẠM ở đầu nét; đủ xa thì thêm một đỉnh cố định.
     // pin = 1: vừa vào mạch vữa — ghim một đỉnh ngay mép vào (chỗ chuyển mực gọn trong bề rộng mạch).
     // pin = 2: vừa ra khỏi mạch vữa — CHẤM LẠI MỰC: ghim một đỉnh ngay mép tảng đá, quãng khô tính lại từ 0. Nét liền
-    // qua mạch (không đứt, không bật cục) mà mỗi tảng vẫn là ô mực tươi đậm như bản Mike duyệt (bản cũ đứt nét ở mọi
+    // qua mạch (không đứt, không bật cục) mà mỗi tảng vẫn là ô mực tươi đậm như bản đã duyệt (bản cũ đứt nét ở mọi
     // mạch vữa nên cọ không bao giờ cạn trên nền đá). Chỗ chuyển nằm đúng trên mạch — lõi sáng không nhận mực, không lộ nối.
     placeCont(P, h, t, spN, pin = 0) {
       const last = pts[pts.length - 1];

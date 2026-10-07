@@ -26,7 +26,7 @@ export const NAC = [
   { god: 0, dof: 0, dofRes: 0.25, bloom: 4, cas: 1, sharp: 0.6, chroma: 0, shadow: 1536, cards: 0.6, scale: 0.75, viecCay: 0.55, viecSuong: 0, lhCay: 0.5, lhSuong: 0, lhCo: 0.4 },
 ];
 export const TOP = NAC.length - 1;
-// sàn cỡ cảnh: 0,7 lần TRẦN (trần = min(tỉ lệ màn, 1,15)) — màn ×1 đúng bằng 0,7 màn hình; điện thoại không vượt trần (soát p10a B6)
+// sàn cỡ cảnh: 0,7 lần TRẦN (trần = min(tỉ lệ màn, 1,15)) — màn ×1 đúng bằng 0,7 màn hình; điện thoại không vượt trần (p10a B6)
 export const MIN_OF_SCREEN = 0.7;
 
 // tên chip từ chính ngữ cảnh vẽ của trang (không tạo ngữ cảnh mới)
@@ -109,7 +109,7 @@ export function makeGovernor({ start = 0, forced = null, onChange } = {}) {
       if (slowRuns >= 2 && nac < TOP) { set(nac + 1, `hai mẻ chậm, trung bình ${mean.toFixed(1)} ms`); return; }
       const good = mean < 17.5 && max < 25;
       goodRuns = good ? goodRuns + 1 : 0;
-      // Sếp 29/9: KHÔNG tự nâng nấc. Đo ở 3840×2160: nâng 4→3 đứng hình 1 883 ms, 2→1 đứng 783 ms (dựng lại khung đệm, dịch
+      // 29/9: KHÔNG tự nâng nấc. Đo ở 3840×2160: nâng 4→3 đứng hình 1 883 ms, 2→1 đứng 783 ms (dựng lại khung đệm, dịch
       // shader) — một cú đứng như thế tệ hơn nhiều so với ở lại nấc nhẹ. Hạ thì êm (≤ 67 ms). Muốn nâng lại: tải lại trang.
       if (UP_OK && goodRuns >= 12 && nac > 0 && performance.now() - lastDown > 20000) set(nac - 1, '6 s giữ trọn nhịp');
     },

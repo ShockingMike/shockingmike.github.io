@@ -1,22 +1,22 @@
-// 連絡 CONTACT — CHƯƠNG CUỐI của chuyến đi đêm (phần 9, 30/9). Mike duyệt ảnh chi tiết phương án C ngày 29/9
-// (prototypes/kozo-dem/lien-he-a.html?pa=c&anh=1|2|3|4 · ảnh scratchpad/kozo-look/chuong-lien-he/_chi-tiet.png, ct-2.png).
+// 連絡 CONTACT — CHƯƠNG CUỐI của chuyến đi đêm (phần 9, 30/9). Ảnh chi tiết phương án C duyệt ngày 29/9
+// (prototypes/kozo-dem/lien-he-a.html?pa=c&anh=1|2|3|4).
 // Chuyến đi kết thúc ở chỗ nó bắt đầu: TOÀ THÀNH trong đêm phía sau, đủ bốn lớp cùng sáng bằng NÉT CỌ MỰC 緑青 phát sáng (đường
 // đồng mức trên dốc thành 地 · nét dọc cạnh góc tường + một mạch lớp đá dừng ở góc 石垣 · cột góc + xà 骨 · cửa giấy đèn ngà 皮);
 // tiền cảnh là BÃI ĐẤT ĐÃ SAN trên mỏm đồi: bốn góc cọc 遣り方 có ván ngang, dây 水糸 căng, nét cọ 地縄 vẽ đường bao ngôi nhà chưa có.
 // Chữ + form "đường mặt đất" là HTML thật (index.html #ch-lienhe) — không nằm trong cảnh.
 //
-// SỬA 5 ĐIỂM YẾU của ảnh duyệt (Sếp báo Mike 29/9):
+// SỬA 5 ĐIỂM YẾU của ảnh duyệt (29/9):
 //  1. không còn trục sáng dọc giữa toà thành: 石垣 nằm ở góc PHẢI (+x −z) — nét dọc cạnh góc + mạch lớp đá dừng ở góc ấy — còn 骨 ở
 //     góc TRÁI (−x +z) — cột góc + xà chạy vào giữa rồi dừng. Góc giữa (+x +z, ngay trước máy) không có nét nào;
 //  2. cọc 遣り方 to và rõ (cọc 0,22 m, ván 0,3 m — gấp ~2,5 lần thật để đọc được ở 70 m), dây căng MẢNH một điểm ảnh thiết bị, sáng
-//     ~0,6 lần nét cọ (soát p10a A4), cỏ cao hơn quanh mép bãi, sương thấp nằm trên mỏm — nhìn 1 giây ra "bãi đất đã căng dây chờ xây";
+//     ~0,6 lần nét cọ (p10a A4), cỏ cao hơn quanh mép bãi, sương thấp nằm trên mỏm — nhìn 1 giây ra "bãi đất đã căng dây chờ xây";
 //  3. mỏm đồi TỰ NHIÊN: sống mỏm lượn (phương vị đổi theo khoảng cách), có yên ngựa, có gò, sườn tròn, bề ngang không đều — không
 //     còn cái nêm thẳng mặt phẳng như đường băng;
 //  4. nét trên toà thành LIỀN MẠCH như nét năm tháng của 仕事: ít xơ khô đứt quãng hơn, đặt nổi khỏi mặt đá / mặt đất đủ xa để
 //     không chìm từng khúc sau tảng đá hay mặt lưới đất;
 //  5. lớp núi xa phủ đủ mọi góc máy của chuyển cảnh 6 (forest.js opt.half).
 //
-// VÒNG SỬA p10a (soát A + B, 30/9): 骨 là MỘT cột thông 通し柱 vẽ liền chân → đỉnh + hai xà khác nhau (không còn ba chữ "⅃"); lõi góc
+// VÒNG SỬA p10a (30/9): 骨 là MỘT cột thông 通し柱 vẽ liền chân → đỉnh + hai xà khác nhau (không còn ba chữ "⅃"); lõi góc
 // nền đá ngả tông mặt đá (hết khe đen); mép bãi san chuyển mềm, sống mỏm tròn có gò; dây 1 điểm ảnh; khổ dọc: nét 道 đổ vào góc bãi
 // rồi tan trước lúc tới nơi; điện thoại đang gõ: khung cảnh dời lên (setLift) để sau form là phần tối; viền sáng "dress" tính theo máy
 // của chương này; toà thành GỘP lưới nhỏ theo vật liệu (175 → 65 lệnh vẽ — chương này bị giới hạn bởi số lệnh vẽ); hình giả để dịch
@@ -120,7 +120,7 @@ function spurK(x, z) {
   if (Math.cos(dA) <= 0) return 0;
   const lat = r * Math.sin(dA) + 3.5 * (vnz(r * 0.07, 5.1) - 0.5) * sst(30, 60, r);
   const u = Math.abs(lat) * (lat > 0 ? 1 + 0.18 * (vnz(r * 0.05, 8.2) - 0.5) : 1) / spineW(r);
-  // (soát p10a A7/A8) mặt cắt TRÒN — không còn dải đỉnh phẳng (bản cũ phẳng tới u 0,42: đoạn sống mỏm dốc xuống phía máy thành một
+  // (p10a A7/A8) mặt cắt TRÒN — không còn dải đỉnh phẳng (bản cũ phẳng tới u 0,42: đoạn sống mỏm dốc xuống phía máy thành một
   // mặt nghiêng phẳng hứng trăng đều, đọc ra "tấm hình thang" dưới bãi)
   return (1 - sst(0.06, 1.12, u)) * sst(16, 26, r);
 }
@@ -134,7 +134,7 @@ export function hill2(x, z) {
     const hs = spineH(r) + 0.8 * (vnz(r * 0.05, 2.3) - 0.5) + 0.45 * (vnz(x * 0.13 + 3, z * 0.13) - 0.5) + 1.3 * (vnz(x * 0.045 + 1.7, z * 0.045 - 4.2) - 0.5) * sst(74, 96, r);
     h += Math.max(0, hs - h0) * k;
   }
-  // bãi san phẳng tới 3,2 m ngoài đường bao; mép san (soát p10a A7: bản cũ thành "bục kê" — mép trước thẳng, dốc đứng) chuyển MỀM về
+  // bãi san phẳng tới 3,2 m ngoài đường bao; mép san (p10a A7: bản cũ thành "bục kê" — mép trước thẳng, dốc đứng) chuyển MỀM về
   // sườn tự nhiên: bề ngang mép theo độ chênh (dốc trung bình ≤ ~1:2,2), đường mép gợn theo nhiễu (không thẳng), ngoài mép có gò nhỏ
   const d = padDist(x, z), dn = d + 1.6 * (vnz(x * 0.11 + 2.3, z * 0.11 - 1.7) - 0.5) * sst(1.5, 4, d);
   const dh = Math.abs(PAD.h - h), wEdge = 3.3 + Math.min(15, dh * 2.2);
@@ -147,7 +147,7 @@ export function hill2(x, z) {
 // (bản thử dùng 128 đèn giả / điểm ảnh — ở đây ≤ 64, vòng dừng ở số đèn thật, điểm ảnh ngoài quả cầu bao của cả bãi + toà thành
 // bỏ qua cả vòng)
 const FL_MAX = 64, FL_NG = 5;
-// (soát p11a A4) quầng ấm quanh cửa sổ nhìn gần thành vệt nâu loang trên tường → nhỏ (2,4 m), nhẹ, gần trung tính — chỉ sáng ngay mép cửa
+// (p11a A4) quầng ấm quanh cửa sổ nhìn gần thành vệt nâu loang trên tường → nhỏ (2,4 m), nhẹ, gần trung tính — chỉ sáng ngay mép cửa
 const FLR_COT = 0.45, FLR_CUA = 0.12;   // tầm với (× uFLR) của ánh nét 骨 và của đèn cửa sổ — xem FL_TAM
 const FL_COT_I = 2.0, FL_CUA_I = 0.4;    // cường độ ánh nét 骨 / đèn cửa sổ
 const CUA_GLOW = 0xe6ddcf;              // màu quầng quanh cửa (ô cửa vẫn hổ phách — NIGHT.mat.paperE)
@@ -158,7 +158,7 @@ function makeFL() {
     uFLR: { value: 20 },
     uFLN: { value: 0 },
     uFLBox: { value: new THREE.Vector4(24, -4, 16, 95) },
-    // (soát p10a B5) đèn xếp theo NHÓM (地縄 · 地 · 石垣 · 皮 — mỗi nhóm một khoảng chỉ số liền) + quả cầu bao của từng nhóm (đã cộng tầm
+    // (p10a B5) đèn xếp theo NHÓM (地縄 · 地 · 石垣 · 皮 — mỗi nhóm một khoảng chỉ số liền) + quả cầu bao của từng nhóm (đã cộng tầm
     // với của đèn): điểm ảnh ngoài quả cầu nào thì bỏ qua cả nhóm ấy — mỗi điểm ảnh chỉ duyệt đèn ở gần nó (trước: duyệt đủ 62 đèn)
     // (Mike 30/9) NĂM nhóm (thêm 骨) và mỗi nhóm MỘT TẦM VỚI riêng (uFLGR.z × uFLR): đèn cửa sổ / ánh nét 骨 chỉ loang quanh chỗ nó —
     // tầm với 20 m chung cho mọi đèn làm ánh cửa sổ phủ đều cả mặt tường (tường xám phẳng)
@@ -261,7 +261,7 @@ void main(){
   bool drawing = shown < 0.999;
   float sA = vS / vW;
   float lead = (shown - vT) * vL / vW;
-  // (soát p10a A5) uTail > 0: đuôi vuốt dài uTail mét (nét 道 dài ~560 m — vuốt 16% cuối là 90 m, nét tắt trước khi tới góc bãi)
+  // (p10a A5) uTail > 0: đuôi vuốt dài uTail mét (nét 道 dài ~560 m — vuốt 16% cuối là 90 m, nét tắt trước khi tới góc bãi)
   float tail0 = uTail > 0.0 ? 1.0 - uTail / max(vL, 1.0) : 0.84;
   float tailT = drawing ? 1.0 : 1.0 - smoothstep(tail0, 1.0, vT);
   float press = (1.0 + 0.22 * (1.0 - smoothstep(0.0, 2.5, sA))) * (0.6 + 0.58 * vN(vec2(sA * 0.12, vSeed * 13.0)) + 0.16 * vN(vec2(sA * 0.45, vSeed * 5.0)));
@@ -289,7 +289,7 @@ void main(){
 }`,
   });
 }
-// dây 水糸 (soát p10a A4): MỘT điểm ảnh thiết bị, không nhân theo độ phân giải màn; sáng ~0,6 lần nét cọ, xám ngả 緑青, không phát
+// dây 水糸 (p10a A4): MỘT điểm ảnh thiết bị, không nhân theo độ phân giải màn; sáng ~0,6 lần nét cọ, xám ngả 緑青, không phát
 // sáng. Khung vẽ thưa hơn màn (điện thoại vẽ 1,15 điểm / điểm CSS trên màn ×3): dây vẽ tối thiểu 1,4 điểm ảnh của khung vẽ (mảnh hơn
 // thì nhấp nháy khi máy thở) và bù bằng độ đục — cùng lượng mực như một sợi 1 điểm ảnh thiết bị. Mép mềm (không răng cưa)
 function stringMat() {
@@ -368,7 +368,7 @@ const POSE = {
   port: {
     k2: { p: orbit(SPUR.az - 0.26, 400, 108), t: [PAD.c.x * 0.7, -16, PAD.c.z * 0.7], fov: 58, off: 0.06 },
     k3: { p: orbit(SPUR.az - 0.12, 250, 66), t: [PAD.c.x * 0.8, -7, PAD.c.z * 0.8], fov: 60, off: 0.14 },
-    // (soát p10a A5) khổ dọc: lúc nét 道 đổ vào góc bãi (p6 ≈ 0,7–0,85) máy đứng lệch trái (az − 0,1) — cả khúc cuối của nét và góc
+    // (p10a A5) khổ dọc: lúc nét 道 đổ vào góc bãi (p6 ≈ 0,7–0,85) máy đứng lệch trái (az − 0,1) — cả khúc cuối của nét và góc
     // gần trái của bãi nằm trong khung (bản cũ: nét đi ra mép trái màn, không chạm góc); rồi mới xoay về tư thế nghỉ
     k4: { p: orbit(SPUR.az - 0.1, 176, 26), t: [6, -3, 6], fov: 62, off: 0.2 },
     rest: { p: orbit(SPUR.az, 152, 14), t: [0, 0, 0], fov: 62, off: 0.2 },
@@ -467,9 +467,9 @@ export function createLienhe(renderer, deps) {
       m.envMapIntensity *= 0.5;   // (Mike 30/9) ánh môi trường đều mọi phía làm hai mặt tường sáng như nhau
     }
     M2.stoneCore.userData.hot.uBreathK.value = 0;   // toà thành đứng yên: mạch lõi không phồng theo nhịp thở
-    // lõi 栗石 giữa mạch: chỉ ngả 緑青 thật tối, không phát sáng (như toà thành màn đầu lúc tối hẳn — soát p7a A2): không một vạch sáng
+    // lõi 栗石 giữa mạch: chỉ ngả 緑青 thật tối, không phát sáng (như toà thành màn đầu lúc tối hẳn — p7a A2): không một vạch sáng
     // dọc nào ở khe góc tường
-    // (soát p10a A6: ×0,3 thành KHE ĐEN chạy suốt góc trước nền đá) — lõi ngả đúng tông mặt đá đêm (xám rêu, sáng xấp xỉ mặt tảng):
+    // (p10a A6: ×0,3 thành KHE ĐEN chạy suốt góc trước nền đá) — lõi ngả đúng tông mặt đá đêm (xám rêu, sáng xấp xỉ mặt tảng):
     // góc lộ lõi đọc ra đá dăm, không đen, không vạch sáng
     M2.stoneCore.color.set(0x8d948e).multiplyScalar(0.45); M2.stoneCoreDim.color.set(0x8d948e).multiplyScalar(0.3);
   }
@@ -491,10 +491,10 @@ export function createLienhe(renderer, deps) {
   // (Mike 30/9: nét 骨 "như thanh đèn neon") 骨 dịu hơn, cạn cọ nhiều hơn và DÀY nhịp hơn (quãng cạn mỗi ~7 m thay vì ~28 m), mép răng
   // cưa rõ, lõi sáng rất ít — đọc ra một nét cọ mực phát sáng, không phải thanh đèn đều tắp
   const LAYER_K = { '地': 1.45, '石垣': 1.6, '骨': 0.85, '柱': 0.85, '地縄': 1.7, '道': 1.55 };
-  // (soát p11a A4) xà (lớp 骨) ngắn: bớt cạn cọ để nét liền tới tận cột; cột (柱) giữ khô, nhịp cạn dày
+  // (p11a A4) xà (lớp 骨) ngắn: bớt cạn cọ để nét liền tới tận cột; cột (柱) giữ khô, nhịp cạn dày
   const LAYER_DRY = { '地': 0.62, '石垣': 0.55, '骨': 0.8, '柱': 1.1, '地縄': 0.8, '道': 1 };
   const LAYER_SKIP = { '地': 0.35, '石垣': 0.3, '骨': 0.45, '柱': 1.0, '地縄': 0.7, '道': 1 };
-  // lõi sáng trong thân nét (0,85 = nét năm tháng): 骨 lõi dịu hơn — soát p10a A3 "bớt lõi trắng, thêm xơ khô như nét dốc thành 地"
+  // lõi sáng trong thân nét (0,85 = nét năm tháng): 骨 lõi dịu hơn — p10a A3 "bớt lõi trắng, thêm xơ khô như nét dốc thành 地"
   const LAYER_CORE = { '地': 0.85, '石垣': 0.85, '骨': 0.25, '柱': 0.25, '地縄': 0.85, '道': 0.6 };
   const LAYER_SKIPF = { '骨': 0.14, '柱': 0.14 }, LAYER_RAG = { '骨': 0.5, '柱': 0.5 };
   const LAYERS = {};
@@ -516,7 +516,7 @@ export function createLienhe(renderer, deps) {
     return true;
   }
 
-  // (soát p10a B5) xếp đèn theo nhóm lớp và tính quả cầu bao từng nhóm (xem uFLG) — làm MỘT lần sau khi đặt xong mọi đèn
+  // (p10a B5) xếp đèn theo nhóm lớp và tính quả cầu bao từng nhóm (xem uFLG) — làm MỘT lần sau khi đặt xong mọi đèn
   const FL_NHOM = ['地縄', '地', '石垣', '骨', '皮'];
   // tầm với của từng nhóm (× uFLR 20 m): đất / đá giữ như cũ; ánh nét 骨 loang ~9 m quanh cột + xà; đèn cửa sổ chỉ ~5 m quanh ô cửa
   const FL_TAM = { '地縄': 1, '地': 1, '石垣': 1, '骨': FLR_COT, '皮': FLR_CUA };
@@ -684,7 +684,7 @@ export function createLienhe(renderer, deps) {
     }
     yield; tY = performance.now();
     sea = buildMistSea(scene, NIGHT, ENV_CAM, sunDir);
-    // (soát p10a A8) biển sương của chương này KHÔNG dùng vòng mực của màn mở (mở thẳng &chuong=6 lúc màn đầu còn chạy vòng)
+    // (p10a A8) biển sương của chương này KHÔNG dùng vòng mực của màn mở (mở thẳng &chuong=6 lúc màn đầu còn chạy vòng)
     for (const m of sea.mats) m.uniforms.uIntroOn = { value: 0 };
     // làn mỏng trên cùng (y −3) vắt NGAY trên bãi (−8) — mỏng đi để bãi đọc rõ; hai tầng dưới giữ nguyên
     sea.mats[2].uniforms.uAlpha.value = 0.28;
@@ -724,7 +724,7 @@ export function createLienhe(renderer, deps) {
     scene.add(castle2);
     castle2.updateMatrixWorld(true);
     yield; tY = performance.now();
-    // (soát p10a B5) GỘP các lưới nhỏ tĩnh của toà thành theo vật liệu: chương này bị giới hạn bởi SỐ LỆNH VẼ (luồng chính gửi ~300 lệnh
+    // (p10a B5) GỘP các lưới nhỏ tĩnh của toà thành theo vật liệu: chương này bị giới hạn bởi SỐ LỆNH VẼ (luồng chính gửi ~300 lệnh
     // mỗi khung — 145 lưới lẻ trung bình 73 tam giác: tấm ván, thanh gỗ, …), không bởi card. Cùng vật liệu + cùng bộ thuộc tính →
     // một lưới (toạ độ đã nhân sẵn vị trí trong toà thành). Hình y hệt: cùng vật liệu, cùng chương trình, chỉ bớt lệnh vẽ. &lhgop=0 để so
     if (!/[?&]lhgop=0/.test(location.search)) yield* mergeCastle(castle2, due);
@@ -811,9 +811,9 @@ export function createLienhe(renderer, deps) {
         const r = 24 + R() * 110, a = SPUR.az + (R() - 0.5) * 1.3;
         const x = Math.sin(a) * r, z = Math.cos(a) * r / 1.04;
         const k = spurK(x, z); if (k < 0.1 || R() > k + 0.12) continue;
-        // (soát p10a A5) lối của nét 道: không cỏ (cỏ cao ven bãi che mất khúc nét đổ vào góc bãi khi nhìn từ máy khổ dọc)
+        // (p10a A5) lối của nét 道: không cỏ (cỏ cao ven bãi che mất khúc nét đổ vào góc bãi khi nhìn từ máy khổ dọc)
         if (nearRoadG(x, z)) continue;
-        // mép cỏ gợn theo hai tầng nhiễu (soát p10a A7: mép cỏ thẳng tắp theo cạnh bãi làm bãi thành "bục kê") — có chỗ cỏ lấn vào
+        // mép cỏ gợn theo hai tầng nhiễu (p10a A7: mép cỏ thẳng tắp theo cạnh bãi làm bãi thành "bục kê") — có chỗ cỏ lấn vào
         // mép đất, có chỗ đất lộ loang ra
         const d = padDist(x, z); if (d < 3.4 + 3.2 * vnz(x * 0.13 + 9, z * 0.13) + 1.2 * vnz(x * 0.6 + 9, z * 0.6)) continue;
         // mép bãi và sống mỏm: cỏ cao hơn, dày hơn (đọc ra "đất để hoang chờ xây") — cao thấp theo từng đám, không thành một dải đều
@@ -1008,12 +1008,12 @@ export function createLienhe(renderer, deps) {
     }
     yield; tY = performance.now();
     st.at = 'net-cot';
-    // 骨 GÓC PHẢI (+x −z) — soát p10a A3 (bản cũ: ba chữ "⅃" y hệt nhau ở ba tầng, đọc thành đèn viền góc tầng):
+    // 骨 GÓC PHẢI (+x −z) — p10a A3 (bản cũ: ba chữ "⅃" y hệt nhau ở ba tầng, đọc thành đèn viền góc tầng):
     //  · MỘT nét CỘT THÔNG 通し柱 vẽ liền từ chân tầng 1 lên đỉnh tầng 3 — đứng ở góc phải từng tầng, chỗ tầng thụt vào thì nét đi
     //    xiên TRONG lòng mái (mái che khuất), nên mắt thấy một cây cột chạy suốt, đứt đúng chỗ mái;
     //  · xà 貫 chỉ ở hai tầng dưới, KHÁC nhau (dài / ngắn, cao độ khác), vẽ từ phía giữa mặt tường (đầu ấn) đâm vào cột (đuôi vuốt
     //    tắt ngay sau cột) — không lặp y hệt; tầng 3 chỉ có cột
-    // (soát p11a A4) cột ôm góc từng tầng vẫn đọc thành BA ĐOẠN rời (mái che chỗ nối) → MỘT cột thông 通し柱 kẻ một nét thẳng tay giữa
+    // (p11a A4) cột ôm góc từng tầng vẫn đọc thành BA ĐOẠN rời (mái che chỗ nối) → MỘT cột thông 通し柱 kẻ một nét thẳng tay giữa
     // mặt tường phải (giữa hai ô cửa, như ảnh duyệt ct-2 cột nằm giữa mặt tường), từ chân tầng 1 lên gần đỉnh tầng 3, vẽ ĐÈ LÊN mép
     // các mái (lớp 柱 không bị che — nét cọ vẽ trên tranh, không phải cây cột 3D lẩn trong lòng mái); hai xà từ phía góc xa đâm vào cột
     {
@@ -1100,7 +1100,7 @@ export function createLienhe(renderer, deps) {
     return (PATHS[key] = { pc, tc, ks, seg });
   }
   const vT = new THREE.Vector3();
-  // (soát p10a B2) điện thoại đang gõ: cả khung cảnh dời LÊN lift điểm ảnh (app.js tính) — như trang cuộn lên theo form: sau form là đúng
+  // (p10a B2) điện thoại đang gõ: cả khung cảnh dời LÊN lift điểm ảnh (app.js tính) — như trang cuộn lên theo form: sau form là đúng
   // phần sườn tối như lúc nghỉ, bãi đất và các nét sáng lên trên (dưới chỗ tiêu đề đã nhường)
   let lift = 0;
   // (vòng kiểm cuối 30/9) KHỔ NGANG THẤP (máy xách tay 1366×768, máy tính bảng ngang 1024×768…): form "đường mặt đất" và tiêu đề cao
@@ -1160,7 +1160,7 @@ export function createLienhe(renderer, deps) {
   function stage(s) {
     // (nét 道 đã vẽ quá nửa khi vùng đất mới bắt đầu thấm ra — nó đi từ sau lưng máy vào khung, như nét 仕事 đang bay theo)
     { const x = ramp(s, at5(0.04), at5(0.84)); STAGE['道'] = 1 - (1 - x) * (1 - x); }
-    // (soát p10a A5) đổ vào góc xong thì nét 道 tan hết TRƯỚC lúc tới nơi — 4 cạnh 地縄 nối tiếp nó. Cả HAI khổ (p10b: khổ ngang lúc nghỉ,
+    // (p10a A5) đổ vào góc xong thì nét 道 tan hết TRƯỚC lúc tới nơi — 4 cạnh 地縄 nối tiếp nó. Cả HAI khổ (p10b: khổ ngang lúc nghỉ,
     // khúc cuối của nét leo dốc mép mỏm ngay trước góc bãi — dải nét nằm gần như nghiêng sát hướng nhìn của máy nghỉ, thành một đường chéo
     // mảnh 1 điểm ảnh lấm tấm cắt qua chân trang; khổ dọc: vệt trắng lạc ở góc dưới trái)
     LAYERS['道'].mat.uniforms.uA.value = 1 - sst(at5(0.9), at5(1.0), s);
@@ -1189,7 +1189,7 @@ export function createLienhe(renderer, deps) {
   }
 
   let time = 0, lastS = TL.T11;
-  // (soát p10a A8) vật liệu "dress" (đất, rừng, toà thành đêm) tính viền sáng theo hướng trăng TRONG HỆ MÁY QUAY (uSunV). castle.js
+  // (p10a A8) vật liệu "dress" (đất, rừng, toà thành đêm) tính viền sáng theo hướng trăng TRONG HỆ MÁY QUAY (uSunV). castle.js
   // chỉ cập nhật theo máy của màn đầu → ở đây sai máy: một mảng sườn đồi sáng phẳng hình thang (thấy rõ khi mở thẳng &chuong=6 trên
   // điện thoại). Tự đặt theo máy của chương này, mỗi khung, sau khi đặt máy
   const sunV = new THREE.Vector3();
@@ -1219,14 +1219,14 @@ export function createLienhe(renderer, deps) {
     for (const im of forest) im.count = Math.max(1, Math.round(im.userData.nFull * treesK));
     if (grass) grass.count = Math.max(1, Math.round(grass.userData.nFull * grassK));
     if (mists[1]) mists[1].visible = mistK >= 1;
-    // (soát p10a B5) nấc 2–4 bỏ thêm làn biển sương mỏng trên cùng (tô gần cả màn) — nấc 0–1 giữ nguyên
+    // (p10a B5) nấc 2–4 bỏ thêm làn biển sương mỏng trên cùng (tô gần cả màn) — nấc 0–1 giữ nguyên
     if (sea && sea.group.children[2]) sea.group.children[2].visible = mistK >= 1;
   }
 
   // ── dải điểm của nét 道 trên màn (cho lớp hoà cảnh — không dùng lúc này, giữ để kiểm) ───────────────────────────────────────
   const scr = (v, out = [0, 0]) => { tmpV.copy(v).project(camera); out[0] = (tmpV.x * 0.5 + 0.5) * W_; out[1] = (-tmpV.y * 0.5 + 0.5) * H_; return out; };
 
-  // (soát p10a B4) HÌNH GIẢ để DỊCH SẴN shader của chương ngay khi vào trang (như 仕事 ở p9b), trước khi dựng: mỗi (vật liệu × kiểu vẽ)
+  // (p10a B4) HÌNH GIẢ để DỊCH SẴN shader của chương ngay khi vào trang (như 仕事 ở p9b), trước khi dựng: mỗi (vật liệu × kiểu vẽ)
   // một lưới tí hon — cùng vật liệu, cùng bộ thuộc tính, cùng kiểu vẽ (thường / nhân bản / nhân bản có màu) như lưới thật, nên
   // chương trình dịch ra dùng lại được y nguyên. Toà thành: đúng các tổ hợp của cây đối tượng màn đầu (dùng chung hình, không tạo hình mới)
   function warmMeshes() {

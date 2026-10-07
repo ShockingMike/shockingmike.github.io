@@ -2,7 +2,7 @@
 // scene, the atelier, blend-your-own, the demo order form, the sampler, the footer, and the reading version when
 // there is no WebGL. The core calls mountPage(api) once; see ADAPTER below for what the page expects from it.
 //
-// Rules this file keeps (CLAUDE.md, docs/content/chom-text-layout.md):
+// Rules this file keeps (the text layout rules):
 //   * words stand still: they only fade in and out where they are, on solid painted paper
 //   * one scroll step = one screen; the previous step's words are gone before the next step's appear
 //   * nothing is measured or written per frame; the DOM changes only when a step, a season or an input changes
@@ -377,7 +377,7 @@ export function mountPage(rawApi = {}) {
   loader.el.after(nav, menu);
 
   // ---- words over the scene ------------------------------------------------------------
-  // docs/content/chom-text-layout.md: hero, open and xuan-1 sit on spring at rest; each later season opens with a
+  // the text layout rules: hero, open and xuan-1 sit on spring at rest; each later season opens with a
   // step at rest (its card), then a step while the camera pushes in (place + memory), then a short label before
   // the painting peels away. No words while it peels.
   const over = h('div', { class: 'pg-over', id: 'pg-over' });
@@ -776,7 +776,7 @@ export function mountPage(rawApi = {}) {
     root.dataset.step = want || '';
     // The big painted name on the opening room is the one in the words themselves. The bar's own name is large only
     // while the page is still coming up, and shrinks into the bar as the room settles ("hiện to rồi thu vào thanh
-    // điều hướng", docs/content/chom-text-layout.md): two names of different sizes on one screen read as a mistake.
+    // điều hướng"): two names of different sizes on one screen read as a mistake.
     brand.classList.toggle('is-hero', !state.built && !state.no3d);
     // arriving in a season: say so, once per arrival
     if (want && /-1$/.test(want) && !seen.has(want)) {
@@ -1277,7 +1277,7 @@ export function mountPage(rawApi = {}) {
 
   // ---- the end part (and the reading version): one screen of words at a time ------------------------
   // Only the part filling the middle of the screen shows its words; the others are faded right out, so two
-  // screens never add up (docs/content/chom-text-layout.md rule 1). The paper itself never moves or fades.
+  // screens never add up (text layout rule 1). The paper itself never moves or fades.
   // the blend and the order form are one screen each on a computer, two each when they stack (phones, portrait tablets)
   const stacked = matchMedia('(max-width: 900px)');
   const unitList = () => [...tail.querySelectorAll(stacked.matches ? '[data-unit]' : '[data-unit]:not([data-sub])'), ...(state.no3d ? steps.values() : [])];

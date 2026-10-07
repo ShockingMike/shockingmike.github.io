@@ -99,7 +99,7 @@ const GRAIN_PARS = [
   '}',
 ].join('\n');
 
-// ── VIỀN VÁT BẮT SÁNG (Sếp 24/9: "cạnh vát bắt sáng — đó là thứ tách tảng này khỏi tảng kia") ──
+// ── VIỀN VÁT BẮT SÁNG (24/9: "cạnh vát bắt sáng — đó là thứ tách tảng này khỏi tảng kia") ──
 // Mép mặt trước của mỗi tảng (bốn cạnh hộp + các nhát bạt góc) sáng lên thành một dải hẹp, tính bằng
 // MÉT THẬT trên mặt tảng. Không rải đều: cạnh trên và cạnh trái (phía nắng) sáng, cạnh dưới gần như tắt,
 // và mỗi tảng một mức riêng — rải đều thì cả bức tường thành tường gạch gắn đèn (bài học vòng trước).

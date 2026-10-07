@@ -50,7 +50,7 @@ svg#plex .dim-num { fill: var(--plex); font-size: 10.5px; letter-spacing: 0.08em
   transition: opacity 620ms ease, visibility 0s linear 620ms;
 }
 .load.done { opacity: 0; visibility: hidden; }
-.load-in { width: min(600px, 84vw); }   /* Sếp 25/9: hàng đá nhỏ và nhạt quá — to hơn, rõ hơn, vẫn dịu */
+.load-in { width: min(600px, 84vw); }   /* 25/9: hàng đá nhỏ và nhạt quá — to hơn, rõ hơn, vẫn dịu */
 .load-brand { margin: 0 0 22px; font-family: var(--mincho); font-size: 19px; letter-spacing: 0.08em; color: var(--ink); }
 .load-wall { display: block; width: 100%; height: auto; }
 .load-wall .st { fill: var(--stone); opacity: 0.13; }   /* tảng chưa xếp: bóng mờ — thấy trước hình bức tường sẽ dựng */
@@ -232,7 +232,7 @@ html[data-accent] a:focus-visible { outline-color: var(--r700); }
 svg#khung { position: fixed; inset: 0; width: 100vw; height: 100vh; pointer-events: none; z-index: 2; opacity: 0; }
 svg#khung path { fill: none; stroke: var(--n-line); stroke-width: 2; }
 .ch-logo, .chap, .ch, .ch-sound { opacity: 0; }
-/* (soát p11a A2/B3) giao diện đi theo nhịp mờ chuyển (độ đục đổi từng khung trong 0,7–1,15 s): mỗi lớp là một lớp ghép riêng — đổi độ
+/* (p11a A2/B3) giao diện đi theo nhịp mờ chuyển (độ đục đổi từng khung trong 0,7–1,15 s): mỗi lớp là một lớp ghép riêng — đổi độ
    đục chỉ ghép lại, không tô lại cả khung SVG / chữ mỗi khung (điện thoại ×3 điểm ảnh) */
 svg#khung, .ch-logo, .chap, .ch-sound, .s1 .c-tl, .s1 .c-tr, .s1 .c-bl, .s1 .c-br { will-change: opacity; }
 .ch-logo {
@@ -255,7 +255,7 @@ svg#khung, .ch-logo, .chap, .ch-sound, .s1 .c-tl, .s1 .c-tr, .s1 .c-bl, .s1 .c-b
 .chap.mo a { pointer-events: auto; }
 .chap.mo a:hover { color: var(--n-ink); }
 .chap a:focus-visible { outline: 2px solid var(--r300); outline-offset: 5px; }
-/* 仕事 / 連絡 chưa mở (soát p7a): mờ hơn, không con trỏ bàn tay, không nhận bấm */
+/* 仕事 / 連絡 chưa mở (p7a): mờ hơn, không con trỏ bàn tay, không nhận bấm */
 .chap li.chua { opacity: 0.42; cursor: default; pointer-events: none; }
 .chap li [lang="ja"] { font-family: var(--mincho); font-weight: 500; letter-spacing: 0.08em; text-transform: none; min-width: 2.3em; }
 .chap li.on { color: var(--n-ink); }
@@ -315,7 +315,7 @@ html.viec-mothe #ch-viec .ch-body { color: rgba(188, 202, 197, 0.8); }
 .viec-doc { display: none; }
 @media (max-width: 760px), (orientation: portrait) {
   .viec-nhan i { display: none; }
-  /* (soát p9a B9) vùng chạm nhãn nhà >= 24 px: đệm trên dưới 3 px (lề âm giữ chữ đúng chỗ) + vùng chạm vô hình 44 px */
+  /* (p9a B9) vùng chạm nhãn nhà >= 24 px: đệm trên dưới 3 px (lề âm giữ chữ đúng chỗ) + vùng chạm vô hình 44 px */
   .viec-nhan { padding: 3px 0; margin-top: -3px; }
   .viec-nhan::before { content: ''; position: absolute; inset: -10px -6px; }
   .viec-the .ve { margin: 12px 0 12px; }
@@ -325,7 +325,7 @@ html.viec-mothe #ch-viec .ch-body { color: rgba(188, 202, 197, 0.8); }
   html.viec-mothe #ch-viec .ch-head { color: var(--n-ink); }
 }
 
-/* ── PHẦN 9: chương 連絡 — về lại toà thành trong đêm (Mike duyệt ảnh chi tiết phương án C, 29/9). MỘT LƯỚI LỀ với logo, cột chương
+/* ── PHẦN 9: chương 連絡 — về lại toà thành trong đêm (ảnh chi tiết phương án C đã duyệt, 29/9). MỘT LƯỚI LỀ với logo, cột chương
    và "Sound": 40 px khung + 36 px ngang / 26 px dọc. Tiêu đề + dẫn ở GÓC TRÊN PHẢI (màn đầu ban ngày cũng đặt chữ ở bốn góc — chuyến
    đi kết thúc ở chỗ nó bắt đầu); form là "ĐƯỜNG MẶT ĐẤT" chạy ngang đáy khung ngay dưới bãi đất (như đường GL của bản vẽ mặt đứng):
    bốn ô là bốn đoạn trên một đường kẻ liền, mỗi ô có vạch mốc ở đầu; dòng chân trang ở GÓC DƯỚI TRÁI, cùng hàng với "Sound".
@@ -365,7 +365,7 @@ html.viec-mothe #ch-viec .ch-body { color: rgba(188, 202, 197, 0.8); }
 /* sau khi bấm Send: câu demo ngay dưới đường mặt đất, đầu câu một vạch 緑青 */
 .lh-demo { position: absolute; left: 0; top: calc(100% + 14px); margin: 0; font-family: var(--mono); font-size: var(--t-s); line-height: 1.5; letter-spacing: 0.04em; color: var(--n-ink2); opacity: 0; transition: opacity 0.4s var(--joe); }
 .lh-dat.sent .lh-demo { opacity: 1; }
-/* (soát p10a B1) gửi xong con trỏ sang câu demo (đúng chỗ trong thứ tự Tab) — câu báo, không phải ô bấm: không viền con trỏ */
+/* (p10a B1) gửi xong con trỏ sang câu demo (đúng chỗ trong thứ tự Tab) — câu báo, không phải ô bấm: không viền con trỏ */
 .lh-demo:focus { outline: none; }
 .lh-dat.sent .lh-demo::before { content: ""; display: inline-block; width: 16px; height: 1px; margin-right: 12px; vertical-align: 0.3em; background: var(--r300); }
 /* chân trang: góc DƯỚI TRÁI, cùng hàng, cùng cỡ, cùng màu với "Sound" ở góc dưới phải */
@@ -383,7 +383,7 @@ html.viec-mothe #ch-viec .ch-body { color: rgba(188, 202, 197, 0.8); }
   #ch-lienhe .ch-head { letter-spacing: 0; }
   #ch-lienhe .lh-dau { left: 25px; right: 25px; width: auto; top: auto; bottom: 300px; text-align: left; }
   #ch-lienhe .ch-body { margin: 12px 0 0; }
-  /* (soát p10a A9) chân trang cách khung dưới 16 px — cùng nhịp logo cách khung trên (khung vát ở 11 px): form nâng theo */
+  /* (p10a A9) chân trang cách khung dưới 16 px — cùng nhịp logo cách khung trên (khung vát ở 11 px): form nâng theo */
   .lh-dat { left: 25px; right: 25px; bottom: 61px; }
   /* nhãn giãn chữ 0,08em (không 0,16em): "WHERE THE SITE IS" (17 ký tự đơn cách × 0,68em ≈ 150 px) vừa một dòng trong cột ~163 px,
      không rơi một chữ xuống dòng */

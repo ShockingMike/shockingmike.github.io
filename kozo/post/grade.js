@@ -151,7 +151,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, out vec4 outputColor)
   bool bad = kBad4(c);
   outputColor = bad ? vec4(0.0, 0.0, 0.0, 1.0) : clamp(c, vec4(-6.0e4), vec4(6.0e4));
 }`, { blendFunction: BlendFunction.SRC });
-    // (soát p11a B2 — GỐC của "連絡 cứ ~20 s nháy một khung": quầng loá tắt đúng một khung) phép trộn NORMAL của thư viện là
+    // (p11a B2 — GỐC của "連絡 cứ ~20 s nháy một khung": quầng loá tắt đúng một khung) phép trộn NORMAL của thư viện là
     // mix(ảnh vào, ảnh chặn, 1) = ảnh vào·0 + ảnh chặn → điểm ảnh vào là NaN / Inf thì 0·NaN = NaN: lớp chặn TỰ ĐƯA LẠI NaN nó vừa
     // chặn. NaN lọt vào bộ nở sáng, phép trung bình mip rải ra cả vùng, lớp cộng nở sáng coi vùng ấy "không có loá" → quầng quanh nét
     // tắt một khung. Trộn SRC = chỉ lấy ảnh chặn (không nhân gì với ảnh vào) — đo 連絡 90 s: trước 4 lần, sau 0 (bài _p11sua-nhay6)
@@ -202,7 +202,7 @@ void mainImage(const in vec4 inputColor, const in vec2 uv, const in float depth,
       c = mix(c, uLineCore, clamp(a * 0.85, 0.0, 1.0)) + uLineHalo * a * (0.45 + 1.2 * front);
     }
   }
-  // CHẠNG VẠNG (bản p7b, soát p7a A2): bỏ viền sáng từng tảng đá (kiểu đèn neon). Thay bằng ÁNH HẮT lên mặt nền đá: trời tối dần,
+  // CHẠNG VẠNG (bản p7b, p7a A2): bỏ viền sáng từng tảng đá (kiểu đèn neon). Thay bằng ÁNH HẮT lên mặt nền đá: trời tối dần,
   // ánh 緑青 từ thung lũng phía dưới hắt lên mặt đá — sáng nhất ở chân, dâng dần lên theo uDuskY, theo đúng độ sáng của chính mặt
   // đá (nhân vào màu đá): mạch đá vẫn tối, không có đường viền nào phát sáng.
   if (uDuskL > 0.001) {

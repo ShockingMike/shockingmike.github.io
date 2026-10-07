@@ -1,4 +1,4 @@
-// Chớm page layer: the blend rules (docs/content/chom-copy.md, "Bảng tên pha mùi").
+// Chớm page layer: the blend rules (the copy file, "Bảng tên pha mùi").
 // Pure functions, no DOM.
 
 export const SEASONS = ['xuan', 'ha', 'thu', 'dong'];   // year order: scroll order and tie-break order

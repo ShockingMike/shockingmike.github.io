@@ -8,7 +8,7 @@ import { buildSky, buildUnkai } from './sky.js';
 import { buildRidgeLayers, buildMistSea, buildHill, buildHillForest, buildCornerMist } from './forest.js';
 import { makeMaterials, buildIshigaki, buildOutcrop, buildTenshu, updateSunDir, IS, rng32, dress, slabGeo, getStructure, INK, INK_GLSL, inkPlaneMaterial, markCastleStencil } from './castle.js';
 import { RAMP } from '../page/accent.js';
-// Lớp nét kết cấu (scene/ketcau.js — agent khác dựng; bản tạm ketcau-tam.js còn giữ, cùng giao diện)
+// Lớp nét kết cấu (scene/ketcau.js — dựng riêng; bản tạm ketcau-tam.js còn giữ, cùng giao diện)
 import { createKetCau } from './ketcau.js';
 import { createHover } from './hover.js';
 import { createTone } from './tone.js';
@@ -26,11 +26,11 @@ import { createRung } from './rung.js';
 import { createLang } from './lang.js';
 // PHẦN 7 (29/9): ĐI TỪNG CHƯƠNG — một cử chỉ = một chương, mọi thứ chạy theo thời gian (thay cho cuộn liên tục page/cuon.js)
 import { createBuoc } from '../page/buoc.js';
-// PHẦN 7b (29/9, soát p7a A1): cửa giấy lùa dựng 3D cho chuyển cảnh 4
+// PHẦN 7b (29/9, p7a A1): cửa giấy lùa dựng 3D cho chuyển cảnh 4
 import { createCua } from './cua.js';
 // phần 8 (29/9): chương 仕事 — năm công trình trên bản đồ cả vùng (Mike chọn phương án A)
 import { createViec } from './viec.js';
-// phần 9 (30/9): chương 連絡 — toà thành trong đêm + bãi đất đã căng dây chờ xây (Mike duyệt ảnh chi tiết phương án C)
+// phần 9 (30/9): chương 連絡 — toà thành trong đêm + bãi đất đã căng dây chờ xây (ảnh chi tiết phương án C đã duyệt)
 import { createLienhe } from './lienhe.js';
 import { LANG } from './lang.js';
 // B6 (29/9): nấc chất lượng cho máy yếu (laptop không card rời) — nấc 0 là bản Mike đã duyệt, không đổi một điểm ảnh
@@ -86,8 +86,8 @@ try {
   if (GPUI.soft && NAC_FORCED === null) throw SOFT;
   // ĐỘ NÉT (săn khung giật 24/9): trần 1,15 như igloo — ở màn ×1,25 của Mike, vẽ đủ ×1,25 tốn thêm ~18% điểm ảnh
   // mà mắt gần như không phân biệt; tụt dưới ~50 hình/giây thì tự hạ dần tới 0,6 (xem "độ nét thích ứng" ở vòng vẽ)
-  // NGÂN SÁCH 120 HÌNH/GIÂY (Sếp 25/9, mỗi khung ≤ 8,3 ms): cảnh vẽ ở 0,85 độ nét của trần rồi phóng lên — như igloo
-  // (cả khung đầy hạt, sương, nhoè nên mắt gần như không thấy khác; ảnh so ở scratchpad/kozo-look/fps/so-ti-le-ve.png).
+  // NGÂN SÁCH 120 HÌNH/GIÂY (25/9, mỗi khung ≤ 8,3 ms): cảnh vẽ ở 0,85 độ nét của trần rồi phóng lên — như igloo
+  // (cả khung đầy hạt, sương, nhoè nên mắt gần như không thấy khác).
   // ?rs=1 → vẽ đủ như trước để so.
   // Mike 28/9: "tôi cảm thấy web đang không được nét lắm" → bỏ vẽ 85%: MẶC ĐỊNH VẼ ĐỦ (màn tỉ lệ 1 vẽ đúng 1 điểm ảnh / điểm
   // ảnh; màn tỉ lệ cao vẫn trần 1,15). &rs=0.85 → bản cũ để so. Thêm lượt làm nét CAS nhẹ ở cuối chuỗi (&cas=0 tắt).
@@ -572,7 +572,7 @@ try {
     // (phần 9: lượt hoà cảnh của chuyển cảnh 6 cũng dịch ngầm, cùng lúc dựng chương 連絡)
     for (const ps of post.composer.passes) if (ps !== post.bayPass && ps !== post.shojiPass && ps !== post.duongPass) visit(ps, 0);
     const scr = post.composer.passes.filter((ps) => ps.enabled && ps.renderToScreen && ps.fullscreenMaterial).map((ps) => ps.fullscreenMaterial);
-    // (soát p9a B1) nấc 2 tắt lượt làm nét → lượt khử răng cưa thành lượt ra màn (post.syncScreen): dịch sẵn cả biến thể ra màn
+    // (p9a B1) nấc 2 tắt lượt làm nét → lượt khử răng cưa thành lượt ra màn (post.syncScreen): dịch sẵn cả biến thể ra màn
     // của nó ở màn chờ — máy tự vào nấc 2 (chip tích hợp, điện thoại) không phải dịch lúc khung đầu tiên hiện ra
     if (post.casPass && post.smaaPass && post.smaaPass.fullscreenMaterial && !scr.includes(post.smaaPass.fullscreenMaterial)) scr.push(post.smaaPass.fullscreenMaterial);
     return { all: [...mats], scr };
@@ -753,7 +753,7 @@ try {
     const s0 = renderer.getDrawingBufferSize(new THREE.Vector2());
     // một khung đệm cho "cảnh đến" của CẢ HAI lần chuyển (không bao giờ chạy cùng lúc)
     valleyRT = new THREE.WebGLRenderTarget(s0.x, s0.y, { type: THREE.HalfFloatType, depthBuffer: true });
-    // (p7b, soát p7a B5: shader thung lũng không dịch ở màn chờ nữa — dịch ngầm lúc màn mở, xem bgStep)
+    // (p7b, p7a B5: shader thung lũng không dịch ở màn chờ nữa — dịch ngầm lúc màn mở, xem bgStep)
     freshVQ = [];
     warm.valleySubmitAt = Math.round(performance.now() - warm.t0);
   };
@@ -942,7 +942,7 @@ try {
   //   dần từ chân lên, form hiện sau cùng — scene/lienhe.js đọc thẳng vị trí ảo)
   const T10 = END5, T11 = T10 + 0.6, END6 = T11 + 0.6, TP6 = T11 - 0.03;
   const W0 = 0.36, W1 = 0.62;                  // quãng hoà hai cảnh (phần của p6)
-  const MIST0 = 0.14;                          // (soát p11a A1) bản đồ 仕事 bắt đầu chìm vào sương từ đây (phần của p6)
+  const MIST0 = 0.14;                          // (p11a A1) bản đồ 仕事 bắt đầu chìm vào sương từ đây (phần của p6)
   const SB6 = T10 + W1 * (TP6 - T10);         // hết cú bay của máy 仕事 (cảnh 仕事 thôi vẽ)
   const QX0 = 5.25, QX1 = 5.85, FSTART = 5.2;
   api.moc = { T0, T1, END, VEND, T2, T3, T4, T5, QEND, END3, T6, T7, T8, T9, END5, T10, T11, END6, TP6, W0, W1 };
@@ -1031,7 +1031,7 @@ try {
   // rừng dưới chân thành: màu nằm trong từng cây (sáng/tối) → nhân cả vật liệu theo tỉ lệ đêm / ngày
   { const r = new THREE.Color(NC.near.lit), d = new THREE.Color(L.near.lit); DK.push([hillForest.mat.color, hillForest.mat.color.clone(), new THREE.Color(1, 1, 1).lerp(new THREE.Color(r.r / d.r, r.g / d.g, r.b / d.b), DKk)]); }
   // lõi 栗石 sáng qua mạch đá: trắng ngà → 緑青 (ảnh a1)
-  // (p7b, soát p7a A2: viền sáng quanh từng tảng là kiểu đèn neon) → lõi giữa mạch chỉ ngả 緑青 thật tối, không phát sáng
+  // (p7b, p7a A2: viền sáng quanh từng tảng là kiểu đèn neon) → lõi giữa mạch chỉ ngả 緑青 thật tối, không phát sáng
   DK.push([M.stoneCore.color, M.stoneCore.color.clone(), M.stoneCore.color.clone().multiplyScalar(0.3)]);
   DK.push([M.stoneCoreDim.color, M.stoneCoreDim.color.clone(), M.stoneCoreDim.color.clone().multiplyScalar(0.3)]);
   if (post.ghep) { const U = post.ghep.uniforms; U.get('uBaseA').value.set(IS.H, IS.p, IS.topA, IS.baseA); U.get('uBaseB').value.set(IS.topB, IS.baseB); }
@@ -1090,7 +1090,7 @@ try {
     const tau = (s) => sineIO((s - FSTART) / (END3 - FSTART)), h = 0.01;
     rung.update(0, tau(T5 + h)); const pB = rung.camera.position.clone(), qB = rung.camera.quaternion.clone();
     rung.update(0, tau(T5)); const pA = rung.camera.position.clone(), qA = rung.camera.quaternion.clone();
-    // (soát p11a B7) vận tốc XOAY của đường trong chương ở mốc tới nơi (trục + rad / đơn vị vị trí ảo): cuối quãng bay máy xoay dần
+    // (p11a B7) vận tốc XOAY của đường trong chương ở mốc tới nơi (trục + rad / đơn vị vị trí ảo): cuối quãng bay máy xoay dần
     // từ 0 lên đúng tốc độ ấy, tới nơi là đã đang xoay đúng như chương — không còn 0 → 2,3°/s trong một khung
     const dq = qB.clone().multiply(qA.clone().invert()); if (dq.w < 0) { dq.x = -dq.x; dq.y = -dq.y; dq.z = -dq.z; dq.w = -dq.w; }
     const ang = 2 * Math.acos(Math.min(1, dq.w)), sn = Math.sqrt(Math.max(1e-12, 1 - dq.w * dq.w));
@@ -1158,7 +1158,7 @@ try {
     }
     // chương 骨: đầu nét xà (bên trái) có thể nằm sau cột chương ở khổ 1440 → màn mờ sau cột chương đậm hơn (chỉ ở chương rừng)
     khungU.get('uSide').value = JX.on ? (sideOf(JX.from) + (sideOf(JX.to) - sideOf(JX.from)) * JX.w) * Z.ui : (0.55 + 0.3 * sm(0.5, 1.0, Z.p3)) * Z.ui;
-    // (p7b, soát p7a A1: trong quãng cửa giấy tắt lớp tối sau cột chương — cột chữ nằm trên tường tối của căn phòng)
+    // (p7b, p7a A1: trong quãng cửa giấy tắt lớp tối sau cột chương — cột chữ nằm trên tường tối của căn phòng)
     if (DOOR.on) khungU.get('uSide').value *= 1 - sm(0.02, 0.2, Math.min(DOOR.x, 1 - DOOR.x) * 2);
     khungU.get('uCap').value = Z.ui;
     // (Mike 30/9) vùng loang sau cột chương đặt theo khung cột chương thật trên màn (đo lại khi đổi cỡ, và ~1,5 s một lần — chữ tải xong
@@ -1189,7 +1189,7 @@ try {
       chuyenU.get('tValley').value = valleyRT.texture;
       chuyenU.get('uMode').value = REDUCED ? 1 : 0;
       chuyenU.get('uSwap').value = JX.on ? JX.swap : 0;
-      chuyenU.get('uSoft').value = JX.on ? 1 : 0;   // nhảy xa: mép loang mềm kiểu mây (soát p7a A3); chuyển cảnh 1 giữ mực tua đã duyệt
+      chuyenU.get('uSoft').value = JX.on ? 1 : 0;   // nhảy xa: mép loang mềm kiểu mây (p7a A3); chuyển cảnh 1 giữ mực tua đã duyệt
     }
     // chuyển cảnh 2 (ruộng → mỏ đá): nét chổi quét ngang; mỏ đá vẽ vào khung đệm "cảnh đến", thung lũng vẽ thẳng vào chuỗi
     const mix2 = Z.p2 > 0 && Z.p2 < 1;
@@ -1209,17 +1209,17 @@ try {
       bayU.get('uWind').value = clock * 0.012;
       bayU.get('uFlow').value.set(flowNow.y, flowNow.z);
     }
-    // chuyển cảnh 4 (rừng → làng giấy) — CỬA GIẤY LÙA 障子 DỰNG 3D (p7b, soát p7a A1; scene/cua.js ghi rõ nhịp từng đoạn). Đổi cảnh
+    // chuyển cảnh 4 (rừng → làng giấy) — CỬA GIẤY LÙA 障子 DỰNG 3D (p7b, p7a A1; scene/cua.js ghi rõ nhịp từng đoạn). Đổi cảnh
     // đúng lúc cửa khép kín (x = 0,5). Lớp nắn màu nhận "giấy" (ấm nhẹ → ngà) suốt quãng chuyển và cả chương 皮.
     // (p7b) cửa giấy lùa dựng 3D: cảnh cửa vẽ riêng (frame) rồi đặt lên ảnh cảnh ở đây
     post.shojiPass.enabled = DOOR.on && !JX.on;
-    // không có chữ chương trong quãng cửa — lớp tối TAN DẦN theo x ở hai mép quãng (soát p9a B4: đặt thẳng 0 thì nửa dưới màn chớp
+    // không có chữ chương trong quãng cửa — lớp tối TAN DẦN theo x ở hai mép quãng (p9a B4: đặt thẳng 0 thì nửa dưới màn chớp
     // sáng một khung lúc bắt đầu và chớp tối lúc tới)
     const edgeK = (x) => 1 - sm(0, 0.12, x) * (1 - sm(0.88, 1, x));
     if (DOOR.on) khungU.get('uFrame').value.z *= edgeK(DOOR.x);
     // chuyển cảnh 5 (làng giấy → 仕事): máy trong làng đã tiến sát một ô giấy (x ≤ 0,34, xem langPush); mực vẽ bản quy hoạch lên tờ
     // giấy (0,3 → 0,68), rồi giấy tan thành thung lũng (0,62 → 0,95) — thung lũng vẽ vào khung đệm "cảnh đến" trong quãng tan
-    // (soát p9a A1/A3/A4) máy dừng ở khung còn thấy nan (giaFrame); mọi thứ trên giấy tính trong toạ độ tờ giấy (phép chiếu uH);
+    // (p9a A1/A3/A4) máy dừng ở khung còn thấy nan (giaFrame); mọi thứ trên giấy tính trong toạ độ tờ giấy (phép chiếu uH);
     // mực bắt đầu vẽ sớm (0,12 — máy còn đang tiến), vẽ đều tới 0,6; mực loang 0,48 → 0,8 (đều); thung lũng hiện 0,62 → 0,95 (ngay sau mép loang)
     const gOn = GIAY.on && !JX.on && GIAY.x > 0.004 && GIAY.x < GSW && !!planRT;
     post.giayPass.enabled = gOn;
@@ -1236,7 +1236,7 @@ try {
     }
     // (phần 9) chuyển cảnh 6: hai cảnh hoà theo chính nét cọ — cảnh 仕事 (máy đang bay theo nét) vẽ vào khung đệm "cảnh cũ", cảnh 連絡 là
     // chuỗi đang vẽ; vùng đất mới thấm ra từ nét trên màn
-    // (soát p11a A1) TRƯỚC quãng hoà (p6 MIST0 → W0): bản đồ 仕事 chìm dần vào sương đêm, chỉ nét cọ còn sáng — lúc cảnh mới loang ra từ
+    // (p11a A1) TRƯỚC quãng hoà (p6 MIST0 → W0): bản đồ 仕事 chìm dần vào sương đêm, chỉ nét cọ còn sáng — lúc cảnh mới loang ra từ
     // nét thì quanh nó chỉ là sương, không còn nhà cửa của bản đồ chồng lên cảnh mới
     const pre6 = !JX.on && lienheReady && viecReady && Z.p6 > MIST0 && Z.p6 <= W0;
     const d6 = !JX.on && lienheReady && viecReady && Z.p6 > W0 && Z.p6 < W1;
@@ -1257,7 +1257,7 @@ try {
     const w6 = JX.on ? (JX.to === 6 ? JX.w : JX.from === 6 ? 1 - JX.w : 0) : lienheReady ? sm(0.55, 1.0, Z.p6) : 0;
     if (w6 > 0) {
       const F = khungU.get('uFrame').value;
-      // (soát p10a B2) đang gõ: dải tối lên tới trên mép form (form đứng cao lên khi bàn phím mở)
+      // (p10a B2) đang gõ: dải tối lên tới trên mép form (form đứng cao lên khi bàn phím mở)
       const LD = portrait && window.__kozoChuong && window.__kozoChuong.lhDo ? window.__kozoChuong.lhDo() : null;
       const top6 = LD && LD.typing ? Math.max(0.55, Math.min(0.92, 1 - LD.formTop / window.innerHeight + 0.16)) : 0.55;
       TOP6 += (top6 - TOP6) * 0.15; if (Math.abs(top6 - TOP6) < 0.002) TOP6 = top6;
@@ -1265,7 +1265,7 @@ try {
       else F.set(F.x * (1 - w6), F.y + (0.24 * LOWK - F.y) * w6, F.z + (0.8 * Z.ui - F.z) * w6);
       if (portrait) { khungU.get('uSide').value *= 1 - w6; khungU.get('uTopK').value = Z.ui; }
     }
-    // chuyển cảnh 6 (không có chữ chương trong quãng bay): lớp tối tan dần ở hai mép quãng, không đặt thẳng 0 (soát p9a B4)
+    // chuyển cảnh 6 (không có chữ chương trong quãng bay): lớp tối tan dần ở hai mép quãng, không đặt thẳng 0 (p9a B4)
     if (TR6.on) khungU.get('uFrame').value.z *= edgeK(Z.p6);
     // chương 仕事: lớp tối rất mềm sau thẻ hình vẽ (thẻ không khung, không tấm nền)
     const cr = !JX.on && Z.p5 >= 1 && viec ? viec.cardRect() : null;
@@ -1286,8 +1286,8 @@ try {
     // (29/9: lượt làm nét kẹp chống chấm đen bật cho CẢ TRANG — post/chuyen.js CasEffect, mặc định uClampK = 1)
     // chương 皮: song cửa sổ mảnh ở mép khung bị nhiễu sắc viền hồng → nhiễu sắc còn một nửa (chỉ khi đang ở làng)
     if (post.chroma) {
-      // (trong quãng cửa: tắt hẳn tách màu — viền đỏ xanh ở mép cánh, soát p7a A1)
-      // (A10, soát p7a: chương 地 — mép bậc ruộng nhìn sượt chỉ còn 1–2 điểm ảnh, tách màu biến nó thành dải hạt viền đỏ xanh →
+      // (trong quãng cửa: tắt hẳn tách màu — viền đỏ xanh ở mép cánh, p7a A1)
+      // (A10, p7a: chương 地 — mép bậc ruộng nhìn sượt chỉ còn 1–2 điểm ảnh, tách màu biến nó thành dải hạt viền đỏ xanh →
       //  ở ruộng TẮT tách màu, làm nét còn một nửa; tan dần theo mực thấm / nét chổi quét)
       const vw = sm(0.5, 1.0, p) * (1 - sm(0.0, 0.5, Z.p2));
       // (Mike 30/9 "ánh sáng ở tòa tháp chỗ contact hơi kì") 連絡: song cửa sổ toà thành xa chỉ 1–2 điểm ảnh — tách màu nhuộm nó viền hồng
@@ -1318,10 +1318,10 @@ try {
   const TIL = { live: true, yaw: 0, pitch: 0 };   // độ nghiêng theo chuột của màn đầu (giữ nguyên lúc rời — xem chỗ đặt máy toà thành)
   let moTex = null;                    // (30/9) ảnh đứng của mờ chuyển (chép từ khung vẽ ra màn)
   const MO = { id: -1 }, MOV2 = new THREE.Vector2();
-  // đường cong của mờ chuyển (ảnh + giao diện dùng chung). (soát p11a A5) mờ VỀ MÀN ĐẦU ban ngày (đêm → ngày): buoc.js cho dài 1,15 s,
+  // đường cong của mờ chuyển (ảnh + giao diện dùng chung). (p11a A5) mờ VỀ MÀN ĐẦU ban ngày (đêm → ngày): buoc.js cho dài 1,15 s,
   // đường cong êm bậc năm rồi mũ 1,6 — nửa đầu ảnh đêm tan chậm (trộn tuyến tính một chút sáng ngày đã làm màn bừng lên), không "bật đèn"
   const moE = (MF) => { const x = MF.p; if (MF.to === 0 && MF.from > 0) return Math.pow(x * x * x * (x * (6 * x - 15) + 10), 1.6); return x * x * (3 - 2 * x); };
-  const FZ = { id: -1, corner: 0, ui: 0, pend: 0 }, MO_TXT = 0.24;          // (soát p10a B2) khung cảnh 連絡 dời lên khi đang gõ trên điện thoại (điểm ảnh CSS)
+  const FZ = { id: -1, corner: 0, ui: 0, pend: 0 }, MO_TXT = 0.24;          // (p10a B2) khung cảnh 連絡 dời lên khi đang gõ trên điện thoại (điểm ảnh CSS)
   // tiêu đề 連絡 góc trên phải: hộp đo một lần (đặt cố định bằng CSS), đo lại khi đổi cỡ cửa sổ
   let lhRect = null;
   const lhHeadRect = () => { if (!lhRect) { const e = document.getElementById('lh-dau'); if (e) { const r = e.getBoundingClientRect(); if (r.width > 0) lhRect = r; } } return lhRect; };
@@ -1343,7 +1343,7 @@ try {
   const nav = createBuoc({
     chapters: NAV_CH,
     // chuyển cảnh 5 lùi (仕事 → 皮) dài hơn: 1,6 s đầu máy 仕事 tua về đầu chương (nhìn thẳng xuống), rồi mới chạy ngược đúng hình
-    // chuyển cảnh đi (3,4 s) — soát p9a B3/A9: máy đứng ở tư thế nghiêng thì bản đồ nghiêng chồng lệch lên bản vẽ nhìn thẳng
+    // chuyển cảnh đi (3,4 s) — p9a B3/A9: máy đứng ở tư thế nghiêng thì bản đồ nghiêng chồng lệch lên bản vẽ nhìn thẳng
     // (phần 9) chuyển cảnh 6: 4,6 s — máy 仕事 bay theo nét ra khỏi bản đồ, hai cảnh hoà theo nét, máy 連絡 hạ xuống bãi; lùi 5,8 s (1,3 s
     // đầu máy 連絡 tua về tư thế tới nơi rồi mới chạy ngược đúng hình)
     trans: [{ dur: 3.2 }, { dur: 2.4 }, { dur: 2.8 }, { dur: 2.8 }, { dur: 3.8, back: 5.0 }, { dur: 4.6, back: TRANS6_BACK }],
@@ -1778,7 +1778,7 @@ try {
   }
   api.planRT = () => planRT;
 
-  // ── (soát p10a B4) 連絡: DỊCH SẴN shader NGAY KHI VÀO TRANG (như 仕事 ở p9b) — không đợi 仕事 dựng xong. Hình giả (lienhe.warmMeshes:
+  // ── (p10a B4) 連絡: DỊCH SẴN shader NGAY KHI VÀO TRANG (như 仕事 ở p9b) — không đợi 仕事 dựng xong. Hình giả (lienhe.warmMeshes:
   //   mỗi vật liệu × kiểu vẽ một lưới tí hon) · gửi dịch KHÔNG CHẶN (tối đa 3 chương trình đang dịch, mỗi khung gửi một) · dùng đầu ·
   //   vẽ đầu hình giả mỗi khung một cái. Tới lúc dựng 連絡 thì bước dịch của nó gần như chỉ còn tra bộ nhớ chương trình.
   const LW = { phase: 0, list: null, queue: [], inflight: [], objs: [], ui: 0, fd: 0, rt: null, log: [], t0: 0 };
@@ -1930,7 +1930,7 @@ try {
   // tờ giấy) — tới 0,34 thì giấy phủ kín màn, lưới nan đã trượt ra ngoài khung. Cộng SAU khi lang.update đặt máy theo τ.
   const PUSH = { q: new THREE.Quaternion(), p: new THREE.Vector3(), m: new THREE.Matrix4(), t: new THREE.Vector3(), up: new THREE.Vector3(0, 1, 0) };
   // khung cuối của máy trên tờ giấy (m): tâm một ô giấy, cao GIAY_HV (khổ dọc cao hơn để bề ngang vẫn đủ hai ô) — còn thấy nan
-  // đứng / nan ngang quanh ô (soát p9a A1: không bao giờ một mặt giấy trơn phủ kín màn)
+  // đứng / nan ngang quanh ô (p9a A1: không bao giờ một mặt giấy trơn phủ kín màn)
   const giayFrame = (asp) => { const hv = Math.max(0.46, 0.6 / asp); return { cx: 0.19, cy: LANG.SY0 + LANG.SHH / 2, z: LANG.DZ - 0.02, hv, hw: hv * asp }; };
   function langPush(k) {
     if (k <= 0) return;
@@ -2018,7 +2018,7 @@ try {
     if (g.userData.nFull === undefined) g.userData.nFull = g.instanceCount;
     g.instanceCount = Math.max(1, Math.round(g.userData.nFull * k));
   }
-  // (soát p10a B6) cỡ cảnh tính trên TRẦN, sàn cũng tính trên trần: trước đây sàn "0,7 × tỉ lệ màn" — màn ×3 (điện thoại) thành 2,1,
+  // (p10a B6) cỡ cảnh tính trên TRẦN, sàn cũng tính trên trần: trước đây sàn "0,7 × tỉ lệ màn" — màn ×3 (điện thoại) thành 2,1,
   // đè lên trần 1,15 ở mọi nấc (vẽ 3,3 lần số điểm ảnh, nấc 3–4 không hạ được gì). Màn ×1 thì y như cũ (0,85 / 0,75, sàn 0,7).
   const prFor = (scale) => Math.round(PR_TRAN * Math.max(MIN_OF_SCREEN, scale) * 100) / 100;
   function nacActions(n) {
@@ -2052,7 +2052,7 @@ try {
   api.setNac = (n) => { gov.set(n, 'bài kiểm'); };
   api.nacApply = (n) => setNac(n);   // bài kiểm: đổi nấc thẳng (bỏ qua bộ tự hạ) — đo khung lúc đổi
   api.pr = () => prNow;
-  // thu phóng trình duyệt (125%…) đổi tỉ lệ điểm ảnh: tính lại trần; đang ở trần cũ thì lên trần mới (soát p7a B10)
+  // thu phóng trình duyệt (125%…) đổi tỉ lệ điểm ảnh: tính lại trần; đang ở trần cũ thì lên trần mới (p7a B10)
   const recap = () => {
     const cap = prCap();
     if (cap === PR_TRAN) return;
@@ -2083,7 +2083,7 @@ try {
   // vạng + mực thấm) nén lại; về màn đầu: toà thành sống, cảnh chương vừa rời là ảnh chụp, mực thấm mở ra toà thành (bình minh).
   // Mỗi khung chỉ vẽ MỘT cảnh sống (+ một lần chụp lúc bắt đầu) — không nặng hơn chuyển cảnh thường, máy yếu vẫn chạy.
   const ZJ = {}, ZOo = {};
-  // A6 (soát p7a): khổ dọc, chương 地 — nét sáng nằm lệch phải khung ngang nên khung dọc hẹp để lọt mất; máy dọc quay dần về
+  // A6 (p7a): khổ dọc, chương 地 — nét sáng nằm lệch phải khung ngang nên khung dọc hẹp để lọt mất; máy dọc quay dần về
   // phía nét theo nhịp chương (0 lúc đầu chương → ~17° sang phải, ~13° cúi lúc cuối), liền mạch, không giật
   function valleyAim(tau) {
     if (!portrait) return;
@@ -2192,7 +2192,7 @@ try {
       if (nv.mode === 'trans') {
         // đang chuyển chương: chữ chương vừa rời mờ đi NGAY khi người xem ra hiệu đi; chữ chương đến giải mã khi tới nơi
         Z.text = 0.9;
-        // (p7b, soát p7a B2/B7) cảnh ĐANG RỜI đọc theo sOut: đi tiếp từ đúng tư thế + đà đang có (không tua nhanh / tua ngược
+        // (p7b, p7a B2/B7) cảnh ĐANG RỜI đọc theo sOut: đi tiếp từ đúng tư thế + đà đang có (không tua nhanh / tua ngược
         // chương); hiệu ứng chuyển cảnh + cảnh ĐẾN đọc theo s
         if (nv.from > 0) {
           const ZO = zones(nv.sOut, ZOo);
@@ -2224,7 +2224,7 @@ try {
     // (phần 9) chuyển cảnh 6 (仕事 ↔ 連絡): mọi thứ là hàm của vị trí ảo → đi tới đọc thẳng s. LÙI: máy 連絡 (và các lớp nét) tua về tư
     // thế tới nơi trong HOI6_RW đầu quãng — cả màn vẫn là 連絡 — rồi chuyển cảnh chạy ngược đúng hình từ tư thế tới nơi về 仕事
     TR6.on = !J && nv.mode === 'trans' && ((nv.from === 5 && nv.to === 6) || (nv.from === 6 && nv.to === 5));
-    // (soát p10a B3) vận tốc của 連絡 ngay trước khi lùi (vị trí ảo / giây) — quãng tua bắt đầu bằng ĐÚNG vận tốc ấy
+    // (p10a B3) vận tốc của 連絡 ngay trước khi lùi (vị trí ảo / giây) — quãng tua bắt đầu bằng ĐÚNG vận tốc ấy
     if (nv.mode !== 'trans') { HOI6.v = nv.cur === 6 && nv.mode === 'play' ? nv.v || 0 : 0; HOI6.sPrev = nv.cur === 6 ? Z.s6 : -1; }
     if (TR6.on && nv.dir < 0) {
       // (đầu quãng = đúng tư thế của KHUNG TRƯỚC — sOut của khung này đã trôi thêm một bước đà, cộng thêm bước của quãng tua thì máy đi
@@ -2248,14 +2248,14 @@ try {
       const txt = Z.text, nc = Z.navCur;
       Z = zones(sE); Z.text = txt; Z.navCur = nc;
     } else HOI6.back = false;
-    // giảm chuyển động: máy toà thành đứng yên, không nét mọc — chỉ tan hình (soát p7a B10)
+    // giảm chuyển động: máy toà thành đứng yên, không nét mọc — chỉ tan hình (p7a B10)
     if (nav.reduced) { Z.ct = 0; Z.lineL = 0; }
     // máy "thở" khi nghỉ: chỉ ở chương đang đứng, nở dần theo idleK, tắt dần khi rời (không giật)
     if (nv.mode === 'idle' && nv.cur > 0 && breathK < 0.001) breathCh = nv.cur;
     const bT = nv.mode === 'idle' && nv.cur === breathCh ? nv.idleK * nv.idleK * (3 - 2 * nv.idleK) : 0;
     breathK += (bT - breathK) * Math.min(1, dt * 2.5);
     if (bT === 0 && breathK < 1e-4) breathK = 0;
-    // (soát p10a A8) thung lũng chưa dựng xong: chỉ GIỮ chuyển cảnh 1 ở đầu khi đang ở GIỮA chuyển cảnh ấy. Đã đứng ở chương ≥ 2 (mở
+    // (p10a A8) thung lũng chưa dựng xong: chỉ GIỮ chuyển cảnh 1 ở đầu khi đang ở GIỮA chuyển cảnh ấy. Đã đứng ở chương ≥ 2 (mở
     // thẳng &chuong=6 lúc thung lũng còn dựng ngầm) thì Z.p = 1 như thường — trước đây ép 0 làm cả toà thành ban ngày chạy lại mỗi khung
     // và lượt ghép nét chạng vạng đọc ảnh độ sâu của 連絡 bằng máy màn đầu → một mảng sáng phẳng hình thang dưới bãi đất 1–2 s
     if (Z.p > 0 && Z.p < 1 && !valleyReady) Z.p = 0;
@@ -2288,7 +2288,7 @@ try {
       P2 = performance.now();
       if (ink) ink.update(dt, frozen ? froze : clock);
       P3 = performance.now();
-      // (30/9, Mike: "tilt chỉ ở trang home") rời màn đầu: độ nghiêng đang có về 0. (soát p11a B4: trước đây tắt gọn trong 0,4 s đầu
+      // (30/9, Mike: "tilt chỉ ở trang home") rời màn đầu: độ nghiêng đang có về 0. (p11a B4: trước đây tắt gọn trong 0,4 s đầu
       // mực thấm — con trỏ ở mép phải máy QUAY NGƯỢC −8°/s, mép trái vọt 13,6°/s: hai cú máy) → GIỮ NGUYÊN độ nghiêng lúc vừa rời
       // (đồng hồ chuột thôi tác dụng) và trả về 0 theo ĐÚNG nhịp Z.ct của cú máy chính: góc = nghiêng·(1 − ct) + đường chính(ct) — cả hai
       // là hàm tuyến tính của cùng một ct nên tổng là MỘT chuyển động, một chiều, một nhịp (không đổi chiều dù con trỏ ở đâu)
@@ -2358,7 +2358,7 @@ try {
     // (nhãn, thẻ) chỉ hiện khi đang đứng hẳn trong chương
     if (normal && viecReady && Z.p5 > 0.55 && Z.p6 < W1) {
       const uiK = !JX.on && nv.cur === 5 && (nv.mode === 'play' || nv.mode === 'idle') ? 1 : 0;
-      // (soát p10a A1) đầu chuyển cảnh 6 (đi tới): nhãn "Open Field · 2026 —" còn sáng thêm ~0,6 s — nét mới đi ra từ chính chấm ấy
+      // (p10a A1) đầu chuyển cảnh 6 (đi tới): nhãn "Open Field · 2026 —" còn sáng thêm ~0,6 s — nét mới đi ra từ chính chấm ấy
       const keep = !JX.on && nv.mode === 'trans' && nv.from === 5 && nv.to === 6 && Z.p6 < 0.17 ? 4 : -1;
       viec.update(dts, Z.tau5, uiK, Z.tau5p ?? Z.tau5, Z.ex6, keep);
       if (breathCh === 5) breathe(viec.camera);
@@ -2368,7 +2368,7 @@ try {
     } else if (viecReady && !JX.on) viec.update(0, Z.tau5, 0, Z.tau5p ?? Z.tau5);
     // 連絡: từ ngay trước quãng hoà cảnh (máy đã đang hạ khi vùng đất mới thấm ra) → vẽ thẳng vào chuỗi hậu kỳ
     if (normal && lienheReady && Z.p6 > W0 - 0.03) {
-      // (soát p10a B2) điện thoại đang gõ: dời khung cảnh lên đủ để cả bãi đất (nét 地縄, dây, cọc) nằm TRÊN mép form — sau chữ form là
+      // (p10a B2) điện thoại đang gõ: dời khung cảnh lên đủ để cả bãi đất (nét 地縄, dây, cọc) nằm TRÊN mép form — sau chữ form là
       // phần sườn tối như lúc nghỉ, ở mọi kiểu bàn phím ảo (khung nhìn chồng lên trang / khung trang co lại / trang cuộn lên). Dời êm
       // (~0,15 s), gõ xong thì về
       const LD = window.__kozoChuong && window.__kozoChuong.lhDo ? window.__kozoChuong.lhDo() : null;
@@ -2388,9 +2388,9 @@ try {
     // dấu 緑青 trên cột chương: sang chương đích ngay khi trang nhận cú cuộn và GIỮ ở đó suốt chuyển cảnh (Mike 1/10: trước đây nó sang
     // chương mới lúc nhận cú cuộn, rồi nhảy về chương cũ khi chuyển cảnh bắt đầu, tới giữa chuyển cảnh mới sang lại)
     if (nv.mode === 'trans' && nv.to >= 1) Z.navCur = nv.to;
-    // (soát p9a B2) bấm tên chương mà chương ấy còn đang dựng: ô 緑青 sang chương đích NGAY lúc bấm — trang đã nhận cú bấm
+    // (p9a B2) bấm tên chương mà chương ấy còn đang dựng: ô 緑青 sang chương đích NGAY lúc bấm — trang đã nhận cú bấm
     if (nv.pend >= 1 && (nv.mode === 'idle' || nv.mode === 'play')) Z.navCur = nv.pend;
-    // (soát p10a B4) ở MÀN ĐẦU cột chương chưa hiện: có cú bấm đang chờ (End, Contact…) thì cột chương hiện lên ngay với ô 緑青 ở chương
+    // (p10a B4) ở MÀN ĐẦU cột chương chưa hiện: có cú bấm đang chờ (End, Contact…) thì cột chương hiện lên ngay với ô 緑青 ở chương
     // đích — dấu hiệu nhẹ "trang đã nhận", trong lúc chương ấy dựng nốt
     PENDK += ((nv.pend >= 1 && nv.cur === 0 && !nav.reduced ? 1 : 0) - PENDK) * Math.min(1, dt * 6);
     if (PENDK < 1e-3) PENDK = 0;
@@ -2398,7 +2398,7 @@ try {
     // (30/9, Mike) MỜ CHUYỂN: ô 緑青 ở chương đích ngay từ khung chụp; ảnh đứng của khung cũ tan dần trên cảnh mới (post.moPass)
     const MF = nv.fade;
     if (MF) Z.navCur = MF.to;
-    // (soát p11a A2 / B3) chữ + giao diện đi THEO NHỊP MỜ: chữ bốn góc, khung vát, logo, cột chương nội suy từ số ở khung chụp sang
+    // (p11a A2 / B3) chữ + giao diện đi THEO NHỊP MỜ: chữ bốn góc, khung vát, logo, cột chương nội suy từ số ở khung chụp sang
     // số của chương đích theo đúng đường cong của ảnh (không bật / tắt cụt trong một khung); chữ chương cũ tắt gọn (0,18 s — chuong.js),
     // chữ chương đích chỉ bắt đầu giải mã sau MO_TXT giây, lúc chữ cũ đã tắt hẳn
     Z.textFast = !!(MF && !MF.capture);
@@ -2417,7 +2417,7 @@ try {
       post.moPass.enabled = moOn;
       if (moOn) { post.moFx.uniforms.get('uK').value = 1 - moE(MF); post.moFx.uniforms.get('tOld').value = moTex; }
     }
-    // nét hình vẽ của thẻ 仕事: lượt riêng sau lớp tối sau chữ (soát p9a A2)
+    // nét hình vẽ của thẻ 仕事: lượt riêng sau lớp tối sau chữ (p9a A2)
     if (post.hudPass) {
       const hOn = !!(viec && viecReady && !JX.on && Z.p5 >= 1 && viec.hudOn);
       post.hudPass.enabled = hOn;
@@ -2465,10 +2465,10 @@ try {
       let need = 0;
       const want = (k) => { if (!need && k > 0 && k <= 6 && !ready[k]) need = k; };
       const busy = nv.mode === 'trans' || nv.mode === 'jump';
-      // (soát p9a B2) có người ĐANG CHỜ (đã bấm tên chương / lăn tới mà chương chưa dựng xong, hoặc đứng ở cổng chờ) → mỗi khung
+      // (p9a B2) có người ĐANG CHỜ (đã bấm tên chương / lăn tới mà chương chưa dựng xong, hoặc đứng ở cổng chờ) → mỗi khung
       // dành ~7 ms cho việc dựng thay vì 1,5–3 ms
       const hurry = st.pend !== null || st.queue !== null || !!nv.waiting;
-      // (lăn sớm: thung lũng đang được chờ ở cổng chạng vạng) · (Sếp 29/9 sau p9b: cuộn rất nhanh phải chờ rừng dựng) đang chuyển tới
+      // (lăn sớm: thung lũng đang được chờ ở cổng chạng vạng) · (29/9 sau p9b: cuộn rất nhanh phải chờ rừng dựng) đang chuyển tới
       // một chương ĐÃ SẴN thì dựng luôn chương SAU nó, ngân sách nhỏ như lúc nghỉ — người lăn liên tục không phải đứng chờ ở chương kế
       if (busy) { want(nv.to); if (nv.mode === 'trans' && nv.dir > 0) want(nv.to + 1); }
       else {
@@ -2476,13 +2476,13 @@ try {
         if (st.queue !== null) want(st.queue);
         if (QS.has('chuong')) want(Math.round(+QS.get('chuong') || 0));
         want(nv.cur + 1);
-        // (soát p9a B2) đã vào trang (qua màn đầu) thì dựng ngầm LẦN LƯỢT mọi chương còn thiếu — không chờ người xem tới chương
+        // (p9a B2) đã vào trang (qua màn đầu) thì dựng ngầm LẦN LƯỢT mọi chương còn thiếu — không chờ người xem tới chương
         // đứng trước nó: bấm "Work" từ chương nào cũng đã sẵn (hoặc gần sẵn)
-        // (Sếp 29/9 sau p9b, lỗi cũ p7b "cuộn rất nhanh phải chờ rừng dựng") bắt đầu ngay khi màn mở xong và thung lũng đã sẵn — lúc
+        // (29/9 sau p9b, lỗi cũ p7b "cuộn rất nhanh phải chờ rừng dựng") bắt đầu ngay khi màn mở xong và thung lũng đã sẵn — lúc
         // người xem còn đứng ở màn đầu — không chờ tới 地
         if (nv.cur >= 1 || api.dungHet || (api.introDone && valleyReady)) for (let k = 1; k <= 6; k++) want(k);
       }
-      // (soát p11a B5 — mở trang lần đầu: 地 giật 25 khung, dài nhất 517 ms, trùng lúc dịch shader rừng + dịch sẵn 仕事 / 連絡) việc NẶNG
+      // (p11a B5 — mở trang lần đầu: 地 giật 25 khung, dài nhất 517 ms, trùng lúc dịch shader rừng + dịch sẵn 仕事 / 連絡) việc NẶNG
       // của card đồ hoạ — gửi dịch chương trình (trên Windows khâu dịch GLSL → HLSL chạy ngay trên luồng đồ hoạ), dùng đầu, vẽ đầu —
       // CHỈ làm khi chương đang NGHỈ (không lúc chương đang chạy nét, không lúc chuyển cảnh / mờ chuyển), trừ khi có người đang chờ
       // chương ấy; và MỖI KHUNG TỐI ĐA MỘT việc nặng (của mọi chương cộng lại). Việc của luồng chính (dựng hình từng mẩu) vẫn chạy mọi lúc.
@@ -2507,14 +2507,14 @@ try {
         do { vbStep(hurry ? Math.max(0.5, tE - performance.now()) : 1.5); if (!hurry || VB.phase >= 5 || VB.phase < 3) break; } while (performance.now() < tE && ++guard < 200);
       }
       else if (need === 6 && LH.phase < 5) { ph = 50 + LH.phase; lhStep(hurry ? 7 : 2.5); }
-      // (Sếp 29/9 sau p9b) DỊCH SẴN shader 仕事 NGAY KHI VÀO TRANG (sau màn mở), song song với việc dựng các chương khác: gửi dịch
+      // (29/9 sau p9b) DỊCH SẴN shader 仕事 NGAY KHI VÀO TRANG (sau màn mở), song song với việc dựng các chương khác: gửi dịch
       // KHÔNG CHẶN (KHR_parallel_shader_compile — mỗi khung gửi một chương trình, tối đa hai cái đang dịch, chỉ hỏi "xong chưa"),
       // dùng đầu, rồi vẽ đầu hình giả mỗi khung một cái. Tới lúc người xem bấm Work thì chỉ còn dựng hình (việc của luồng chính,
       // chia mẩu) — không còn khung nào phải đợi card dịch shader.
       // (không cùng khung với bước dịch / vẽ đầu của chương khác — hai việc của card dồn một khung thì khung ấy dài)
       let early = false;
       if (need !== 5 && (ph < 0 || ph % 10 >= 3) && viec && VB.phase < 3 && !busy && api.ready && (!INTRO_MODE || api.introDone) && (VB.phase < 1 || (gpuOK && !heavyDone))) { const p0 = VB.phase; vbStep(1.5); if (ph < 0) ph = 40 + p0; early = true; if (p0 >= 1) heavyDone = true; }
-      // (soát p10a B4) dịch sẵn shader 連絡 ngay khi vào trang, xen kẽ với 仕事 (không cùng khung với một bước dịch / vẽ đầu khác; cùng
+      // (p10a B4) dịch sẵn shader 連絡 ngay khi vào trang, xen kẽ với 仕事 (không cùng khung với một bước dịch / vẽ đầu khác; cùng
       // khung với bước DỰNG hình của 連絡 thì được — việc ấy chỉ của luồng chính). Người xem đang CHỜ 連絡 (bấm End / Contact từ màn
       // đầu) thì chạy luôn, kể cả khi màn mở chưa xong
       const want6 = st.pend === 6 || st.queue === 6 || (busy && nv.to === 6);
@@ -2522,7 +2522,7 @@ try {
         // tạo cảnh + hình giả (0, 0.5), gửi dịch / hỏi xong chưa (1), dùng đầu (1.5): việc rất nhẹ của luồng chính (card dịch ở luồng
         // riêng) → mọi khung không chuyển cảnh, kể cả khi chương khác đang dựng ngầm cùng khung. Vẽ đầu hình giả (2): chỉ khung không có
         // việc ngầm nào khác (hoặc người xem đang chờ 連絡)
-        // (soát p11a B5) chỉ tạo cảnh + hình giả (0, 0.5) là việc nhẹ; gửi dịch / dùng đầu / vẽ đầu là việc NẶNG của card — như mọi
+        // (p11a B5) chỉ tạo cảnh + hình giả (0, 0.5) là việc nhẹ; gửi dịch / dùng đầu / vẽ đầu là việc NẶNG của card — như mọi
         // chương: chỉ lúc nghỉ (hoặc có người chờ 連絡) và không cùng khung với việc nặng khác
         const light = LW.phase <= 0.5;   // (tạo cảnh + hình giả đo được ≤ 1 ms)
         if (light || (!heavyDone && (want6 || gpuOK))) { const p0 = LW.phase; lwStep(); if (ph < 0) ph = 60 + Math.floor(p0 * 2); }

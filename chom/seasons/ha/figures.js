@@ -1,5 +1,5 @@
 // Chớm world, season Hạ: the two main people, as simple stand-ins until their own folders exist in people/.
-// TẠM: chờ Agent Nhân Vật (people/<name> for the roles teaMaker / picker; season.js builds a stand-in only for a role nobody plays).
+// TẠM: chờ lớp nhân vật (people/<name> for the roles teaMaker / picker; season.js builds a stand-in only for a role nobody plays).
 // They reuse person() / solveArm() from people/placeholder (imported, not changed)
 // and take the poses the real ones will have:
 //   teaMaker  sits on a low stool at the tea table, nón lá bowed over an open lotus in her left hand; her right hand takes a pinch of
