@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Blind Alley Pictures · Animation studio, Glasgow</title>
+<meta name="description" content="Seven animators and a camera operator in a dead-end lane in Glasgow, making ads and music videos from pencil and cut paper.">
+<meta property="og:title" content="Blind Alley Pictures · Animation studio, Glasgow">
+<meta property="og:description" content="Seven animators and a camera operator in a dead-end lane in Glasgow, making ads and music videos from pencil and cut paper.">
+<meta property="og:url" content="https://shockingmike.github.io/blind-alley/">
+<meta property="og:image" content="https://shockingmike.github.io/blind-alley/og.jpg">
+<meta property="og:image:alt" content="Blind Alley Pictures · Animation studio, Glasgow">
+<meta property="og:locale" content="en_US">
+<meta property="og:type" content="website">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="627">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#17131A">
+<link rel="icon" href="./brand/favicon.ico" sizes="any">
+<link rel="icon" href="./brand/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./brand/apple-touch-icon.png">
+<link rel="manifest" href="./brand/site.webmanifest">
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/",
+    "opentype": "https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.module.min.js"
+  }
+}
+</script>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.core.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/loaders/GLTFLoader.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/utils/BufferGeometryUtils.js">
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/opentype.js@1.3.4/dist/opentype.module.min.js">
+<link rel="stylesheet" href="./style.css" id="css-chinh" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="./style.css"></noscript>
+<style>
+html, body { margin: 0; height: 100%; background: #17131a; overflow: hidden; }
+.an { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@font-face { font-family: "Special Elite"; font-weight: 400; font-display: swap; src: url("./fonts/special-elite.woff2") format("woff2"); }
+#tai { position: fixed; inset: 0; z-index: 30; background: #17131a; transition: opacity .6s ease; }
+#tai.xong { opacity: 0; pointer-events: none; }
+#tai.dung > * { visibility: hidden; }
+#tai-ve { position: absolute; left: 0; top: 0; width: 100%; height: 100%; display: block; }
+.tai-dong { position: absolute; left: 0; right: 0; bottom: 40px; margin: 0; display: flex; justify-content: center; gap: 16px; pointer-events: none; opacity: 0;
+  font: 13px/1 "Special Elite", "Courier Prime", "Courier New", monospace; letter-spacing: .18em; text-transform: uppercase; color: #b1a09e; }
+.tai-so { color: #f3dcd6; min-width: 4.6ch; font-variant-numeric: tabular-nums; }
+@media (max-width: 640px) { .tai-dong { bottom: 26px; font-size: 12px; } }
+</style>
+</head>
+<body>
+<p class="an" id="nhan-studio">Animation studio · Glasgow</p>
+<h1 class="an" id="tieu-de">Everyone here carries a blade.</h1>
+<ul class="an" id="gioi-thieu"></ul>
+<div class="hieu" role="img" aria-label="Blind Alley Pictures"><img src="./brand/khoa-ngang_mau-tren-muc.svg" alt="" width="807" height="189"></div>
+<div id="tai">
+  <canvas id="tai-ve" aria-hidden="true"></canvas>
+  <p class="tai-dong" id="tai-dong" aria-hidden="true"><span class="tai-nhan" id="tai-nhan">Cutting the titles</span><span class="tai-so" id="tai-so">0%</span></p>
+  <p class="an" id="tai-doc" role="status" aria-live="polite">Cutting the titles 0%</p>
+</div>
+<div id="hong" class="hong" role="alert" hidden>
+  <div class="hong-khung">
+    <p class="hong-tua" id="hong-tua"></p>
+    <p class="hong-cau" id="hong-cau"></p>
+    <p class="hong-ly" id="hong-ly"></p>
+    <button type="button" class="hong-nut" id="hong-nut">Try again</button>
+  </div>
+</div>
+<main id="san" aria-label="Scene"></main>
+<nav id="dai" aria-label="Film reel"></nav>
+<noscript><p class="ns">Blind Alley Pictures. This film needs JavaScript and WebGL.</p></noscript>
+<script>
+  (function () {
+    try { performance.mark('tai-bat-dau'); } catch (e) { }
+    var D = document, tai = D.getElementById('tai'), cv = D.getElementById('tai-ve'), g = cv.getContext('2d');
+    var soEl = D.getElementById('tai-so'), docEl = D.getElementById('tai-doc'), nhanEl = D.getElementById('tai-nhan'), dongEl = D.getElementById('tai-dong');
+    var QS = location.search, TU_DONG = !!navigator.webdriver && !/[?&]chon=1/.test(QS), BO_CHO = /[?&]cho=0(&|$)/.test(QS);
+    var GIAM = matchMedia('(prefers-reduced-motion: reduce)');
+    var MUC = '#17131a', DEN = '#34399a', DO = '#ff1f4f', GIAY = '#f3dcd6', R_DEN = [52, 57, 154], R_DO = [255, 31, 79], R_GIAY = [243, 220, 214];
+    var N = { batDau: 0.45, vmax: 36, giuaLa: 0.6, la: 0.42, mat: [0.12, 0.48], trong: [0.38, 0.78], chu: 0.6, presents: 1.1, giu: 2.0, ve: 0.7 };
+    N.ten = N.presents + 8 / 18;
+    N.roi = N.ten + N.giu;
+    var kep = function (x) { return x < 0 ? 0 : x > 1 ? 1 : x; };
+    var ss = function (a, b, x) { var t = kep((x - a) / (b - a)); return t * t * (3 - 2 * t); };
+    var tron = function (t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; };
+    var raNhanh = function (t) { return 1 - Math.pow(1 - kep(t), 3); };
+    var raRatNhanh = function (t) { return 1 - Math.pow(1 - kep(t), 5); };
+    var vao = function (t) { t = kep(t); return t * t * t; };
+    var lerp = function (a, b, t) { return a + (b - a) * t; };
+    var hash = function (i, j) { var h = (Math.imul(i | 0, 374761393) + Math.imul(j | 0, 668265263)) | 0; h = Math.imul(h ^ (h >>> 13), 1274126177); return ((h ^ (h >>> 16)) >>> 0) / 4294967296; };
+
+    var LA = [
+      function () { return [[27.4, 36.47], [237.74, 33.53], [228.6, 69.66], [18.26, 72.6]]; },
+      function (m) { return [[27.65, 85.07], [238, 85.07], [228.35, 121.07], [212, 121.07], [128, m], [44, 121.07], [18, 121.07]]; },
+      function (m) { return [[228.35, 171.07], [238, 135.07], [212, 135.07], [128, m], [44, 135.07], [27.65, 135.07], [18, 171.07]]; },
+      function () { return [[228.09, 222.47], [238.24, 186.6], [27.91, 183.67], [17.76, 219.53]]; }];
+    var CHU_D = 'M540.15 -95.13L521.18 -95.79L514.7 -63.49L510.49 -96.16L491.47 -96.83L504.54 -31.91L503.44 -0.35L521.53 0.28L522.64 -31.28ZM464.35 -18.9L463.2 -40.85L481.29 -41.8L480.34 -59.83L462.26 -58.88L461.28 -77.56L480.13 -78.55L479.16 -97.07L440.81 -95.06L445.83 0.81L485.43 -1.27L484.45 -19.95ZM104.67 -95.74L107.18 0.23L125.72 -0.26L123.2 -96.23ZM181.14 1.17L186.17 -94.7L167.65 -95.67L165.24 -49.75L158.82 -96.13L139.1 -97.17L134.08 -1.3L152.82 -0.32L155.33 -48.25L162.4 0.19ZM362.88 -96.2L343.69 -95.53L347.04 0.41L385.97 -0.95L385.4 -17.3L365.66 -16.61ZM412.96 -16.2L415.05 -95.81L395.85 -96.31L393.34 -0.34L432.27 0.68L432.7 -15.68ZM315.02 0.27L333.17 1.07L328.25 -95.24L295.72 -96.66L282.27 -1.16L300.91 -0.34L302.78 -15.77L314.33 -15.26ZM304.81 -31.02L310.59 -79.63L311.47 -79.59L313.53 -30.64ZM76.22 -16.15L79 -95.73L59.81 -96.4L56.46 -0.46L95.38 0.9L95.96 -15.46ZM236.82 -91.06L220.99 -96.13L194.61 -94.98L198.8 0.93L224.52 -0.19L240.9 -8.33L244.75 -29.58L242.79 -74.48ZM225.74 -22.36L220.67 -17.01L217.35 -16.86L214.63 -79.04L216.76 -79.13L222.02 -77.97L223.58 -71.84ZM44.99 -46.96L35.9 -54.16L43 -60.04L44.85 -71.12L44.63 -75.31L38.98 -91.87L23.49 -96.16L-2.49 -94.8L2.53 1.07L28.51 -0.29L41.33 -4.84L47.08 -16.02L47.97 -32.39ZM25.88 -67.12L25.38 -62.12L22.06 -59.87L18.14 -59.67L17.02 -80.97L21.05 -81.18L25.38 -76.76ZM27.19 -42.75L28.75 -36.36L29.38 -24.37L22.29 -16.9L20.38 -16.91L18.92 -44.69L22.46 -44.88ZM12.99 46.15L15 42.81L15.56 37.75L14.89 32.55L12.66 29.18L8.45 28L0 28L0 60L6.29 60L6.29 47.33L8.89 47.33ZM9.24 37.64L8.84 40.58L6.65 41.58L6.29 41.58L6.29 33.84L7 33.84L8.85 34.83ZM76.52 28L76.52 60L82.7 60L82.7 28ZM160 46.22L153.56 46.22L153.56 51.98L153.23 53.73L152.07 54.4L150.96 53.85L150.56 51.98L150.56 35.96L150.87 34.25L152.07 33.6L153.2 34.1L153.56 36.04L153.56 40.76L159.93 40.76L159.93 35.24L158.91 31.05L156.12 28.55L152.07 27.71L146.06 30.18L144.22 37.31L144.22 52.07L146.34 58.13L151.93 60.29L157.87 58.39L160 52.27ZM234.3 34.15L234.3 28L220.3 28L220.3 34.15L224.1 34.15L224.1 60L230.5 60L230.5 34.15ZM381.06 47.47L381.06 60L387.37 60L387.37 47.89L386.76 44.81L384.65 43.31L387.15 41.15L387.81 36.96L387.38 32.25L385.7 29.12L381.99 28L372.17 28L372.17 60L378.65 60L378.65 45.4L380.49 45.74ZM381.56 36.96L380.23 39.85L378.68 39.85L378.68 33.93L380.17 33.93L381.26 34.51ZM455.66 53.76L455.66 46.44L461.69 46.44L461.69 40.42L455.66 40.42L455.66 34.18L461.95 34.18L461.95 28L449.15 28L449.15 60L462.37 60L462.37 53.76ZM538.19 46.88L536.7 44.15L534.67 41.93L530.97 38.38L529.54 36.58L529.17 35.13L529.53 34.03L530.65 33.6L531.66 33.96L532.03 34.98L532.03 37.18L538.54 37.18L536.69 30.05L530.45 27.71L524.95 29.85L523.05 36.09L526.27 43.04L529.14 45.76L531.13 47.86L532.14 49.75L532.43 52.22L532.09 53.89L530.88 54.4L529.71 53.77L529.37 52.04L529.37 48.04L523.05 48.04L523.05 51.16L524.98 58.11L531.3 60.29L537.09 57.74L538.76 50.67ZM310.49 28L304.27 28L304.27 51.18L304.19 52.73L303.78 53.94L302.71 54.4L301.66 53.93L301.24 52.72L301.15 51.18L301.15 28L294.93 28L294.93 51.44L296.82 58.05L302.71 60.29L308.6 58.05L310.49 51.44Z';
+    var CHU_P = {"e":[544,[[501,-102,488,-65,440,-26,363,10,262,22,204,9,117,-51,76,-105,49,-179,40,-234,53,-284,52,-334,81,-401,115,-431,123,-451,220,-489,295,-498,331,-490,408,-450,458,-408,477,-354,498,-333,494,-239,459,-214,366,-225,171,-215,122,-201,125,-171,142,-135,176,-97,254,-58,338,-47,424,-119,441,-123,498,-124],[428,-300,415,-381,400,-374,308,-417,248,-423,168,-375,137,-361,120,-319,126,-300,157,-285,219,-276,385,-280,417,-287]]],"n":[632,[[611,-13,593,8,456,21,386,10,360,-13,353,-42,364,-49,457,-57,446,-207,459,-315,435,-386,390,-403,313,-389,279,-357,259,-350,243,-322,228,-321,200,-259,204,-210,191,-179,207,-136,205,-86,215,-72,283,-38,280,8,197,23,81,15,50,0,46,-42,62,-58,109,-64,123,-77,132,-123,126,-175,137,-205,133,-316,122,-369,105,-388,42,-417,33,-441,38,-467,84,-483,165,-472,187,-453,211,-391,274,-458,318,-481,399,-490,468,-468,513,-410,534,-323,521,-205,530,-120,519,-91,547,-59,592,-57],[506,-197,494,-211,485,-196,495,-181],[514,-103,506,-112,491,-86,499,-77],[189,-208,177,-236,151,-229,161,-208,186,-196]]],"p":[587,[[546,-238,529,-123,502,-71,430,2,388,19,334,17,313,28,206,-13,180,-6,169,68,155,70,177,142,191,158,258,172,267,189,260,212,233,221,42,215,15,201,14,185,92,158,113,153,119,112,127,-85,113,-219,124,-246,114,-276,121,-345,113,-368,90,-391,8,-418,8,-442,52,-459,92,-453,135,-461,193,-421,340,-465,404,-454,462,-426,504,-389,509,-351,528,-327,526,-304],[323,-446,312,-452,308,-439],[489,-223,480,-265,441,-354,360,-403,310,-396,266,-411,266,-396,241,-369,206,-347,189,-306,181,-244,183,-118,230,-68,269,-46,360,-32,431,-75,475,-146,475,-187]]],"r":[579,[[565,-356,538,-299,464,-300,445,-313,433,-339,433,-404,410,-397,392,-404,359,-391,329,-355,288,-336,238,-237,245,-99,274,-71,348,-70,350,-35,370,-49,378,-43,371,-10,350,-4,316,-19,295,-10,299,7,291,14,202,7,176,14,142,0,60,11,29,-7,61,-48,119,-52,159,-76,171,-103,175,-183,169,-349,159,-393,144,-406,90,-402,48,-412,33,-433,42,-465,68,-474,201,-474,221,-466,243,-427,259,-422,352,-471,447,-492,494,-476,530,-449]]],"s":[520,[[480,-149,454,-77,389,-16,357,-16,297,5,158,-17,99,27,78,29,53,-26,61,-124,48,-171,66,-196,104,-183,146,-93,174,-73,206,-72,209,-64,293,-73,327,-64,370,-100,390,-106,407,-154,389,-193,340,-224,276,-241,223,-231,219,-244,181,-266,154,-248,120,-248,90,-266,74,-297,55,-354,59,-405,97,-460,131,-485,275,-496,350,-475,383,-482,403,-473,412,-481,435,-464,446,-437,446,-329,417,-308,372,-339,376,-362,355,-386,308,-409,278,-405,183,-420,149,-381,132,-377,154,-328,207,-284,240,-292,359,-285,402,-269,463,-207]]],"t":[510,[[488,-173,454,-38,416,3,353,23,233,34,205,3,186,-4,175,-53,143,-74,120,-152,124,-244,139,-276,133,-297,146,-376,56,-399,1,-449,5,-465,20,-476,129,-511,138,-541,136,-627,152,-664,178,-690,194,-692,215,-666,223,-584,216,-545,237,-501,391,-486,443,-463,440,-442,423,-428,280,-419,249,-403,231,-379,223,-336,231,-194,268,-90,306,-73,368,-90,379,-106,373,-155,434,-201,478,-196]]]};
+    var CHU_TO = null, CHU_NHO = null, HINH_P = null;
+    function dungChu() {
+      if (CHU_TO) return;
+      var ph = CHU_D.split('Z'), to = '', nho = '';
+      for (var i = 0; i < ph.length; i++) { if (!ph[i].trim()) continue; var so = ph[i].match(/-?\d+(\.\d+)?/g), ym = 1e9; for (var j = 1; j < so.length; j += 2) ym = Math.min(ym, +so[j]); if (ym < 10) to += ph[i] + 'Z'; else nho += ph[i] + 'Z'; }
+      CHU_TO = new Path2D(to); CHU_NHO = new Path2D(nho);
+      HINH_P = {};
+      for (var k in CHU_P) { var p = new Path2D(); CHU_P[k][1].forEach(function (v) { p.moveTo(v[0], v[1]); for (var n = 2; n < v.length; n += 2) p.lineTo(v[n], v[n + 1]); p.closePath(); }); HINH_P[k] = p; }
+    }
+
+    var K = { W: 0, H: 0, R: 1, dt: false };
+    function boTri() {
+      K.W = innerWidth; K.H = innerHeight; K.R = Math.min(devicePixelRatio || 1, 2);
+      cv.width = Math.round(K.W * K.R); cv.height = Math.round(K.H * K.R);
+      K.dt = K.W <= 640 || K.H > K.W * 1.15;
+      D.documentElement.style.setProperty('--tai-day', (K.dt ? 64 : 84) + 'px');
+    }
+    function boCuc() {
+      if (K.dt) { var s1 = K.W * 0.5; return { k: s1 / 256, cx: K.W / 2, cy: K.H * 0.34, wm: K.W * 0.8 }; }
+      var s2 = Math.min(K.H * 0.34, K.W * 0.24); return { k: s2 / 256, cx: K.W / 2, cy: K.H * 0.36, wm: Math.min(K.W * 0.34, s2 * 1.95) };
+    }
+    var NG = null, _d = null, _dx = null, _o = null, _ox = null;
+    function lopHat(hop, veMat, rgb, lech) {
+      if (!NG) { NG = new Uint8Array(65536); for (var y = 0; y < 256; y++) for (var x = 0; x < 256; x++) NG[y * 256 + x] = Math.floor(hash(x * 7 + 13, y * 11 + 5) * 255);
+        _d = D.createElement('canvas'); _dx = _d.getContext('2d', { willReadFrequently: true }); _o = D.createElement('canvas'); _ox = _o.getContext('2d'); }
+      var x0 = Math.max(0, Math.floor(hop[0])), y0 = Math.max(0, Math.floor(hop[1])), x1 = Math.min(Math.ceil(K.W), Math.ceil(hop[2])), y1 = Math.min(Math.ceil(K.H), Math.ceil(hop[3]));
+      var w = x1 - x0, h = y1 - y0; if (w <= 0 || h <= 0) return;
+      if (_d.width < w || _d.height < h) { _d.width = Math.max(_d.width, w); _d.height = Math.max(_d.height, h); }
+      if (_o.width < w || _o.height < h) { _o.width = Math.max(_o.width, w); _o.height = Math.max(_o.height, h); }
+      _dx.setTransform(1, 0, 0, 1, 0, 0); _dx.clearRect(0, 0, w, h); _dx.setTransform(1, 0, 0, 1, -x0, -y0);
+      veMat(_dx);
+      var src = new Uint32Array(_dx.getImageData(0, 0, w, h).data.buffer), im = _ox.createImageData(w, h), u = new Uint32Array(im.data.buffer);
+      var col = (255 << 24) | (rgb[2] << 16) | (rgb[1] << 8) | rgb[0];
+      for (var j = 0; j < h; j++) { var hang = ((y0 + j + (lech | 0)) & 255) << 8, r0 = j * w;
+        for (var i = 0; i < w; i++) { var a = src[r0 + i] >>> 24; if (a && (a === 255 || a > NG[hang | ((x0 + i) & 255)])) u[r0 + i] = col; } }
+      _ox.putImageData(im, 0, 0);
+      g.save(); g.setTransform(K.R, 0, 0, K.R, 0, 0); g.imageSmoothingEnabled = false; g.drawImage(_o, 0, 0, w, h, x0, y0, w, h); g.restore();
+    }
+    function thanh(x0, x1, y, th, mau) { var v = th * 0.26; g.fillStyle = mau; g.beginPath(); g.moveTo(x0 + v, y - th / 2); g.lineTo(x1 + v, y - th / 2); g.lineTo(x1 - v, y + th / 2); g.lineTo(x0 - v, y + th / 2); g.closePath(); g.fill(); }
+    function duoiHat(xTail, dir, y, th, len, rgb, lech) {
+      if (len < 2) return;
+      var a = dir > 0 ? xTail - len : xTail, b = dir > 0 ? xTail : xTail + len;
+      lopHat([a, y - th / 2 - 1, b, y + th / 2 + 1], function (x) { var gr = x.createLinearGradient(xTail - dir * len, 0, xTail, 0); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,0.95)'); x.fillStyle = gr; x.fillRect(a, y - th / 2, b - a, th); }, rgb, lech);
+    }
+    function top(gi) {
+      var ben = gi % 2 ? -1 : 1, n = 4 + Math.floor(hash(gi, 2) * 5), yc = 0.14 + 0.72 * hash(gi, 3), gap = 0.016 + 0.014 * hash(gi, 4), dur = 0.62 + 0.3 * hash(gi, 5), bars = [];
+      for (var j = 0; j < n; j++) { var q = gi * 31 + j; bars.push({ y: yc + (j - n / 2) * gap + (hash(q, 7) - 0.5) * 0.006, th: [0.004, 0.007, 0.011, 0.018, 0.026][Math.floor(hash(q, 8) * 5)], L: 0.25 + 0.75 * hash(q, 9), tre: j * 0.035 + hash(q, 10) * 0.05, dO: hash(q, 11) < 0.12 }); }
+      return { ben: ben, dur: dur, bars: bars };
+    }
+    var TOP_T = function (gi) { return 0.3 + gi * 0.62 + (hash(gi, 12) - 0.5) * 0.12; };
+
+    var S = { t: 0, r: 0, d: 0, v: 0, la: [null, null, null, null], xong: null, ket: null, hoi: false, toi: false, raf: 0, tTruoc: 0, het: false, pt: -1, nd: -1, dongA: -1, nhan: '', moc: {} };
+    var dau = null, man = null;
+    function moc(ten) { if (S.moc[ten]) return; S.moc[ten] = 1; try { performance.mark('tai-' + ten); } catch (e) { } }
+    function buoc(dt) {
+      S.t += dt; var t = S.t;
+      if (t >= N.batDau) {
+        if (GIAM.matches) S.d = S.r;
+        else { var vT = Math.min(N.vmax, Math.max(6, (S.r - S.d) * 5)); S.v += (vT - S.v) * Math.min(1, dt * 6); S.d = Math.min(S.r, S.d + S.v * dt); if (S.r - S.d < 0.02 && S.r >= 100) S.d = S.r; }
+      }
+      for (var i = 0; i < 4; i++) {
+        if (S.la[i] != null) continue;
+        if (S.d >= (i + 1) * 25 - 1e-6 && (i === 0 || (S.la[i - 1] != null && t - S.la[i - 1] >= N.giuaLa))) S.la[i] = t;
+        break;
+      }
+      if (S.la[3] != null && S.xong == null && t - S.la[3] >= N.la) S.xong = t;
+      var u = S.xong == null ? -1 : t - S.xong;
+      if (u >= N.ten) moc('ten');
+      if (u >= N.roi && !S.hoi && S.ket) {
+        S.hoi = true; S.uHoi = u; moc('ten-het');
+        man = D.getElementById('chon-am');
+        if (man && !GIAM.matches) man.style.transitionDelay = '.3s';
+        var f = S.ket; S.ket = null; f(); moc('hoi');
+        dau = man && !man.hidden ? man.querySelector('.chon-dau') : null;
+        if (dau && !GIAM.matches) dau.style.visibility = 'hidden';
+      }
+      if (man && S.tre !== 0 && man.classList.contains('hien')) { if (S.tre == null) S.tre = 2; else if (--S.tre === 0) man.style.transitionDelay = ''; }
+      if (S.hoi && !S.toi && u - S.uHoi >= (GIAM.matches ? 0.5 : N.ve)) {
+        S.toi = true; moc('toi');
+        if (dau) dau.style.visibility = '';
+      }
+    }
+    function nhanXong() { return (window.__CHU && window.__CHU.tai && window.__CHU.tai.xong) || 'Titles cut'; }
+    function ve() {
+      var t = S.t, W = K.W, H = K.H, L = boCuc(), giam = GIAM.matches;
+      g.setTransform(K.R, 0, 0, K.R, 0, 0); g.fillStyle = MUC; g.fillRect(0, 0, W, H);
+      var u = S.xong == null ? -1 : t - S.xong;
+      if (u > N.roi) u = S.hoi ? u - S.uHoi + N.roi : N.roi;
+      var daLa = 0; for (var q = 0; q < 4; q++) if (S.la[q] != null) daLa++;
+      if (!giam) {
+        var ngung = S.la[3] != null ? S.la[3] : 1e9;
+        for (var gi = 0; gi < 400; gi++) {
+          var t0 = TOP_T(gi); if (t0 > t || t0 > ngung - 0.1) break;
+          var T = top(gi);
+          for (var j = 0; j < T.bars.length; j++) {
+            var b = T.bars[j], kk = (t - t0 - b.tre) / T.dur; if (kk <= 0 || kk >= 1) continue;
+            var len = b.L * W, th = Math.max(1.5, b.th * H), y = b.y * H, tong = W + len;
+            var head = T.ben > 0 ? -0.02 * W + kk * (tong + 0.04 * W) : W * 1.02 - kk * (tong + 0.04 * W);
+            var tail = head - T.ben * len, sp = tong / T.dur;
+            var lui = daLa > 0 || t0 > (S.la[0] != null ? S.la[0] : 1e9);
+            var mau = b.dO ? DO : lui ? DEN : GIAY, rgb = b.dO ? R_DO : lui ? R_DEN : R_GIAY;
+            var keo = Math.min(len * 0.35, sp * 0.045);
+            thanh(Math.min(head, tail + T.ben * keo), Math.max(head, tail + T.ben * keo), y, th, mau);
+            duoiHat(tail + T.ben * keo, T.ben, y, th, keo * 1.6, rgb, 100 + j);
+          }
+        }
+      }
+      var k = L.k, cx = L.cx, cy = L.cy, veChon = 0, an = 1;
+      if (S.hoi && !giam) {
+        veChon = ss(N.roi, N.roi + N.ve, u);
+        if (dau) { var r = dau.getBoundingClientRect(); if (r.width > 0) { var e = tron(veChon); k = lerp(L.k, r.width / 256, e); cx = lerp(L.cx, r.left + r.width / 2, e); cy = lerp(L.cy, r.top + r.height / 2, e); } }
+        else an = 1 - veChon;
+      }
+      if (S.hoi && giam) an = 1 - ss(N.roi, N.roi + 0.5, u);
+      var P = function (p, dx) { return [cx + (p[0] - 128) * k + (dx || 0), cy + (p[1] - 128) * k]; };
+      var mo = u < 0 ? 0 : giam ? ss(N.mat[0], N.mat[1], u) : raNhanh(kep((u - N.mat[0]) / (N.mat[1] - N.mat[0])));
+      var m2 = giam ? 98.56 : lerp(121.07, 98.56, mo), m3 = giam ? 157.58 : lerp(135.07, 157.58, mo);
+      var duong = function (pts) { g.beginPath(); for (var n = 0; n < pts.length; n++) { if (n) g.lineTo(pts[n][0], pts[n][1]); else g.moveTo(pts[n][0], pts[n][1]); } g.closePath(); };
+      if (!S.toi && an > 0) {
+        g.globalAlpha = an;
+        for (var i = 0; i < 4; i++) {
+          if (S.la[i] == null) continue;
+          var a = kep((t - S.la[i]) / N.la), dir = i % 2 ? 1 : -1;
+          var dx = giam ? 0 : dir * (1 - raRatNhanh(a)) * (W * 0.9);
+          var pts = LA[i](i === 1 ? m2 : m3).map(function (p) { return P(p, dx); });
+          if (giam) g.globalAlpha = an * ss(0, 0.4, t - S.la[i]);
+          g.fillStyle = GIAY; duong(pts); g.fill();
+          g.globalAlpha = an;
+          if (giam) continue;
+          var ta = t - S.la[i];
+          if (ta < 0.9) {
+            var ys = pts.map(function (p) { return p[1]; }), ya = Math.min.apply(null, ys), yb = Math.max.apply(null, ys);
+            for (var jj = 0; jj < 6; jj++) {
+              var k2 = (ta - jj * 0.028) / 0.5; if (k2 <= 0 || k2 >= 1) continue;
+              var yh = lerp(ya - (yb - ya) * 0.35, yb + (yb - ya) * 0.35, hash(i * 7 + jj, 21)), thh = Math.max(1.5, (1.5 + 4 * hash(i * 7 + jj, 22)) * H / 1080);
+              var lh = W * (0.35 + 0.4 * hash(i * 7 + jj, 23)), tg = W + lh, ben = -dir;
+              var hh = ben > 0 ? k2 * tg : W - k2 * tg, tl = hh - ben * lh, laDo = jj === 2 && i === 1;
+              thanh(Math.min(hh, tl), Math.max(hh, tl), yh, thh, laDo ? DO : GIAY);
+              duoiHat(tl, ben, yh, thh, lh * 0.5, laDo ? R_DO : R_GIAY, 400 + i * 7 + jj);
+            }
+          }
+          if (a < 1) {
+            var ys2 = pts.map(function (p) { return p[1]; }), y0 = Math.min.apply(null, ys2), y1 = Math.max.apply(null, ys2), xs = pts.map(function (p) { return p[0]; });
+            var tl2 = dir < 0 ? Math.min.apply(null, xs) : Math.max.apply(null, xs), ln = Math.min(W * 0.4, (1 - a) * 5 * 120 * (W / 1920));
+            (function (tl2, ln, y0, y1, dir) {
+              lopHat([tl2 - (dir < 0 ? ln : 0), y0, tl2 + (dir > 0 ? ln : 0), y1], function (x) { var gr = x.createLinearGradient(tl2 + (dir < 0 ? -ln : ln), 0, tl2, 0); gr.addColorStop(0, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,1)'); x.fillStyle = gr; x.fillRect(tl2 - ln, y0 + (y1 - y0) * 0.08, ln * 2, (y1 - y0) * 0.84); }, R_GIAY, 200 + i);
+            })(tl2, ln, y0, y1, dir);
+          }
+        }
+        var khe = [[44, 121.07], [128, m2], [212, 121.07], [212, 135.07], [128, m3], [44, 135.07]].map(function (p) { return P(p); });
+        if (giam && mo < 1) for (var mi = 1; mi <= 2; mi++) { if (S.la[mi] == null) continue;
+          g.globalAlpha = an * (1 - mo) * ss(0, 0.4, t - S.la[mi]); g.fillStyle = GIAY; duong((mi === 1 ? [[44, 121.07], [128, 98.56], [212, 121.07]] : [[44, 135.07], [128, 157.58], [212, 135.07]]).map(function (p) { return P(p); })); g.fill(); g.globalAlpha = an; }
+        var tr = u < 0 ? 0 : giam ? ss(N.trong[0], N.trong[1], u) : raNhanh(kep((u - N.trong[0]) / (N.trong[1] - N.trong[0])));
+        if (tr > 0 && mo > 0.2) {
+          var liec = giam ? 0 : -9 * (ss(N.ten + 0.45, N.ten + 0.8, u) - ss(N.ten + 1.25, N.ten + 1.6, u));
+          g.save(); duong(khe); g.clip();
+          var ip = P([giam ? 128 + liec : lerp(40, 128, tr) + liec, 128.07]);
+          if (giam) g.globalAlpha = an * tr;
+          g.fillStyle = DO; g.beginPath(); g.arc(ip[0], ip[1], 20 * k, 0, Math.PI * 2); g.arc(ip[0], ip[1], 7 * k, 0, Math.PI * 2, true); g.fill();
+          g.restore();
+        }
+        g.globalAlpha = 1;
+      }
+      var chuT = u < 0 ? -1 : u - N.chu, roi = u < 0 || !S.hoi ? 0 : ss(N.roi, N.roi + 0.35, u);
+      if (giam) roi = 0;
+      if (chuT > 0 && roi < 1 && an > 0) {
+        dungChu();
+        var km = L.wm / 545, x0c = L.cx - 270 * km, yTop = L.cy + 128 * L.k + H * 0.075, yBase = yTop + 97 * km;
+        g.globalAlpha = giam ? an * ss(0, 0.5, chuT) : 1;
+        var dai = function (path, ya, yb, n, tre, so) {
+          if (giam || (chuT >= tre + (n - 1) * 0.045 + 0.5 && roi <= 0)) {
+            g.save(); g.translate(x0c, yBase); g.scale(km, km); g.fillStyle = GIAY; g.fill(path); g.restore(); return;
+          }
+          for (var i = 0; i < n; i++) {
+            var a = kep((chuT - tre - i * 0.045) / 0.5), e = raRatNhanh(a), dir = (i + so) % 2 ? 1 : -1;
+            var rr = roi > 0 ? vao(roi * 1.4 - i * 0.08) : 0;
+            var dx = giam ? 0 : dir * (1 - e) * W * 0.55 - dir * rr * W * 0.7;
+            if (a <= 0 && !giam) continue;
+            var y0 = yBase + lerp(ya, yb, i / n) * km, y1 = yBase + lerp(ya, yb, (i + 1) / n) * km;
+            g.save(); g.beginPath(); g.rect(0, y0, W, y1 - y0 + 0.6); g.clip();
+            if (!giam) g.globalAlpha = (0.34 + 0.66 * ss(0.6, 0.86, a)) * (1 - 0.66 * ss(0, 0.18, rr));
+            g.translate(x0c + dx, yBase); g.scale(km, km); g.fillStyle = GIAY; g.fill(path); g.restore();
+          }
+        };
+        dai(CHU_TO, -98, 2, 4, 0, 0);
+        dai(CHU_NHO, 27, 61, 2, 0.16, 1);
+        var pt = u - N.presents;
+        if (pt > 0) {
+          var s = 'presents', nn = giam ? 8 : Math.min(8, Math.floor(pt * 18) + 1), fs = Math.max(14, 22 * (L.wm / 650)), sc = fs / 1000, spc = fs * 0.34, wT = -spc;
+          for (var c = 0; c < 8; c++) wT += CHU_P[s[c]][0] * sc + spc;
+          var xp = L.cx - wT / 2, yp = yBase + 61 * km + fs * 2.1;
+          g.globalAlpha = (giam ? an * ss(0, 0.4, pt) : 1) * (1 - roi); g.fillStyle = GIAY;
+          for (var c2 = 0; c2 < nn; c2++) { g.save(); g.translate(xp, yp); g.scale(sc, sc); g.fill(HINH_P[s[c2]]); g.restore(); xp += CHU_P[s[c2]][0] * sc + spc; }
+        }
+        g.globalAlpha = 1;
+      }
+      var pt2 = Math.floor(S.d + 1e-6);
+      if (pt2 !== S.pt) { S.pt = pt2; soEl.textContent = pt2 + '%'; }
+      var nh = daLa >= 4 ? nhanXong() : nhanEl.textContent;
+      if (daLa >= 4 && nhanEl.textContent !== nh) nhanEl.textContent = nh;
+      var nd = Math.floor(pt2 / 25);
+      if (nd !== S.nd) { S.nd = nd; docEl.textContent = nhanEl.textContent + ' ' + pt2 + '%'; }
+      var dA = ss(0.2, 0.5, t) * (1 - ss(N.chu - 0.2, N.chu, Math.max(0, u)));
+      dA = Math.round(dA * 100) / 100; if (dA !== S.dongA) { S.dongA = dA; dongEl.style.opacity = dA; }
+    }
+    function hen() { if (!S.raf && !S.het && !S.thu) S.raf = requestAnimationFrame(khung); }
+    function dungHan() { S.het = true; if (S.raf) cancelAnimationFrame(S.raf); S.raf = 0; }
+    var canBoTri = false;
+    function khung(now) {
+      S.raf = 0;
+      if (tai.hidden || tai.classList.contains('xong') || tai.classList.contains('dung')) { if (dau) dau.style.visibility = ''; if (man) man.style.transitionDelay = ''; dungHan(); return; }
+      var dt = S.tTruoc ? Math.min(0.1, (now - S.tTruoc) / 1000) : 1 / 60; S.tTruoc = now;
+      if (canBoTri) { canBoTri = false; boTri(); }
+      buoc(dt); ve();
+      if (S.toi) { g.setTransform(K.R, 0, 0, K.R, 0, 0); g.fillStyle = MUC; g.fillRect(0, 0, K.W, K.H); return; }
+      hen();
+    }
+    window.__tai = function (p) { if (!(p > S.r)) return; S.r = Math.min(100, p); };
+    window.__taiXong = function (f) {
+      if (TU_DONG || BO_CHO || S.het) { tai.classList.add('xong'); dungHan(); f(); return; }
+      S.r = 100; S.ket = f; hen();
+    };
+    window.__taiThu = { dung: function () { S.thu = true; if (S.raf) cancelAnimationFrame(S.raf); S.raf = 0; }, buoc: function (dt) { buoc(dt); ve(); return S.t; }, S: S, N: N, boCuc: boCuc };
+    addEventListener('resize', function () { canBoTri = true; if (S.toi) { boTri(); g.setTransform(K.R, 0, 0, K.R, 0, 0); g.fillStyle = MUC; g.fillRect(0, 0, K.W, K.H); } });
+    var css = D.getElementById('css-chinh');
+    window.__cssP = new Promise(function (xong) { if (!css || css.sheet) xong(); else { css.addEventListener('load', xong); css.addEventListener('error', xong); } });
+    boTri(); ve();
+    try { performance.mark('tai-ve-dau'); } catch (e) { }
+    hen();
+    window.__tai(2);
+    var phan = { 'three.module.js': 1, 'three.core.js': 3, 'GLTFLoader.js': 1, 'BufferGeometryUtils.js': 0.5, 'opentype.module.min.js': 1, 'main.js': 0.5 };
+    var da = 0;
+    try {
+      new PerformanceObserver(function (l) {
+        l.getEntries().forEach(function (e) { for (var k2 in phan) if (e.name.slice(-k2.length) === k2) { da += phan[k2]; delete phan[k2]; window.__tai(Math.min(8, 2 + da)); } });
+      }).observe({ type: 'resource', buffered: true });
+    } catch (e) { }
+    window.__hong = function (vi) {
+      if (window.__daMo) return;
+      var h = document.getElementById('hong'); if (!h) return;
+      if (h.dataset.vi && h.dataset.vi !== 'cham') return;
+      var LY = (window.__CHU && window.__CHU.loi) || {}; document.getElementById('hong-ly').textContent = LY[vi] || LY.loi || '';
+      document.getElementById('hong-nut').hidden = vi === 'cham';
+      h.hidden = false; h.dataset.vi = vi;
+      if (vi !== 'cham') { tai.classList.add('dung'); dungHan(); }
+    };
+    document.getElementById('hong-nut').addEventListener('click', function () { location.reload(); });
+    addEventListener('error', function (e) { if (e instanceof ErrorEvent && !window.__daMo) window.__hong(/webgl/i.test(e.message || '') ? 'webgl' : 'loi'); });
+    addEventListener('unhandledrejection', function () { if (!window.__daMo) window.__hong('loi'); });
+    setTimeout(function () { if (!window.__daMo) window.__hong('cham'); }, 30000);
+  })();
+</script>
+<script type="module">
+  import { CHU, thanChu } from './js/chu.js';
+  window.__CHU = CHU;
+  const dat = (id, t) => { const e = document.getElementById(id); if (e) e.textContent = t; };
+  const than = CHU.studio.than.map(thanChu);
+  { const ul = document.getElementById('gioi-thieu'); if (ul) ul.replaceChildren(...than.map((t) => { const li = document.createElement('li'); li.textContent = t; return li; })); }
+  dat('tieu-de', CHU.studio.tieuDe); dat('tai-nhan', CHU.tai.nhan);
+  dat('hong-tua', CHU.studio.tieuDe); dat('hong-cau', than.join(' ')); dat('hong-nut', CHU.loi.nut);
+  document.title = CHU.trang.ten;
+  const m = document.querySelector('meta[name=description]'); if (m) m.content = CHU.trang.moTa;
+  const h = document.getElementById('hong'); if (h && !h.hidden && h.dataset.vi) dat('hong-ly', CHU.loi[h.dataset.vi] || CHU.loi.loi);
+</script>
+<script type="module" src="./js/main.js" onerror="window.__hong('mang')"></script>
+</body>
+</html>
