@@ -31,28 +31,54 @@ body { color: var(--giay); font-family: "Courier Prime", ui-monospace, monospace
 #chon-am[hidden] { display: none; }
 #tai:not(.xong):not([hidden]) ~ #chon-am { background: transparent; }
 #chon-am.hien { opacity: 1; }
-#chon-am.di { opacity: 0; transition-duration: .35s; pointer-events: none; }
-.chon-noi { display: flex; flex-direction: column; align-items: center; gap: 34px; width: 100%; }
-.chon-dau { display: block; width: 64px; height: 64px; }
-.chon-khung { display: flex; flex-wrap: wrap; justify-content: center; gap: 22px; }
-@media (max-height: 560px) and (orientation: landscape) { .chon-noi { gap: 20px; } .chon-dau { width: 44px; height: 44px; } }
-.chon-nut { all: unset; box-sizing: border-box; position: relative; cursor: pointer; display: inline-flex; align-items: center; gap: 16px;
-  min-width: 330px; min-height: 76px; padding: 18px 30px 16px; font-family: "Special Elite", "Courier Prime", monospace; font-size: 21px;
-  letter-spacing: .16em; text-transform: uppercase; color: var(--giay); border: 1.5px solid rgba(243, 220, 214, .5);
-  transition: border-color .2s ease, background-color .2s ease; }
-.chon-nut.khong { color: var(--giay-70); }
-.chon-nut:hover { border-color: var(--giay); color: var(--giay); }
-.chon-nut.co:hover { background: rgba(255, 31, 79, .08); }
-.chon-nut:focus-visible { outline: 2px solid var(--hong); outline-offset: 5px; }
-.chon-nut .o { width: 9px; height: 26px; background: var(--do); flex: none; }
-.chon-nut svg, #nut-am svg { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.chon-nut svg .vo, #nut-am svg .vo { fill: currentColor; stroke: none; }
-.chon-nut.co .cheo, .chon-nut.khong .song { display: none; }
+#chon-am.di { opacity: 0; transition-duration: .5s; pointer-events: none; }
+.chon-noi { display: flex; flex-direction: column; align-items: center; width: 100%; }
+#chon-am .the { position: relative; width: 600px; box-sizing: border-box; padding: 40px 56px 44px; background: var(--muc); display: flex;
+  flex-direction: column; align-items: center; gap: 20px; }
+#chon-am svg.goc { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+#chon-am .goc .v1 { fill: none; stroke: var(--giay); stroke-width: 2; }
+#chon-am .goc .v2 { fill: none; stroke: rgba(243, 220, 214, .42); stroke-width: 1; }
+#chon-am .goc .mg { fill: var(--giay); }
+#chon-am .goc .md { fill: var(--do); }
+.chon-dau { display: block; width: 80px; height: 80px; }
+.chon-khung { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
+.chon-nut { all: unset; box-sizing: border-box; position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  min-height: 58px; padding: 0 70px; -webkit-tap-highlight-color: transparent; }
+.chon-nut svg.chu { display: block; height: 51px; width: auto; fill: var(--giay); stroke: var(--giay); stroke-width: 1px; vector-effect: non-scaling-stroke;
+  stroke-linejoin: miter; opacity: .6; transition: opacity .2s ease; pointer-events: none; }
+.chon-nut svg.chu path { vector-effect: non-scaling-stroke; }
+.chon-nut svg.tay { position: absolute; left: 4px; top: 50%; width: 52px; height: 26px; margin-top: -13px; fill: var(--do); opacity: 0; translate: -12px 0;
+  transition: opacity .2s ease, translate .28s cubic-bezier(.2, .8, .2, 1); pointer-events: none; }
+#chon-am[data-nhin="on"] .co svg.chu, #chon-am[data-nhin="off"] .khong svg.chu { opacity: 1; }
+#chon-am[data-nhin="on"] .co svg.tay, #chon-am[data-nhin="off"] .khong svg.tay { opacity: 1; translate: 0 0; }
+.chon-nut:focus-visible { outline: none; }
+.chon-nut::after { content: ""; position: absolute; left: 70px; right: 70px; bottom: 6px; height: 2px; background: var(--hong); opacity: 0; }
+.chon-nut:focus-visible::after { opacity: 1; }
+#chon-am.hien .the { animation: chon-mo .6s .3s backwards cubic-bezier(.4, 0, .2, 1); }
+@keyframes chon-mo { from { clip-path: circle(0% at 50% 22%); } to { clip-path: circle(90% at 50% 22%); } }
+#chon-am.di .the { animation: chon-khep .46s forwards cubic-bezier(.55, 0, .8, .4); }
+@keyframes chon-khep { from { clip-path: circle(90% at 50% 50%); } to { clip-path: circle(0% at 50% 50%); } }
+#nut-am svg { width: 24px; height: 24px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+#nut-am svg .vo { fill: currentColor; stroke: none; }
 @media (max-width: 640px) {
-  .chon-khung { flex-direction: column; gap: 16px; width: 100%; max-width: 360px; }
-  .chon-noi { gap: 28px; }
+  #chon-am { padding: 16px; }
+  #chon-am .the { width: 100%; max-width: 420px; padding: 34px 16px 36px; }
+  .chon-dau { width: 70px; height: 70px; }
+  .chon-nut { padding: 0 56px; min-height: 56px; }
+  .chon-nut svg.chu { height: 41px; }
+  .chon-nut::after { left: 56px; right: 56px; }
+  .chon-nut svg.tay { width: 44px; height: 22px; margin-top: -11px; }
+}
+@media (max-height: 560px) and (orientation: landscape) {
+  #chon-am .the { padding: 22px 40px 24px; gap: 10px; }
   .chon-dau { width: 54px; height: 54px; }
-  .chon-nut { min-width: 0; width: 100%; min-height: 68px; padding: 16px 20px 14px; font-size: 18px; letter-spacing: .12em; gap: 14px; }
+  .chon-nut { min-height: 48px; }
+  .chon-nut svg.chu { height: 41px; }
+}
+@media (hover: none) { .chon-nut svg.chu { opacity: .94; } }
+@media (prefers-reduced-motion: reduce) {
+  #chon-am .the { animation: none !important; }
+  .chon-nut svg.tay { transition: opacity .2s ease; translate: 0 0; }
 }
 #nut-am { all: unset; box-sizing: border-box; position: fixed; top: 24px; right: 24px; z-index: 36; cursor: pointer; display: block;
   width: var(--nut-w, 205px); height: 44px; opacity: 0; transition: opacity .6s ease .2s; }
