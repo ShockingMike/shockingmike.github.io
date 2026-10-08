@@ -12,10 +12,10 @@
   if (!k) { m.textContent = 'This link is missing its key. Please use the full link you were sent.'; return; }
   let key;
   try {
-    key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: bytes('Q2nARLIyuf9TdOSj0jbrLg'), iterations: 250000, hash: 'SHA-256' },
+    key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: bytes('JoLyIAa5TQHMWNRbBOCVWA'), iterations: 250000, hash: 'SHA-256' },
       await crypto.subtle.importKey('raw', new TextEncoder().encode(k), 'PBKDF2', false, ['deriveKey']),
       { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-    const ld = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('HgPbji5qGDNmzRHy') }, key, await (await fetch('a.bin')).arrayBuffer())));
+    const ld = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('UCDTdl6J1XAwDg0R') }, key, await (await fetch('a.bin')).arrayBuffer())));
     document.head.insertAdjacentHTML('beforeend', ld.css); m.remove(); document.body.insertAdjacentHTML('afterbegin', ld.mark);
   } catch (e) { m.textContent = 'This link could not be opened. Please use the full link you were sent.'; return; }
   const press = document.getElementById('ldpress'), pct = document.getElementById('ldp');
@@ -26,11 +26,11 @@
     // the 3D library the page will ask for comes down alongside, so the page does not wait on it after this screen
     let lib = 0, frac = 0; const upd = () => { target = 0.03 + 0.74 * frac + 0.05 * lib / 2; };
     for (const f of ['three.module.js', 'three.core.js']) fetch('https://cdn.jsdelivr.net/npm/three@0.186.0/build/' + f, { mode: 'cors' }).then((x) => x.arrayBuffer()).then(() => { lib++; upd(); }).catch(() => {});
-    const r = await fetch('b.bin'), total = 4398196, rd = r.body.getReader(), parts = [];
+    const r = await fetch('b.bin'), total = 4398206, rd = r.body.getReader(), parts = [];
     let got = 0;
     for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; frac = Math.min(1, got / total); upd(); }
     const buf = new Uint8Array(got); let o = 0; for (const q of parts) { buf.set(q, o); o += q.length; }
-    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('zMWMsCywGjBsCAgJ') }, key, buf));
+    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('Y8nAJaIOKcCdw3fZ') }, key, buf));
     const n = new DataView(plain.buffer).getUint32(0, true);
     const { html, js, files } = JSON.parse(new TextDecoder().decode(plain.subarray(4, 4 + n)));
     const body = 4 + n, url = {};
