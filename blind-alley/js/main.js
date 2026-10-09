@@ -1021,9 +1021,9 @@ function veCanh4(s4, dich = null, coChu = true) {
 function veKinh4(k, dich = null) {
   if (Math.abs(k - lopK4) > 0.004 || ((k === 0) !== (lopK4 === 0))) { lens4.datLop(k); lopK4 = k; }
   lv.copy(ngo4.nshared.uLfill.value).transformDirection(ngo4.camera.matrixWorldInverse);
-  lens4.render(ngo4.scene, ngo4.camera, Wc, Hc, lv, dich);
   renderer.setRenderTarget(dich);
   chu4.render(renderer);
+  lens4.render(ngo4.scene, ngo4.camera, Wc, Hc, lv, dich);
 }
 const kinh4 = (s4) => { if (tTD4 === -1) return 0; const a = tTD4 === -99 ? T4.D + 0.6 : tTD4 + chu4.L.het + 0.3; return ssm(a, a + MO.KINH, s4); };
 function datDay4() {
@@ -1173,9 +1173,9 @@ function veCanh5(s5, dich = null, coChu = true, khongBong = false) {
 function veKinh5(k, dich = null) {
   if (Math.abs(k - lopK5) > 0.004 || ((k === 0) !== (lopK5 === 0))) { lens5.datLop(k); lopK5 = k; }
   lv.copy(ham5.nshared.uLred.value).transformDirection(ham5.camera.matrixWorldInverse);
-  lens5.render(ham5.scene, ham5.camera, Wc, Hc, lv, dich);
   renderer.setRenderTarget(dich);
   chu5.render(renderer);
+  lens5.render(ham5.scene, ham5.camera, Wc, Hc, lv, dich);
 }
 const kinh5 = (s5) => { if (tTD5 === -1) return 0; const a = tTD5 === -99 ? T5.D + 0.6 : tTD5 + chu5.L.het + 0.3; return ssm(a, a + MO.KINH, s5); };
 function datDay5() {
@@ -1409,9 +1409,9 @@ function veCanh6(s6, dich = null, coChu = true) {
 function veKinh6(k, dich = null) {
   if (Math.abs(k - lopK6) > 0.004 || ((k === 0) !== (lopK6 === 0))) { lens6.datLop(k); lopK6 = k; }
   lv.set(0.3, 0.6, 0.7).normalize().transformDirection(ban6.camera.matrixWorldInverse);
-  lens6.render(ban6.scene, ban6.camera, Wc, Hc, lv, dich);
   renderer.setRenderTarget(dich);
   chu6.render(renderer);
+  lens6.render(ban6.scene, ban6.camera, Wc, Hc, lv, dich);
 }
 const kinh6 = (s6) => { if (tTD6 === -1) return 0; const a = tTD6 === -99 ? T6.D + 0.6 : tTD6 + chu6.L.het + 0.3; return ssm(a, a + MO.KINH, s6); };
 function veChuyen56(k, man, now) {
@@ -1555,9 +1555,9 @@ function veKinh3(k, dich = null) {
   const kl = k;
   if (Math.abs(kl - lopK3) > 0.004 || ((kl === 0) !== (lopK3 === 0))) { lens3.datLop(kl); lopK3 = kl; }
   lv.set(0, 0, 1);
-  lens3.render(lat.scene, lat.camera, Wc, Hc, lv, dich);
   renderer.setRenderTarget(dich);
   chu3.render(renderer);
+  lens3.render(lat.scene, lat.camera, Wc, Hc, lv, dich);
 }
 const kinh3 = (s3) => { if (tDung3 < 0) return 0; const a = Math.max(tDung3 + 1.2, tTD3 >= 0 ? tTD3 + chu3.L.het + 0.3 : 0); return ssm(a, a + MO.KINH, s3); };
 let DAY = null;
@@ -1755,9 +1755,9 @@ function veKinh2(k, dich = null) {
   if (Math.abs(k - lopK2) > 0.004 || ((k === 0) !== (lopK2 === 0))) { lens2.datLop(k); lopK2 = k; }
   lens2.chiMat.uniforms.uTq.value = Math.floor(pho.datU.uT.value * 6) / 6;
   lv.copy(pho.shared.uLfill.value).transformDirection(pho.camera.matrixWorldInverse);
-  lens2.render(pho.scene, pho.camera, Wc, Hc, lv, dich);
   renderer.setRenderTarget(dich);
   chu2.render(renderer);
+  lens2.render(pho.scene, pho.camera, Wc, Hc, lv, dich);
 }
 function gocNan() {
   const r = new THREE.Vector3().setFromMatrixColumn(nen.cua.matrixWorld, 0).normalize();
@@ -1997,8 +1997,20 @@ for (const ev of ['wheel', 'keydown', 'pointerdown', 'touchstart']) addEventList
 let troCuoi = null, troAn = false, kinhTay = null;
 const lensPos = { x: 0, y: 0, khoi: false };
 let khuay = 0, troT = 0;
+const MAU_TRO = [], TUOI_MAU = [], KHUNG_CHO = [];
+let treTro = 10, nhipMau = 8, kinhTheo = false, mauMoi = false;
+const ghiTuoi = (a) => { TUOI_MAU.push(Math.max(0, a)); if (TUOI_MAU.length > 40) TUOI_MAU.shift(); };
+function ghiMau(t, x, y) {
+  if (MAU_TRO.length && t < MAU_TRO[MAU_TRO.length - 1][0]) MAU_TRO.length = 0;
+  MAU_TRO.push([t, x, y]); if (MAU_TRO.length > 48) MAU_TRO.splice(0, MAU_TRO.length - 48);
+}
 addEventListener('pointermove', (e) => {
   if (e.pointerType !== 'mouse') return;
+  const gop = e.getCoalescedEvents ? e.getCoalescedEvents() : null, ds = gop && gop.length ? gop : [e];
+  for (const [T, a] of KHUNG_CHO) if (ds[0].timeStamp <= T) ghiTuoi(a);
+  KHUNG_CHO.length = 0;
+  for (const c of ds) ghiMau(c.timeStamp, c.clientX, c.clientY);
+  mauMoi = true;
   const now = performance.now();
   if (troCuoi && troT) khuay = Math.max(khuay, Math.min(1, Math.hypot(e.clientX - troCuoi.x, e.clientY - troCuoi.y) / Math.max(8, now - troT) / 1.2));
   troCuoi = { x: e.clientX, y: e.clientY }; troT = now;
@@ -2058,14 +2070,39 @@ function kepKinh(p) {
   return { x: THREE.MathUtils.clamp(p.x, R, Wc - R), y: THREE.MathUtils.clamp(p.y, R, Hc - day - R) };
 }
 let kinhHien = 0, tKinh0 = -1, troTruoc = false, vaoLai = null;
+function troDeu(now) {
+  const n = MAU_TRO.length; if (!n || !troCuoi) return troCuoi;
+  const moi = MAU_TRO[n - 1];
+  if (moi[0] > now + 100) return troCuoi;
+  const tuoi = now - moi[0];
+  if (mauMoi) {
+    mauMoi = false; ghiTuoi(tuoi);
+    const ks = []; for (let i = Math.max(1, n - 12); i < n; i++) { const d = MAU_TRO[i][0] - MAU_TRO[i - 1][0]; if (d > 0.2 && d < 40) ks.push(d); }
+    if (ks.length >= 4) { ks.sort((a, b) => a - b); nhipMau = ks[ks.length >> 1]; }
+  } else if (tuoi < 60 && KHUNG_CHO.length < 8) KHUNG_CHO.push([now, tuoi]);
+  if (TUOI_MAU.length >= 8) {
+    const s = TUOI_MAU.slice().sort((a, b) => a - b), dich = Math.min(34, Math.max(4, s[Math.floor(s.length * 0.9)] + 1));
+    treTro += (dich - treTro) * (dich > treTro ? 0.25 : 0.03);
+  }
+  const tt = now - treTro;
+  if (tt >= moi[0]) return { x: moi[1], y: moi[2] };
+  let i = n - 1; while (i > 0 && MAU_TRO[i - 1][0] > tt) i--;
+  if (i === 0) return { x: MAU_TRO[0][1], y: MAU_TRO[0][2] };
+  const a = MAU_TRO[i - 1], b = MAU_TRO[i];
+  const ta = Math.max(a[0], b[0] - nhipMau * 1.5);
+  if (tt <= ta) return { x: a[1], y: a[2] };
+  const k = (tt - ta) / Math.max(1e-3, b[0] - ta);
+  return { x: a[1] + (b[1] - a[1]) * k, y: a[2] + (b[2] - a[2]) * k };
+}
 function dichKinh(dt, kMo, now) {
   const ln = CANH_HIEN === 5 ? lens6 : CANH_HIEN === 4 ? lens5 : CANH_HIEN === 3 ? lens4 : CANH_HIEN === 2 ? lens3 : CANH_HIEN === 1 ? lens2 : lens, L0 = CANH_HIEN === 5 ? LENS6_0 : CANH_HIEN === 4 ? LENS5_0 : CANH_HIEN === 3 ? LENS4_0 : CANH_HIEN === 2 ? LENS3_0 : CANH_HIEN === 1 ? LENS2_0 : LENS0;
   if (KHONG_KINH()) kMo = 0;
   kinhHien = kMo <= 0 ? 0 : Math.min(kMo, kinhHien + dt / 0.3);
   if (kinhHien >= 0.9 && tKinh0 < 0) tKinh0 = now;
-  const tro = troCuoi && troCuoi.y < Hc - daiH() ? troCuoi : null;
+  const tro = troCuoi && troCuoi.y < Hc - daiH() ? troDeu(now) : null;
   const tuKhiHien = tKinh0 < 0 ? 0 : (now - tKinh0) / 1000;
   const giuMoi = tro && tuKhiHien < 1.8;
+  kinhTheo = false;
   if (!lensPos.khoi) { const d0 = kepKinh(L0); lensPos.x = d0.x; lensPos.y = d0.y; lensPos.khoi = true; }
   if (giuMoi) {
     const a = kepKinh(L0), b = kepKinh(tro), k = inOut3(Math.min(1, Math.max(0, (tuKhiHien - 1.2) / 0.6)));
@@ -2075,7 +2112,7 @@ function dichKinh(dt, kMo, now) {
     if (tro && !troTruoc) vaoLai = { t: now, x: lensPos.x, y: lensPos.y };
     const kv = vaoLai ? (now - vaoLai.t) / 350 : 1;
     if (tro && kv < 1) { const k = inOut3(Math.max(0, kv)); lensPos.x = vaoLai.x + (dich.x - vaoLai.x) * k; lensPos.y = vaoLai.y + (dich.y - vaoLai.y) * k; }
-    else if (tro || (kinhTay && tc && tc.lensMode)) { lensPos.x = dich.x; lensPos.y = dich.y; }
+    else if (tro || (kinhTay && tc && tc.lensMode)) { lensPos.x = dich.x; lensPos.y = dich.y; kinhTheo = !!tro; }
     else { const a = Math.min(1, dt * 6); lensPos.x += (dich.x - lensPos.x) * a; lensPos.y += (dich.y - lensPos.y) * a; }
   }
   troTruoc = !!tro;
@@ -2379,7 +2416,7 @@ function loop(now) {
   ketThucDo(tBat);
   cpuMau.push(performance.now() - tBat); if (cpuMau.length > 60) cpuMau.shift();
   const lnH = (CANH_HIEN === 5 ? lens6 : CANH_HIEN === 4 ? lens5 : CANH_HIEN === 3 ? lens4 : CANH_HIEN === 2 ? lens3 : CANH_HIEN === 1 ? lens2 : lens).H;
-  const anTro = lnH.on > 0.5 && !!troCuoi && Math.hypot(lnH.x - troCuoi.x, lnH.y - troCuoi.y) < 6;
+  const anTro = lnH.on > 0.5 && !!troCuoi && kinhTheo && (() => { const k = kepKinh(troCuoi); return Math.hypot(k.x - troCuoi.x, k.y - troCuoi.y) < 6; })();
   if (anTro !== troAn) { cv.style.cursor = anTro ? 'none' : ''; troAn = anTro; }
   if (hieu && (CANH_HIEN >= 1 || logoMo < 0.999)) {
     let duoi = false;

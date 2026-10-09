@@ -5,7 +5,7 @@ import * as T from './am-tieng.js';
 const dB = (x) => Math.pow(10, x / 20);
 const kep = (x, a, b) => Math.min(b, Math.max(a, x));
 
-const MUC = { nhac: 9.8, noi: 9 };
+const MUC = { nhac: 7.9, noi: 9 };
 const MUC_CU = { bass: 0, vibes: 1.5, choi: -9 };
 const BPM = 72, PH = 60 / BPM, SWING = 0.6, LECH = 0.008;
 const VANG = { t60: 1.5, som: 0.016, lp: 6000, rong: 0.9 }, GUI = 0.3;

@@ -401,23 +401,45 @@ void main() {
 }`;
 
 const VERT_MUA = `
-attribute vec3 aP; attribute float aL;
-uniform vec3 uGio; uniform vec2 uRes; uniform float uRong, uRoi, uCaoMua;
-varying vec3 vW;
+attribute vec3 aP; attribute float aL; attribute vec4 aR;
+uniform vec2 uRes; uniform float uRong, uRoi, uCaoMua, uToa;
+uniform vec4 uCon;
+varying vec3 vW; varying float vDam; varying float vRong;
+float h11(float n) { return fract(sin(n * 127.1) * 43758.5453); }
+float vn2(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+  float a = h11(dot(i, vec2(1.0, 57.0))), b = h11(dot(i + vec2(1.0, 0.0), vec2(1.0, 57.0))), c = h11(dot(i + vec2(0.0, 1.0), vec2(1.0, 57.0))), d = h11(dot(i + vec2(1.0, 1.0), vec2(1.0, 57.0)));
+  return mix(mix(a, b, f.x), mix(c, d, f.x), f.y); }
 void main() {
-  vec3 A = aP; A.y = mod(aP.y - uRoi, uCaoMua);
-  vec3 B = A + uGio * aL;
-  vec4 ca = projectionMatrix * viewMatrix * vec4(A, 1.0), cb = projectionMatrix * viewMatrix * vec4(B, 1.0);
-  vec2 sa = ca.xy / ca.w, sb = cb.xy / cb.w;
+  float sp = 0.8 + 0.45 * aR.x;
+  float ph = aP.y - uRoi * sp, k = floor(ph / uCaoMua);
+  float y = ph - k * uCaoMua;
+  vec2 G = aP.xz + (vec2(h11(k * 1.7 + aR.w * 91.0), h11(k * 2.3 + aR.x * 37.0)) - 0.5) * vec2(0.22, 0.6);
+  float tS = uCon.y - (uCaoMua - y) / (6.5 * sp);
+  vec2 dg = normalize(uCon.xz + 1e-4), vg = vec2(-dg.y, dg.x);
+  float n = vn2(vec2(dot(G, dg) * 0.55 - tS * 0.9, dot(G, vg) * 0.3 + 3.1));
+  float day = clamp(0.3 + 0.62 * n + 0.22 * uCon.w, 0.22, 1.0);
+  if (h11(k * 3.1 + aR.w * 53.0) > day) { gl_Position = vec4(0.0, 0.0, 2.0, 1.0); vW = vec3(0.0); vDam = 0.0; vRong = 0.0; return; }
+  vec3 D = normalize(vec3(uCon.x, -1.0, uCon.z));
+  vec3 A = vec3(G.x - uCon.x * y, y, G.y - uCon.z * y);
+  float L = aL * (0.75 + 0.45 * sp) * (1.0 + 0.3 * uCon.w);
+  vec3 B = A + D * L;
+  vec4 ca = projectionMatrix * viewMatrix * vec4(A, 1.0);
+  vec4 ch = projectionMatrix * viewMatrix * vec4(A + vec3(D.x, 0.0, D.z) * L, 1.0), cv = projectionMatrix * viewMatrix * vec4(A + vec3(0.0, D.y, 0.0) * L, 1.0);
+  vec2 sa = ca.xy / ca.w, vh = ch.xy / ch.w - sa, vv = cv.xy / cv.w - sa, v = vh + uToa * vv;
+  vec2 sb = sa + v * (length(vh + vv) / max(length(v), 1e-6));
+  vec4 cb = vec4(sb * ca.w, ca.z, ca.w);
   vec2 dir = normalize((sb - sa) * uRes + 1e-6); vec2 nr = vec2(-dir.y, dir.x);
   vec4 c = mix(ca, cb, position.y);
-  c.xy += nr * position.x * 2.0 * uRong / uRes * c.w;
+  float rg = uRong * (0.75 + 0.9 * aR.y) * clamp(cameraPosition.y / max(cameraPosition.y - y, 1.0), 1.0, 1.8);
+  vRong = min(rg, 1.0);
+  c.xy += nr * position.x * 2.0 * max(rg, 1.0) / uRes * c.w;
   vW = mix(A, B, position.y);
+  vDam = aR.z;
   gl_Position = c;
 }`;
 const FRAG_MUA = `
 ${CHUNG}
-varying vec3 vW;
+varying vec3 vW; varying float vDam; varying float vRong;
 void main() {
   if (vW.y < 0.01) discard;
   if (uTat > 0.0 && hash13(floor(vW / 0.004) + 3.0) < 0.75 * uTat) discard;
@@ -431,10 +453,23 @@ void main() {
   float r = hash13(cel);
   float bw = bacH(w, r, 0.8), bc = bacH(c, hash13(cel + 5.0), 0.8);
   if (nemSang(G) > 0.5 && bongTT(G) > 0.5) discard;
-  vec3 col;
-  if (bw > 3.5) col = K_HONG; else if (bw > 2.5) col = K_DO; else if (bw > 1.5) col = K_HONG; else if (bw > 0.5) col = K_DEM;
-  else if (bc > 1.5) col = K_DEM; else if (bc > 0.5) col = K_SANG; else col = K_DEM;
-  gl_FragColor = hatCuoi(col, cel);
+  vec3 Pd = vec3(vW.x, 0.0, vW.z);
+  float lR = min(nemCua(Pd), 2.0) * 0.5 * (1.0 - smoothstep(1.6, 2.6, vW.y));
+  float lL = 1.0 - smoothstep(0.3, 1.4, length(uDenB - vW));
+  float lC = min(den(Pd), 1.0) * (1.0 - smoothstep(1.4, 3.0, vW.y));
+  float sang = clamp(max(max(lR, lL), lC), 0.0, 1.0);
+  vec3 col; float a;
+  if (bw > 3.5) { col = mix(K_HONG, K_GIAY, 0.12 * step(0.8, vDam) * sang); a = 0.6 + 0.4 * vDam; }
+  else if (bw > 2.5) { col = K_DO; a = 0.6 + 0.4 * vDam; }
+  else if (bw > 1.5) { col = mix(K_HONG, K_GIAY, 0.12 * step(0.8, vDam) * sang); a = 0.6 + 0.4 * vDam; }
+  else if (bw > 0.5) { col = lR > 0.2 ? K_DO : K_DEM; a = lR > 0.2 ? 0.25 + 0.2 * vDam : 0.55 + 0.45 * vDam; }
+  else if (bc > 1.5) { col = K_DEM; a = 0.7 + 0.3 * vDam; }
+  else if (bc > 0.5) { col = K_SANG; a = 0.5 + 0.5 * vDam; }
+  else if (sang > 0.2) { col = K_SANG; a = 0.5 + 0.5 * vDam; }
+  else { col = vDam > 0.85 ? K_SANG : K_DEM; a = vDam > 0.85 ? 0.5 : 0.35 + 0.6 * vDam; }
+  a *= mix(0.7, 1.0, vRong);
+  if (a < 0.04) discard;
+  gl_FragColor = vec4(hatCuoi(col, cel).rgb, min(a, 1.0));
 }`;
 
 const VERT_BAO = `
@@ -838,16 +873,18 @@ export function* makeNgo4G(o) {
   }
   datBut(VAT4.but);
 
-  let mua = null; const NMUA = o.low ? 560 : 1000;
+  let mua = null; const NMUA = o.low ? 840 : 1500;
   { const N = NMUA;
     const base = new THREE.PlaneGeometry(1, 1); base.translate(0, 0.5, 0);
     const g = new THREE.InstancedBufferGeometry(); g.index = base.index; g.attributes.position = base.attributes.position;
     const aP = new Float32Array(N * 3), aL = new Float32Array(N);
     let s = 977; const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647);
-    for (let i = 0; i < N; i++) { aP[i * 3] = (rnd() - 0.5) * (rong - 0.1); aP[i * 3 + 1] = rnd() * 4.6; aP[i * 3 + 2] = -dai + rnd() * 9.0; aL[i] = [0.22, 0.32, 0.42][Math.floor(rnd() * 3)]; }
-    g.setAttribute('aP', new THREE.InstancedBufferAttribute(aP, 3)); g.setAttribute('aL', new THREE.InstancedBufferAttribute(aL, 1)); g.instanceCount = N;
-    const m = new THREE.ShaderMaterial({ vertexShader: VERT_MUA, fragmentShader: FRAG_MUA, depthTest: true, depthWrite: false, side: THREE.DoubleSide,
-      uniforms: { ...shared, uGio: { value: new THREE.Vector3(0.04, -1, 0.1).normalize() }, uRes, uRong: { value: 0.95 }, uRoi: { value: 0 }, uCaoMua: { value: 4.6 } } });
+    const aR = new Float32Array(N * 4);
+    for (let i = 0; i < N; i++) { aP[i * 3] = (rnd() - 0.5) * (rong - 0.1); aP[i * 3 + 1] = rnd() * 4.6; aP[i * 3 + 2] = -dai + rnd() * 9.0; aL[i] = 0.16 + 0.34 * rnd();
+      aR[i * 4] = rnd(); aR[i * 4 + 1] = rnd() * rnd(); aR[i * 4 + 2] = Math.sqrt(rnd()); aR[i * 4 + 3] = rnd(); }
+    g.setAttribute('aP', new THREE.InstancedBufferAttribute(aP, 3)); g.setAttribute('aL', new THREE.InstancedBufferAttribute(aL, 1)); g.setAttribute('aR', new THREE.InstancedBufferAttribute(aR, 4)); g.instanceCount = N;
+    const m = new THREE.ShaderMaterial({ vertexShader: VERT_MUA, fragmentShader: FRAG_MUA, depthTest: true, depthWrite: false, side: THREE.DoubleSide, transparent: true,
+      uniforms: { ...shared, uRes, uRong: { value: 0.95 }, uRoi: { value: 0 }, uCaoMua: { value: 4.6 }, uCon: { value: new THREE.Vector4(0.04, 0, 0.1, 0) }, uToa: { value: 0.35 } } });
     m.extensions = { derivatives: true };
     mua = new THREE.Mesh(g, m); mua.frustumCulled = false; mua.name = 'mua'; mua.renderOrder = 3; sc.add(mua); }
 
@@ -892,7 +929,10 @@ export function* makeNgo4G(o) {
     if (Math.abs(k - nhapCu) > 1e-4) { for (const m of Object.values(nmats)) if (m.uniforms.uRimOn) m.uniforms.uRimOn.value = (m.userData.rim0 ?? (m.userData.rim0 = m.uniforms.uRimOn.value)) * (0.35 + 0.65 * (k - 0.65) / 0.35); nhapCu = k; }
     mua.material.uniforms.uRoi.value = t * 6.5 * cham;
     meo3.capNhat(t, cham);
-    { const tt2 = t * cham; baoU.uGioBao.value = 0.2 + 0.8 * (0.5 + 0.5 * Math.sin(tt2 * 1.6) * Math.sin(tt2 * 0.57 + 0.9)); }
+    { const tt2 = t * cham, con = 0.5 + 0.5 * Math.sin(tt2 * 1.6) * Math.sin(tt2 * 0.57 + 0.9); baoU.uGioBao.value = 0.2 + 0.8 * con;
+      const goc = 0.07 * (con - 0.5) + 0.05 * Math.sin(tt2 * 0.21 + 1.3), manh = 0.8 + 0.55 * con;
+      const gx = 0.04 * manh, gz = 0.1 * manh, cg = Math.cos(goc), sg = Math.sin(goc);
+      mua.material.uniforms.uCon.value.set(gx * cg - gz * sg, tt2, gx * sg + gz * cg, con); }
   }
   function ve(dich) {
     if (!tinh) veTinh();
