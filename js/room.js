@@ -1,5 +1,5 @@
 /* room.js — the record shop around the crate, built from boxes and canvas paint: a wooden counter the crate sits on,
-   a shelf unit behind it full of standing records (the label's own six face out), framed prints on a plaster wall,
+   a shelf unit behind it full of standing records (the label's own seven face out), framed prints on a plaster wall,
    pendant lamps, a plank floor. Nothing here moves; the fog in stage.js fades it with depth. Units are centimetres. */
 
 import * as THREE from 'three';
@@ -48,7 +48,7 @@ function printCard(S, text, sub, ink, paper) {
 }
 
 /**
- * Builds the shop. `covers` = the six sleeve fronts (canvases) for the face-out records and the prints.
+ * Builds the shop. `covers` = the seven sleeve fronts (canvases) for the face-out records and the prints.
  * Returns { group, lights, mats } — mats are every material here (they all take the fog).
  */
 export function buildRoom({ covers, tex, portrait }) {

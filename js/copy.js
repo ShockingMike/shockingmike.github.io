@@ -84,6 +84,15 @@ export const COPY = {
         story: ['The website is the trip: a 3D flight from Earth orbit all the way to the Moon.'],
         details: { role: 'Name, logo, design, code', tech: 'Not picked yet', status: 'Still on the launch pad' },
         cta: { pricing: 'Want a page like this?' }
+      },
+      blind: {
+        subtitle: 'Animation studio',
+        story: [
+          'A pencil line rubs out; a cut doesn’t. So at Blind Alley nobody cuts in a hurry, and one wrong frame is enough to keep somebody up all night.',
+          'Seven animators and a camera operator, at the dead end of a lane in Glasgow.'
+        ],
+        details: { role: 'Name, logo, 3D film, sound, code', tech: 'three.js, flat-grain shader, Web Audio', year: '2026', status: 'Out now' },
+        cta: { visit: 'Visit the site', preview: 'Watch a clip', pricing: 'Want a website like this?' }
       }
     },
     pricing: {

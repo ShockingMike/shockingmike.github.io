@@ -1,4 +1,4 @@
-/* main.js — the portfolio: the stack of six records, the record page, the preview layer, English / Vietnamese. */
+/* main.js — the portfolio: the stack of seven records, the record page, the preview layer, English / Vietnamese. */
 
 import { RECORDS, byId } from './records.js';
 import { PLAN_ORDER } from './order.js';
@@ -365,7 +365,7 @@ async function boot() {
   const art = RECORDS.filter((r) => r.art);
   // Weights are the measured share of the real work on this machine (see q8-loader-report.txt), so the number
   // walks at roughly the speed the work does. Nothing is invented: each piece reports in when it is truly done.
-  const SLEEVE = [11, 4.5, 4, 4, 2, 2];
+  const SLEEVE = [11, 4.5, 4, 4, 2, 2, 4];
   const load = createLoad([
     ['fonts', 1.5], ...art.map(() => ['art', 0.5]), ['module', 3],
     ...RECORDS.map((r, i) => ['sleeve', SLEEVE[i] ?? 3]), ['room', 2],

@@ -85,6 +85,15 @@ export const COPY = {
         story: ['Trang web chính là chuyến đi: bay 3D từ quỹ đạo Trái Đất ra tới Mặt Trăng.'],
         details: { role: 'Tên, logo, thiết kế, code', tech: 'Chưa chọn', status: 'Còn nằm ở bệ phóng' },
         cta: { pricing: 'Muốn một trang như thế này?' }
+      },
+      blind: {
+        subtitle: 'Xưởng phim hoạt hình',
+        story: [
+          'Nét chì tẩy được, vết dao thì không. Nên ở Blind Alley chẳng ai cắt vội, và chỉ một khung sai cũng đủ khiến ai đó thức trắng đêm.',
+          'Bảy hoạ sĩ hoạt hình và một người quay, ở cuối một con ngõ cụt tại Glasgow.'
+        ],
+        details: { role: 'Tên, logo, phim 3D, âm thanh, code', tech: 'three.js, shader tô phẳng có hạt tự viết, Web Audio', year: '2026', status: 'Đã phát hành' },
+        cta: { visit: 'Vào xem (tiếng Anh)', preview: 'Xem đoạn demo', pricing: 'Muốn một trang web như thế này?' }
       }
     },
     pricing: {

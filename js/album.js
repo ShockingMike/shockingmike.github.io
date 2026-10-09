@@ -1,4 +1,4 @@
-/* album.js — the label's house sleeve, drawn with canvas. One frame for all six records (like ECM or Blue Note):
+/* album.js — the label's house sleeve, drawn with canvas. One frame for all seven records (like ECM or Blue Note):
    a top band with the catalogue number and the label mark, a picture window, the title stamped below.
    Print techniques instead of screenshots: halftone screens (duotone or CMYK), foil (a mask the 3D material turns
    into metal with a thin-film colour shift), blind emboss (a bump map), paper fibre, ring wear and worn edges.
@@ -145,6 +145,22 @@ function paperGround(ctx, S, paper, seed, { worn = true } = {}) {
   }
 }
 
+/** The title's size on the front: one size for every record, a step smaller only for a name too long to sit between
+    the margins (so a long name is never cut off at the edge of the board). */
+function titlePx(ctx, S, name) {
+  const room = S * (1 - 2 * FRAME.mx);
+  let px = S * 0.088;
+  ctx.save();
+  try { ctx.letterSpacing = `${-S * 0.0025}px`; } catch { /* ignore */ }
+  for (let i = 0; i < 40; i++) {
+    ctx.font = `600 ${px}px ${SERIF}`;
+    if (ctx.measureText(name).width <= room) break;
+    px -= S * 0.002;
+  }
+  ctx.restore();
+  return px;
+}
+
 /** Top band + title + small line; `foil` receives the same marks as pure white for the foil mask. */
 function frameText(ctx, S, rec, c, foilCtx) {
   const m = FRAME.mx * S;
@@ -163,9 +179,10 @@ function frameText(ctx, S, rec, c, foilCtx) {
   ctx.fillRect(m, S * 0.098, S - 2 * m, Math.max(1, S * 0.0012));
   ctx.globalAlpha = 1;
   // title: foil stamp (drawn in the colour map as a light neutral so the metal reads, and in the mask)
+  const px = titlePx(ctx, S, rec.name);
   const drawTitle = (x, weight, colour) => {
     x.fillStyle = colour; x.textAlign = 'left';
-    x.font = `${weight} ${S * 0.088}px ${SERIF}`;
+    x.font = `${weight} ${px}px ${SERIF}`;
     try { x.letterSpacing = `${-S * 0.0025}px`; } catch { /* ignore */ }
     x.fillText(rec.name, m - S * 0.004, FRAME.titleY * S);
   };
@@ -208,6 +225,17 @@ const ART = {
     ctx.fillStyle = c.paper;
     ctx.fillRect(x0, y0, w, h);
     duotone(ctx, img, x0, y0, w, h, { ink: c.ink, ink2: c.accent, cell: S * 0.0052 });
+  },
+  blind(ctx, S, x0, y0, w, h, c, foilCtx, img) {
+    // the detective in the office, the neon through the blinds: a frame of the studio's own film, separated by colour
+    // the way a screen printer would — the red plate takes the film's red, the ink plate takes the dark, and the
+    // blue light of the room is left as the pink paper showing through the dots
+    const cl = (v) => Math.max(0, Math.min(1, v));
+    ctx.fillStyle = c.paper;
+    ctx.fillRect(x0, y0, w, h);
+    const cell = S * 0.0052;
+    screen(ctx, img, x0, y0, w, h, { cell, angle: 15 * Math.PI / 180, color: c.accent, value: (r, g, b) => cl((r - Math.max(g, b)) * 1.6), gamma: 0.8, maxR: 0.64 });
+    screen(ctx, img, x0, y0, w, h, { cell, angle: 45 * Math.PI / 180, color: c.ink, value: (r, g, b) => cl((0.78 - Math.max(r, g, b)) / 0.58), gamma: 1, maxR: 0.64 });
   },
   hadal(ctx, S, x0, y0, w, h) {
     // depth lines going down into the dark; the creatures' own light
@@ -295,7 +323,7 @@ export function sleeveFront(S, rec, c, img, opts) {
   bmp.ctx.fillStyle = 'rgba(0,0,0,0.1)'; bmp.ctx.fillRect(x0, y0, w, h);
   bmp.ctx.fillStyle = 'rgba(255,255,255,0.4)';
   bmp.ctx.textAlign = 'left'; bmp.ctx.textBaseline = 'alphabetic';
-  bmp.ctx.font = `600 ${S * 0.088}px ${SERIF}`;
+  bmp.ctx.font = `600 ${titlePx(bmp.ctx, S, rec.name)}px ${SERIF}`;
   bmp.ctx.fillText(rec.name, m - S * 0.004, FRAME.titleY * S);
   /* The print is not the only place the words live: the foil stamp is a shine and the title is a relief, each
      read from its own map. On a sealed sleeve those are softened as well — otherwise the name comes back through
@@ -472,7 +500,9 @@ export function sleeveBack(S, rec, c, en) {
   ctx.textAlign = 'left'; ctx.fillText('SHOCKING MIKE RECORDS', L, S * 0.1);
   font(ctx, 500, S * 0.02, MONO); ctx.textAlign = 'right'; ctx.fillText(rec.cat, R, S * 0.1);
   ctx.textAlign = 'left';
-  ctx.font = `600 ${S * 0.08}px ${SERIF}`;
+  let namePx = S * 0.08;
+  ctx.font = `600 ${namePx}px ${SERIF}`;
+  while (ctx.measureText(rec.name).width > R - L && namePx > S * 0.05) { namePx -= S * 0.002; ctx.font = `600 ${namePx}px ${SERIF}`; }
   ctx.fillText(rec.name, L, S * 0.21);
   ctx.font = `italic 400 ${S * 0.036}px ${SERIF}`;
   ctx.fillText(en.sub, L, S * 0.265);
@@ -496,7 +526,7 @@ export function sleeveBack(S, rec, c, en) {
   return cv;
 }
 
-/** The record's own label, one formula for all six: a ring of small caps around the top, the name across the
+/** The record's own label, one formula for all seven: a ring of small caps around the top, the name across the
     middle, the catalogue number and the speed below. Painted over a disc map that was drawn with a blank label. */
 export function houseLabel(disc, { labelR = 0.34, label, labelInk, name, cat }) {
   const ctx = disc.getContext('2d');
@@ -527,8 +557,21 @@ export function houseLabel(disc, { labelR = 0.34, label, labelInk, name, cat }) 
   // the name, across the middle; long names step down a size so they never touch the rim
   let px = lr * 0.30;
   ctx.font = `600 ${px}px ${SERIF}`;
-  while (ctx.measureText(name).width > lr * 1.5 && px > lr * 0.16) { px -= lr * 0.012; ctx.font = `600 ${px}px ${SERIF}`; }
-  ctx.fillText(name, cx, cx + px * 0.34);
+  const sp = name.indexOf(' ', Math.floor(name.length / 2) - 4);
+  if (ctx.measureText(name).width > lr * 1.5 * 1.6 && name.includes(' ')) {
+    // a name far too long for one line is set on two, one above the spindle hole and one below it, the way a
+    // pressing plant would set it, so the hole never punches through a word
+    const cut = sp > 0 ? sp : name.lastIndexOf(' ');
+    const lines = [name.slice(0, cut), name.slice(cut + 1)];
+    px = lr * 0.22;
+    ctx.font = `600 ${px}px ${SERIF}`;
+    while (Math.max(...lines.map((l) => ctx.measureText(l).width)) > lr * 1.3 && px > lr * 0.14) { px -= lr * 0.01; ctx.font = `600 ${px}px ${SERIF}`; }
+    ctx.fillText(lines[0], cx, cx - lr * 0.12);
+    ctx.fillText(lines[1], cx, cx + lr * 0.12 + px * 0.68);
+  } else {
+    while (ctx.measureText(name).width > lr * 1.5 && px > lr * 0.16) { px -= lr * 0.012; ctx.font = `600 ${px}px ${SERIF}`; }
+    ctx.fillText(name, cx, cx + px * 0.34);
+  }
   // a hairline, then the catalogue number and the speed
   ctx.globalAlpha = 0.45;
   ctx.fillRect(cx - lr * 0.42, cx + lr * 0.42, lr * 0.84, Math.max(1, S * 0.0012));
@@ -916,7 +959,7 @@ function wrapLines(ctx, text, maxW) {
 }
 
 /**
- * One panel of the flyer, a real printed piece: panel 0 is the outer cover (label, title, the six sleeves as a
+ * One panel of the flyer, a real printed piece: panel 0 is the outer cover (label, title, the seven sleeves as a
  * two-colour halftone); panels 1–3 one package each on a strict grid (number, name, price, who it is for, timeline,
  * sample); the last panel the care plan and the way to the full price list. Laid out in 480 css-px units (u = W/480).
  */
@@ -955,7 +998,7 @@ export function flyerPanelPrinted(W, H, k, n, print) {
     mark(ctx, R - mr - 4, Hu / 2 + 6, mr, P.ink, 1.4);
     ctx.textAlign = 'right';
     font(ctx, 600, 10.5, SANS, 'semi-expanded', 1.5);
-    ctx.fillText('SMR 001–006', R, 32);
+    ctx.fillText('SMR 001–007', R, 32);
     ctx.textAlign = 'left';
   } else {
     const row = k <= 3 ? print.rows[k - 1] : print.care;

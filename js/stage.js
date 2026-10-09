@@ -1,4 +1,4 @@
-/* stage.js — a record crate. Six sleeves stand in a wooden crate, one behind the other, facing you and leaning back a
+/* stage.js — a record crate. Seven sleeves stand in a wooden crate, one behind the other, facing you and leaning back a
    little. Scrolling flips through them the way a hand does: the front record tips forward and drops to show the next.
    Click the record in view and it is pulled out of the crate, lifted, and turned to the Stripe Press pose (left half,
    the disc half out) while the page takes the sleeve's colours. Past the last record lies the folded price flyer.
