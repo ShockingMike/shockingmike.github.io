@@ -15,10 +15,10 @@
   if (!k) { m.textContent = 'This link is missing its key. Please use the full link you were sent.'; return; }
   let key, ld;
   try {
-    key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: bytes('ys2miB2n_bUQMrdU3zzGJw'), iterations: 250000, hash: 'SHA-256' },
+    key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: bytes('vbU42M4RK7U-eB4KRNrjjA'), iterations: 250000, hash: 'SHA-256' },
       await crypto.subtle.importKey('raw', new TextEncoder().encode(k), 'PBKDF2', false, ['deriveKey']),
       { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-    ld = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('zOQ0drk9Hj4gHvAH') }, key, await (await fetch('a.bin')).arrayBuffer())));
+    ld = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('12zIyf0IPVVByq4W') }, key, await (await fetch('a.bin')).arrayBuffer())));
   } catch (e) { fail('This link could not be opened. Please use the full link you were sent.'); return; }
   document.head.insertAdjacentHTML('beforeend', ld.css); m.remove(); document.body.insertAdjacentHTML('afterbegin', ld.mark);
   // the same ten nuts as the page's own loading screen; here they count the page's bytes as they arrive
@@ -34,11 +34,11 @@
     // the 3D library and the model decoder the page will ask for come down alongside
     for (const u of ['build/three.module.js', 'build/three.core.js', 'examples/jsm/libs/draco/gltf/draco_decoder.wasm', 'examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js'])
       fetch('https://cdn.jsdelivr.net/npm/three@0.186.0/' + u, { mode: 'cors' }).catch(() => {});
-    const r = await fetch('b.bin'), total = 10476767, rd = r.body.getReader(), parts = [];
+    const lo = innerWidth / innerHeight < 0.8, r = await fetch(lo ? 'p.bin' : 'b.bin'), total = lo ? 4103489 : 10477575, top = lo ? 75 : 29, rd = r.body.getReader(), parts = [];
     let got = 0;
-    for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; target = 1 + 29 * Math.min(1, got / total); }
+    for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; target = 1 + top * Math.min(1, got / total); }
     const buf = new Uint8Array(got); let o = 0; for (const q of parts) { buf.set(q, o); o += q.length; }
-    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('vbqn_fXA2tkdS2pk') }, key, buf));
+    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes(lo ? 'b97EKHWP9Yi47hXv' : '7AODl-ldFVGNyr0M') }, key, buf));
     const n = new DataView(plain.buffer).getUint32(0, true);
     const { html, js, files } = JSON.parse(new TextDecoder().decode(plain.subarray(4, 4 + n)));
     const body = 4 + n, A = {};
@@ -47,7 +47,7 @@
     const jsUrl = {};
     for (const [f, t] of Object.entries(js)) jsUrl['js:' + f] = URL.createObjectURL(new Blob([t], { type: 'text/javascript' }));
     const page = fill(html).replace(/__BLOB_(js:[A-Za-z0-9_.\/-]+?)__/g, (s, f) => jsUrl[f] || s);
-    window.__A = A; live = false; window.__ldStart = Math.max(lit * 10, Math.min(30, shown));
+    window.__A = A; live = false; window.__ldStart = Math.max(lit * 10, Math.min(lo ? 76 : 30, shown));
     document.open(); document.write(page); document.close();
     if (ld.title) document.title = ld.title;
   } catch (e) { live = false; fail('This link could not be opened. Please use the full link you were sent.'); }
