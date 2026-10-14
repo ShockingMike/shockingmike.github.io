@@ -15,10 +15,10 @@
   if (!k) { m.textContent = 'This link is missing its key. Please use the full link you were sent.'; return; }
   let key, ld;
   try {
-    key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: bytes('7BYi8aCpFlqfaPggL5b8xg'), iterations: 250000, hash: 'SHA-256' },
+    key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: bytes('R4D-0a4u5RzbIPcTGLRstQ'), iterations: 250000, hash: 'SHA-256' },
       await crypto.subtle.importKey('raw', new TextEncoder().encode(k), 'PBKDF2', false, ['deriveKey']),
       { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-    ld = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('UFSKyg97cVwxq4XP') }, key, await (await fetch('a.bin')).arrayBuffer())));
+    ld = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('Ng8C4ounIvJ5KGJl') }, key, await (await fetch('a.bin')).arrayBuffer())));
   } catch (e) { fail('This link could not be opened. Please use the full link you were sent.'); return; }
   document.head.insertAdjacentHTML('beforeend', ld.css); m.remove(); document.body.insertAdjacentHTML('afterbegin', ld.mark);
   // the same ten nuts as the page's own loading screen; here they count the page's bytes as they arrive
@@ -34,11 +34,11 @@
     // the 3D library and the model decoder the page will ask for come down alongside
     for (const u of ['build/three.module.js', 'build/three.core.js', 'examples/jsm/libs/draco/gltf/draco_decoder.wasm', 'examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js'])
       fetch('https://cdn.jsdelivr.net/npm/three@0.186.0/' + u, { mode: 'cors' }).catch(() => {});
-    const lo = innerWidth / innerHeight < 0.8, r = await fetch(lo ? 'p.bin' : 'b.bin'), total = lo ? 4104219 : 10478305, top = lo ? 38 : 29, rd = r.body.getReader(), parts = [];
+    const lo = innerWidth / innerHeight < 0.8, r = await fetch(lo ? 'p.bin' : 'b.bin'), total = lo ? 4104308 : 10478394, top = lo ? 38 : 29, rd = r.body.getReader(), parts = [];
     let got = 0;
     for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; target = 1 + top * Math.min(1, got / total); }
     const buf = new Uint8Array(got); let o = 0; for (const q of parts) { buf.set(q, o); o += q.length; }
-    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes(lo ? 'ZsAZwFton6VTTyMK' : 'LP7ZOL63Iv_MIWss') }, key, buf));
+    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes(lo ? 'Wxv8QoFN8BpVIG9G' : 'epKiwb1yvH6toL5M') }, key, buf));
     const n = new DataView(plain.buffer).getUint32(0, true);
     const { html, js, files } = JSON.parse(new TextDecoder().decode(plain.subarray(4, 4 + n)));
     const body = 4 + n, A = {};
