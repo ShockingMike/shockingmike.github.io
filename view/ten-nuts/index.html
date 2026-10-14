@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow, noarchive"><meta name="referrer" content="no-referrer">
+<title>Private preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=Newsreader:ital,opsz,wght@0,6..72,300..500;1,6..72,300..400&display=swap" rel="stylesheet">
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#1c120a;font:15px/1.5 system-ui,sans-serif;color:#f6ecda}#m{position:fixed;inset:0;display:grid;place-items:center;margin:0;text-align:center;padding:24px;opacity:.7}</style>
+</head><body><p id="m"></p>
+<script>
+(async () => {
+  const m = document.getElementById('m');
+  const bytes = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0));
+  const k = decodeURIComponent(location.hash.slice(1));
+  const fail = (t) => { document.body.innerHTML = '<p id="m"></p>'; document.getElementById('m').textContent = t; };
+  if (!k) { m.textContent = 'This link is missing its key. Please use the full link you were sent.'; return; }
+  let key, ld;
+  try {
+    key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: bytes('6Q-c4x9k1HZX7FtwUWDTyQ'), iterations: 250000, hash: 'SHA-256' },
+      await crypto.subtle.importKey('raw', new TextEncoder().encode(k), 'PBKDF2', false, ['deriveKey']),
+      { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
+    ld = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('weYcC9Um0gQu1pSp') }, key, await (await fetch('a.bin')).arrayBuffer())));
+  } catch (e) { fail('This link could not be opened. Please use the full link you were sent.'); return; }
+  document.head.insertAdjacentHTML('beforeend', ld.css); m.remove(); document.body.insertAdjacentHTML('afterbegin', ld.mark);
+  // the same ten nuts as the page's own loading screen; here they count the page's bytes as they arrive
+  const SAP = [2, 7], TURN = [-8, 12, -3, 18, -14, 6, -20, 9, -6, 15], nuts = [];
+  for (let i = 0; i < 10; i++) { const d = document.createElement('div'); d.className = 'n' + (SAP.includes(i) ? ' sap' : '');
+    d.innerHTML = '<i class="sh"><img src="' + ld.nuts[i] + '" alt="" style="transform: rotate(' + TURN[i] + 'deg)"></i><span>' + (SAP.includes(i) ? ld.lab[1] : ld.lab[0]) + '</span>';
+    document.getElementById('ldrow').appendChild(d); nuts.push(d); }
+  let shown = 0, target = 1, lit = 0, litAt = 0, live = true; nuts[0].classList.add('now');
+  (function tick() { if (!live) return; shown += (target - shown) * 0.12;
+    if (lit < Math.floor(shown / 10 + 0.02) && performance.now() - litAt > 240) { litAt = performance.now(); const i = lit++, d = nuts[i]; d.classList.remove('now'); d.classList.add('on'); if (nuts[lit]) nuts[lit].classList.add('now'); }
+    document.getElementById('ldn').textContent = String(lit).padStart(2, '0') + ' / 10'; requestAnimationFrame(tick); })();
+  try {
+    // the 3D library and the model decoder the page will ask for come down alongside
+    for (const u of ['build/three.module.js', 'build/three.core.js', 'examples/jsm/libs/draco/gltf/draco_decoder.wasm', 'examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js'])
+      fetch('https://cdn.jsdelivr.net/npm/three@0.186.0/' + u, { mode: 'cors' }).catch(() => {});
+    const r = await fetch('b.bin'), total = 10472707, rd = r.body.getReader(), parts = [];
+    let got = 0;
+    for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; target = 1 + 29 * Math.min(1, got / total); }
+    const buf = new Uint8Array(got); let o = 0; for (const q of parts) { buf.set(q, o); o += q.length; }
+    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('yLdaDMuzMSFVhX5A') }, key, buf));
+    const n = new DataView(plain.buffer).getUint32(0, true);
+    const { html, js, files } = JSON.parse(new TextDecoder().decode(plain.subarray(4, 4 + n)));
+    const body = 4 + n, A = {};
+    for (const [f, d] of Object.entries(files)) A[f] = URL.createObjectURL(new Blob([plain.subarray(body + d.off, body + d.off + d.len)], { type: d.type }));
+    const fill = (t) => t.replace(/__BLOB_([A-Za-z0-9_.:\/-]+?)__/g, (s, f) => A[f] || s);
+    const jsUrl = {};
+    for (const [f, t] of Object.entries(js)) jsUrl['js:' + f] = URL.createObjectURL(new Blob([t], { type: 'text/javascript' }));
+    const page = fill(html).replace(/__BLOB_(js:[A-Za-z0-9_.\/-]+?)__/g, (s, f) => jsUrl[f] || s);
+    window.__A = A; live = false; window.__ldStart = Math.max(lit * 10, Math.min(30, shown));
+    document.open(); document.write(page); document.close();
+    if (ld.title) document.title = ld.title;
+  } catch (e) { live = false; fail('This link could not be opened. Please use the full link you were sent.'); }
+})();
+</script></body></html>
