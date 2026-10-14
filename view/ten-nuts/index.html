@@ -12,14 +12,18 @@
   const bytes = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0));
   const k = decodeURIComponent(location.hash.slice(1));
   const fail = (t) => { document.body.innerHTML = '<p id="m"></p>'; document.getElementById('m').textContent = t; };
-  if (!k) { m.textContent = 'This link is missing its key. Please use the full link you were sent.'; return; }
+  if (!k) { m.textContent = 'Link thiếu phần mã ở cuối (sau dấu #). Vui lòng mở đúng link đầy đủ đã được gửi.'; return; }
+  // this build's values, read fresh every time (the site keeps every file in caches for ten minutes)
+  const fresh = (u) => fetch(u, { cache: 'no-store' });
+  let meta; try { meta = await (await fresh('meta.json?t=' + Date.now())).json(); } catch (e) { fail('Không tải được trang. Vui lòng kiểm tra mạng rồi mở lại.'); return; }
+  const v = '?v=' + meta.id;
   let key, ld;
   try {
-    key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: bytes('R4D-0a4u5RzbIPcTGLRstQ'), iterations: 250000, hash: 'SHA-256' },
+    key = await crypto.subtle.deriveKey({ name: 'PBKDF2', salt: bytes(meta.salt), iterations: meta.iter, hash: 'SHA-256' },
       await crypto.subtle.importKey('raw', new TextEncoder().encode(k), 'PBKDF2', false, ['deriveKey']),
       { name: 'AES-GCM', length: 256 }, false, ['decrypt']);
-    ld = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes('Ng8C4ounIvJ5KGJl') }, key, await (await fetch('a.bin')).arrayBuffer())));
-  } catch (e) { fail('This link could not be opened. Please use the full link you were sent.'); return; }
+    ld = JSON.parse(new TextDecoder().decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes(meta.ivA) }, key, await (await fresh('a.bin' + v)).arrayBuffer())));
+  } catch (e) { fail('Link này không mở được. Vui lòng dùng đúng link đầy đủ đã được gửi.'); return; }
   document.head.insertAdjacentHTML('beforeend', ld.css); m.remove(); document.body.insertAdjacentHTML('afterbegin', ld.mark);
   // the same ten nuts as the page's own loading screen; here they count the page's bytes as they arrive
   const SAP = [2, 7], TURN = [-8, 12, -3, 18, -14, 6, -20, 9, -6, 15], nuts = [];
@@ -34,11 +38,11 @@
     // the 3D library and the model decoder the page will ask for come down alongside
     for (const u of ['build/three.module.js', 'build/three.core.js', 'examples/jsm/libs/draco/gltf/draco_decoder.wasm', 'examples/jsm/libs/draco/gltf/draco_wasm_wrapper.js'])
       fetch('https://cdn.jsdelivr.net/npm/three@0.186.0/' + u, { mode: 'cors' }).catch(() => {});
-    const lo = innerWidth / innerHeight < 0.8, r = await fetch(lo ? 'p.bin' : 'b.bin'), total = lo ? 4104308 : 10478394, top = lo ? 38 : 29, rd = r.body.getReader(), parts = [];
+    const lo = innerWidth / innerHeight < 0.8, r = await fresh((lo ? 'p.bin' : 'b.bin') + v), total = lo ? meta.sizeP : meta.sizeB, top = lo ? 38 : 29, rd = r.body.getReader(), parts = [];
     let got = 0;
     for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; target = 1 + top * Math.min(1, got / total); }
     const buf = new Uint8Array(got); let o = 0; for (const q of parts) { buf.set(q, o); o += q.length; }
-    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes(lo ? 'Wxv8QoFN8BpVIG9G' : 'epKiwb1yvH6toL5M') }, key, buf));
+    const plain = new Uint8Array(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: bytes(lo ? meta.ivP : meta.ivB) }, key, buf));
     const n = new DataView(plain.buffer).getUint32(0, true);
     const { html, js, files } = JSON.parse(new TextDecoder().decode(plain.subarray(4, 4 + n)));
     const body = 4 + n, A = {};
@@ -47,9 +51,13 @@
     const jsUrl = {};
     for (const [f, t] of Object.entries(js)) jsUrl['js:' + f] = URL.createObjectURL(new Blob([t], { type: 'text/javascript' }));
     const page = fill(html).replace(/__BLOB_(js:[A-Za-z0-9_.\/-]+?)__/g, (s, f) => jsUrl[f] || s);
+    try { sessionStorage.removeItem('retried'); } catch (x) {}
     window.__A = A; live = false; window.__ldStart = Math.max(lit * 10, Math.min(lo ? 39 : 30, shown));
     document.open(); document.write(page); document.close();
     if (ld.title) document.title = ld.title;
-  } catch (e) { live = false; fail('This link could not be opened. Please use the full link you were sent.'); }
+  } catch (e) { live = false;
+    // once: perhaps a copy from a newer build arrived half-way; start over with everything fresh
+    if (!sessionStorage.getItem('retried')) { try { sessionStorage.setItem('retried', '1'); } catch (x) {} location.reload(); return; }
+    fail('Link này không mở được. Vui lòng tải lại trang.'); }
 })();
 </script></body></html>
