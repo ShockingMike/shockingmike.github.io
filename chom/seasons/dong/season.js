@@ -521,15 +521,6 @@ export default {
     solids.push(...bai.solids, ...bt.solids, ...shore.solids);
     // the bridge's own piers, read back from what longBien actually built (never recomputed here): without these the
     // clipping check has nothing to catch a boat on, which is exactly how the barge came to be standing inside one.
-    //
-    // ⚠ ONLY THE PIERS IN THE WATER ARE DECLARED - AND THIS EXCLUSION IS HIDING TWO REAL FAULTS. SAID HERE ON PURPOSE.
-    // Declaring the pier that stands on the bar (x = -3) as well, with its true footprint, clip.mjs finds (21/9):
-    //   - a BANANA CLUMP planted 2.22 m inside that stone pier (bai.js);
-    //   - the crowd walking the bar brushing the pier by up to 0.14 m (crowd#15 0.14, crowd#22 0.08; the rest <= 5 cm).
-    // Both were there before the barge was touched; nobody saw them because no pier was ever a solid. They are not
-    // hidden here to make the check green - they are left out because moving the banana and the crowd's lane is a
-    // change to the layout of the bar, and that was not the job and was not asked for. Reported to the coordinator.
-    // To see them again: drop the .filter below and run `node core/qa/clip.mjs dong 40`.
     for (const p of bridge.piers.filter((q) => q.inWater)) {
       for (const [i, c] of p.circles.entries()) solids.push({ x: c.x, z: c.z, r: c.r, h: 9, name: `chân cầu x${p.x}#${i}` });
     }
