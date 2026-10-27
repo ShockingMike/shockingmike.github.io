@@ -547,6 +547,10 @@ input[type="range"]:active::-webkit-slider-thumb { background: var(--paper); }
 .footer__ks.is-static { margin-left: 0; font-variation-settings: "wght" 900; }
 .footer__credits { row-gap: 10px; margin-top: clamp(56px, 7vw, 120px); padding-top: 18px; border-top: 1px solid var(--paper); font-size: 12px; }
 .credits__by { grid-column: 10 / 13; justify-self: end; }
+/* Website Design Awards winner badge (Oct 2026), left end of the credits row; links to the jury review. */
+.credits__award { grid-column: 1 / 7; justify-self: start; margin: 0; line-height: 0; }
+.credits__award img { display: block; width: 200px; height: auto; }
+.credits__award a:focus-visible { outline: 2px solid var(--signal); outline-offset: 3px; }
 .credits__by a { text-underline-offset: 3px; text-decoration-thickness: 1px; }
 .credits__by a:hover { text-decoration-color: var(--signal); text-decoration-thickness: 3px; }
 
@@ -703,6 +707,7 @@ html.lenis.is-loading.lenis-stopped { overflow: visible; }
   .nl__row { flex-direction: column; }
   .nl__input { border-right: 1px solid var(--paper); border-bottom: 0; }
   .credits__by { grid-column: 1 / -1; justify-self: start; }
+  .credits__award { grid-column: 1 / -1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

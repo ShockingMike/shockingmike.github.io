@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="88" viewBox="0 0 240 88" role="img" aria-label="Website Design Awards — Winner, Oct 2026, score 8.5 out of 10">
+  <rect x="0" y="0" width="240" height="88" fill="#0E0E0C"/>
+  <rect x="0.5" y="0.5" width="239" height="87" fill="none" stroke="#2A2925" stroke-width="1"/>
+  <rect x="4.5" y="4.5" width="231" height="79" fill="none" stroke="#2A2925" stroke-width="0.5"/>
+
+  <g transform="translate(44,4)">
+    <g transform="translate(-22,40)" fill="none" stroke="#E8B86A" stroke-width="1" stroke-linecap="round">
+      <path d="M0,-18 C-4,-12 -6,-4 -5,6 C-4,14 -1,18 1,20"/>
+      <path d="M-2,-12 C-6,-12 -8,-10 -9,-7"/>
+      <path d="M-3,-6 C-7,-6 -9,-4 -10,-1"/>
+      <path d="M-3,1 C-7,1 -9,3 -10,6"/>
+      <path d="M-2,8 C-6,8 -8,10 -9,13"/>
+    </g>
+    <g transform="translate(22,40) scale(-1,1)" fill="none" stroke="#E8B86A" stroke-width="1" stroke-linecap="round">
+      <path d="M0,-18 C-4,-12 -6,-4 -5,6 C-4,14 -1,18 1,20"/>
+      <path d="M-2,-12 C-6,-12 -8,-10 -9,-7"/>
+      <path d="M-3,-6 C-7,-6 -9,-4 -10,-1"/>
+      <path d="M-3,1 C-7,1 -9,3 -10,6"/>
+      <path d="M-2,8 C-6,8 -8,10 -9,13"/>
+    </g>
+    <text x="0" y="46" font-family="ui-serif, 'Playfair Display', Georgia, serif" font-size="26" font-weight="500" fill="#F5EFE4" text-anchor="middle" letter-spacing="-0.5">8.5</text>
+    <text x="0" y="60" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="6.5" letter-spacing="2" fill="#8C8578" text-anchor="middle">/ 10</text>
+  </g>
+
+  <line x1="96" y1="18" x2="96" y2="70" stroke="#2A2925" stroke-width="1"/>
+
+  <g transform="translate(108,0)">
+    <text x="0" y="26" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="7" letter-spacing="2.4" fill="#E8B86A" font-weight="600">WINNER</text>
+    <text x="0" y="46" font-family="ui-serif, 'Playfair Display', Georgia, serif" font-size="15" font-weight="600" fill="#F5EFE4" letter-spacing="-0.3">Website Design</text>
+    <text x="0" y="62" font-family="ui-serif, 'Playfair Display', Georgia, serif" font-size="15" font-weight="600" fill="#F5EFE4" letter-spacing="-0.3" font-style="italic">Awards</text>
+    <line x1="0" y1="68" x2="118" y2="68" stroke="#2A2925" stroke-width="0.75"/>
+    <text x="0" y="78" font-family="ui-monospace, 'JetBrains Mono', monospace" font-size="6.5" letter-spacing="1.8" fill="#8C8578">OCT 2026</text>
+  </g>
+</svg>
