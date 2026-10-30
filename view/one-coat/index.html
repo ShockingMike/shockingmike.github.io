@@ -3,23 +3,23 @@
 <meta name="robots" content="noindex, nofollow, noarchive"><meta name="referrer" content="no-referrer">
 <title>Private preview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@300;400&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="preload" as="style">
 <style>html,body{margin:0;height:100%;overflow:hidden;background:#0d0f15;font:15px/1.5 system-ui,sans-serif;color:#f7f3ec}#m{position:fixed;inset:0;display:grid;place-items:center;margin:0;text-align:center;padding:24px;opacity:.7}</style>
 </head><body><p id="m"></p>
 <script>
 (async () => {
-  const m = document.getElementById('m');
+  const m = document.getElementById('m'), slow = setTimeout(() => { m.textContent = 'Opening the preview…'; }, 1500);
   const bytes = (s) => Uint8Array.from(atob(s.replace(/-/g, '+').replace(/_/g, '/')), (c) => c.charCodeAt(0));
   const k = decodeURIComponent(location.hash.slice(1));
-  const say = (t) => { document.body.innerHTML = '<p id="m"></p>'; document.getElementById('m').textContent = t; };
-  if (!k) { m.textContent = 'This link is missing its key (the part after the #). Please open the full link you were sent.'; return; }
+  const say = (t) => { clearTimeout(slow); document.body.innerHTML = '<p id="m"></p>'; document.getElementById('m').textContent = t; };
+  if (!k) { say('This link is missing its key (the part after the #). Please open the full link you were sent.'); return; }
   // this build's values, read fresh every time (the site keeps every file in caches for ten minutes)
   const fresh = (u) => fetch(u, { cache: 'no-store' });
   let meta; try { meta = await (await fresh('meta.json?t=' + Date.now())).json(); } catch (e) { say('The page could not be loaded. Please check your connection and open the link again.'); return; }
   const v = '?v=' + meta.id, A = {};
   let key;
   const read = async (name, on) => {
-    const r = await fresh(name + '.bin' + v); if (!r.ok) throw new Error(name + ' ' + r.status);
+    const r = await fetch(name + '.bin' + v); if (!r.ok) throw new Error(name + ' ' + r.status);
     const total = meta.size[name], rd = r.body.getReader(), parts = []; let got = 0;
     for (;;) { const { done, value } = await rd.read(); if (done) break; parts.push(value); got += value.length; if (on) on(Math.min(1, got / total)); }
     const buf = new Uint8Array(got); let o = 0; for (const q of parts) { buf.set(q, o); o += q.length; }
@@ -36,8 +36,10 @@
     page = await read('a');
   } catch (e) { say('This link could not be opened. Please use the full link you were sent.'); return; }
   // the other packs, each fetched once, the first time the page asks for one of its files, and counted as it arrives
-  const packs = {}, ons = {};
-  const pack = (name) => packs[name] || (packs[name] = read(name, (f) => (ons[name] || []).forEach((cb) => cb(f))));
+  const packs = {}, ons = {}, line = []; let busy = 0;
+  const next = () => { while (busy < 3 && line.length) { const [name, ok, no] = line.shift(); busy++; read(name).then(ok, no).finally(() => { busy--; next(); }); } };
+  const pack = (name) => packs[name] || (packs[name] = name === 'b' ? read(name, (f) => (ons[name] || []).forEach((cb) => cb(f)))
+    : new Promise((ok, no) => { line.push([name, ok, no]); next(); }));
   const again = () => {    // once: perhaps a file from a newer build arrived half-way; start over with everything fresh
     if (!sessionStorage.getItem('retried')) { try { sessionStorage.setItem('retried', '1'); } catch (x) {} location.reload(); return; }
     say('This link could not be opened. Please reload the page.'); };
@@ -51,6 +53,6 @@
   const J = {}, fill = (t) => t.replace(/__BLOB_([A-Za-z0-9_.:\/-]+?)__/g, (s, f) => (f.startsWith('js:') ? J[f] : A[f]) || s);
   J['js:quality.js'] = URL.createObjectURL(new Blob([page.js['quality.js']], { type: 'text/javascript' }));
   J['js:stage.js'] = URL.createObjectURL(new Blob([fill(page.js['stage.js'])], { type: 'text/javascript' }));
-  document.open(); document.write(fill(page.html)); document.close();
+  clearTimeout(slow); document.open(); document.write(fill(page.html)); document.close();
 })();
 </script><script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "0591d6a0860a4a46beba407410571b4d"}'></script></body></html>
