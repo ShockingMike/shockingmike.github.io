@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://shockingmike.github.io/</loc>
+    <lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://shockingmike.github.io/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://shockingmike.github.io/vi/"/>
+  </url>
+  <url>
+    <loc>https://shockingmike.github.io/vi/</loc>
+    <lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://shockingmike.github.io/vi/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://shockingmike.github.io/"/>
+  </url>
+  <url>
+    <loc>https://shockingmike.github.io/pricing/</loc>
+    <lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="en" href="https://shockingmike.github.io/pricing/"/>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://shockingmike.github.io/vi/bang-gia/"/>
+  </url>
+  <url>
+    <loc>https://shockingmike.github.io/vi/bang-gia/</loc>
+    <lastmod>2026-10-19</lastmod>
+    <xhtml:link rel="alternate" hreflang="vi" href="https://shockingmike.github.io/vi/bang-gia/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://shockingmike.github.io/pricing/"/>
+  </url>
+  <url>
+    <loc>https://shockingmike.github.io/kern-society/</loc>
+    <lastmod>2026-10-27</lastmod>
+  </url>
+  <url>
+    <loc>https://shockingmike.github.io/kozo/</loc>
+    <lastmod>2026-10-19</lastmod>
+  </url>
+  <url>
+    <loc>https://shockingmike.github.io/chom/</loc>
+    <lastmod>2026-10-19</lastmod>
+  </url>
+  <url>
+    <loc>https://shockingmike.github.io/rhumb-line/</loc>
+    <lastmod>2026-10-19</lastmod>
+  </url>
+  <url>
+    <loc>https://shockingmike.github.io/blind-alley/</loc>
+    <lastmod>2026-10-19</lastmod>
+  </url>
+</urlset>

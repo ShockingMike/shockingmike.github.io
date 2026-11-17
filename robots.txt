@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://shockingmike.github.io/sitemap.xml
