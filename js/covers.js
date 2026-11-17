@@ -2,6 +2,7 @@
    One house style (Shocking Mike Records): a stone / teal / night / lilac family,
    Archivo for the sleeve type, JetBrains Mono for catalogue numbers. */
 
+import { AWARDS } from './records.js';
 export const PAL = {
   bg: '#1c1b1f',
   stone: '#d5d0c3', stoneDeep: '#c4bfb1', ink: '#17161a',
@@ -591,12 +592,85 @@ function sealSticker(ctx, S, x, y, r, lines, ground = '#e8c95a', ink = '#17161a'
   ctx.restore();
 }
 
+/* award:v2 — round foil seals with a scalloped edge, Mike's pick B1 (17/11/2026).
+   Website Design Awards: gold, laurel round the 8.5 score. DesignNominees: their blue, their DN mark. */
+const DN_MARK = await new Promise((ok) => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = '/media/awards/dn-mark.png'; });
+const SEAL_METAL = {
+  gold: [[0, '#f7e2a6'], [.12, '#d6a54c'], [.28, '#fbe9b4'], [.45, '#b98a33'], [.6, '#f2d68f'], [.78, '#c7953f'], [.9, '#fae7b0'], [1, '#f7e2a6']],
+  blue: [[0, '#7d9cff'], [.15, '#3d6dff'], [.32, '#9bb3ff'], [.5, '#2a52e0'], [.66, '#6f8fff'], [.82, '#2f5cf0'], [1, '#7d9cff']]
+};
+function sealFont(ctx, w, px, fam) { ctx.font = `${w} ${px}px ${fam}`; ctx.letterSpacing = '0px'; }
+function sealArc(ctx, text, r, top, track) {
+  const chars = [...text]; const w = chars.map((c) => ctx.measureText(c).width + track);
+  const total = w.reduce((s, v) => s + v, 0) - track;
+  let a = top ? -total / r / 2 : total / r / 2;
+  chars.forEach((c, i) => {
+    const mid = a + (top ? 1 : -1) * (w[i] - track) / r / 2;
+    ctx.save(); ctx.rotate(mid); ctx.translate(0, top ? -r : r); ctx.fillText(c, 0, 0); ctx.restore();
+    a += (top ? 1 : -1) * w[i] / r;
+  });
+}
+function sealEdge(ctx, r, n, depth) {
+  ctx.beginPath();
+  for (let i = 0; i <= n * 2; i++) { const a = i / (n * 2) * Math.PI * 2, rr = i % 2 ? r - depth : r; ctx[i ? 'lineTo' : 'moveTo'](Math.cos(a) * rr, Math.sin(a) * rr); }
+  ctx.closePath();
+}
+function sealLaurel(ctx, h, color, lw) {
+  const r = h * .6, n = 8, len = h * .1, wid = h * .034;
+  ctx.save(); ctx.fillStyle = color; ctx.strokeStyle = color; ctx.lineWidth = lw; ctx.lineCap = 'round';
+  for (const s of [-1, 1]) {
+    const a0 = Math.PI / 2 + s * .22, a1 = Math.PI / 2 + s * 2.25, dir = Math.sign(a1 - a0);
+    ctx.beginPath(); ctx.arc(0, 0, r, Math.min(a0, a1), Math.max(a0, a1)); ctx.stroke();
+    for (let i = 0; i < n; i++) {
+      const a = a0 + (a1 - a0) * (i + .35) / n, k = 1 - i * .05;
+      for (const side of [-1, 1]) {
+        ctx.save(); ctx.translate(Math.cos(a) * r, Math.sin(a) * r); ctx.rotate(a + dir * Math.PI / 2 + side * .62);
+        ctx.beginPath(); ctx.ellipse(len * .5 * k, 0, len * .55 * k, wid * k, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+      }
+    }
+    ctx.save(); ctx.translate(Math.cos(a1) * r, Math.sin(a1) * r); ctx.rotate(a1 + dir * Math.PI / 2);
+    ctx.beginPath(); ctx.ellipse(len * .45, 0, len * .5, wid * .9, 0, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+  }
+  ctx.restore();
+}
+function sealMark(ctx, img, h, color) {
+  const w = h * img.width / img.height, c = document.createElement('canvas'); c.width = img.width; c.height = img.height;
+  const g = c.getContext('2d'); g.drawImage(img, 0, 0); g.globalCompositeOperation = 'source-in'; g.fillStyle = color; g.fillRect(0, 0, c.width, c.height);
+  ctx.drawImage(c, -w / 2, -h / 2, w, h);
+}
+/* mask: when set, only the seal's outline is filled with that colour (for the sleeve's material mask) */
+export function awardSeal(ctx, S, a, mask) {
+  const R = S * .19, gold = a.metal === 'gold';
+  const ink = gold ? '#1a1406' : '#ffffff', faint = gold ? 'rgba(26,20,6,.55)' : 'rgba(255,255,255,.7)';
+  ctx.save(); ctx.translate(S * a.x, S * a.y); ctx.rotate(a.tilt);
+  ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = S * .03; ctx.shadowOffsetY = S * .012;
+  const g = ctx.createConicGradient(-0.6, 0, 0); SEAL_METAL[a.metal].forEach(([o, c]) => g.addColorStop(o, c));
+  if (mask) { ctx.shadowColor = 'transparent'; ctx.fillStyle = mask; sealEdge(ctx, R, 36, R * .045); ctx.fill(); ctx.restore(); return; }
+  ctx.fillStyle = g; sealEdge(ctx, R, 36, R * .045); ctx.fill(); ctx.shadowColor = 'transparent';
+  for (const [rr, w] of [[.86, .0035], [.62, .002]]) { ctx.strokeStyle = faint; ctx.lineWidth = S * w; ctx.beginPath(); ctx.arc(0, 0, R * rr, 0, 7); ctx.stroke(); }
+  ctx.fillStyle = ink; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  sealFont(ctx, 800, R * .13, SANS); sealArc(ctx, a.top, R * .74, true, R * .035);
+  sealFont(ctx, 700, R * .085, SANS); sealArc(ctx, a.bottom, R * .74, false, R * .018);
+  if (a.score) {
+    ctx.save(); ctx.translate(0, R * .02); sealLaurel(ctx, R * .78, ink, S * .003); ctx.restore();
+    sealFont(ctx, 600, R * .4, SERIF); ctx.fillText(a.score, 0, -R * .06);
+    sealFont(ctx, 600, R * .08, MONO); ctx.fillText('/ 10', 0, R * .24);
+  } else if (DN_MARK) sealMark(ctx, DN_MARK, R * .55, ink);
+  ctx.save(); sealEdge(ctx, R, 36, R * .045); ctx.clip();
+  const gl = ctx.createLinearGradient(-R, -R, R * .4, R * .4);
+  gl.addColorStop(0, 'rgba(255,255,255,.35)'); gl.addColorStop(.35, 'rgba(255,255,255,.08)'); gl.addColorStop(.36, 'rgba(255,255,255,0)'); gl.addColorStop(1, 'rgba(0,0,0,.08)');
+  ctx.fillStyle = gl; ctx.fillRect(-R, -R, 2 * R, 2 * R); ctx.restore();
+  ctx.textBaseline = 'alphabetic';
+  ctx.restore();
+}
+
 /** Cover made from a screenshot of the real site's first screen, plus the house band. */
 export function photoCover(S, img, rec) {
   const { c, ctx } = make(S);
   ctx.drawImage(img, 0, 0, S, S);
   grain(ctx, S, S, 0.035, 101); // a breath of paper, so the print sits on board, not on a screen
   houseBand(ctx, S, rec);
+  if (AWARDS[rec.id]) awardSeal(ctx, S, AWARDS[rec.id]);
   return c;
 }
 

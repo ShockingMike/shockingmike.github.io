@@ -384,3 +384,9 @@ html[lang="vi"] .load__line [lang="en"], html[lang="en"] .load__line [lang="vi"]
   .load__line { font-size: 17px; }
   .load__read { font-size: 13px; }
 }
+
+/* award:v1 */
+.page__award { margin: 14px 0 0; font: 400 14px/1.4 var(--mono); letter-spacing: 0.02em; }
+.page__award a { color: inherit; text-decoration: none; border-bottom: 1px solid color-mix(in srgb, currentColor 40%, transparent); padding-bottom: 2px; }
+.page__award a:hover, .page__award a:focus-visible { border-bottom-color: currentColor; }
+.page__award b { font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; }

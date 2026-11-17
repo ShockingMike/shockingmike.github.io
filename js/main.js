@@ -1,6 +1,6 @@
 /* main.js — the portfolio: the stack of seven records, the record page, the preview layer, English / Vietnamese. */
 
-import { RECORDS, byId } from './records.js';
+import { RECORDS, byId, AWARDS } from './records.js'; /* award:v1 */
 import { PLAN_ORDER } from './order.js';
 import { COPY } from './copy.js';
 import { getLang, setLang, applyDocLang, T, fill } from './lang.js';
@@ -90,6 +90,7 @@ function pageMarkup(rec, t) {
     <p class="page__cat">${esc(rec.cat)}</p>
     <h2 class="page__title" id="title-${rec.id}" tabindex="-1">${esc(rec.name)}</h2>
     <p class="page__gloss">${esc(c.subtitle)}</p>
+    ${c.award ? `<p class="page__award"><a href="${AWARDS[rec.id].url}" target="_blank" rel="noopener"><b>${esc(c.award.title)}</b> ${esc(c.award.by)} · ${esc(c.award.when)} ↗</a></p>` : ''}
     <hr class="page__rule">
     ${rec.sealed ? sealedMarkup(t) : c.story.map((p) => `<p class="page__lead">${esc(p)}</p>`).join('')}
     <div class="page__acts">
@@ -174,7 +175,7 @@ function renderShelf() {
     const links = [];
     if (r.url) links.push(`<a href="${r.url}" target="_blank" rel="noopener">${esc(c.cta.visit)} ↗</a>`);
     links.push(`<a href="${pricingHref(r)}">${esc(c.cta.pricing)} ${esc(t.ui.wantPrice)} ↗</a>`);
-    return `<li class="shelf__item"><p class="shelf__cat">${esc(r.cat)}</p><h2>${esc(r.name)} <span>${esc(c.subtitle)}</span></h2>
+    return `<li class="shelf__item"><p class="shelf__cat">${esc(r.cat)}</p><h2>${esc(r.name)} <span>${esc(c.subtitle)}</span></h2>${c.award ? `<p class="shelf__meta"><a href="${AWARDS[r.id].url}" target="_blank" rel="noopener">${esc(c.award.title)} · ${esc(c.award.by)} · ${esc(c.award.when)} ↗</a></p>` : ''}
       ${r.sealed ? `<p class="shelf__meta">${esc(t.ui.comingSoon)}</p>` : `${c.story.map((p) => `<p>${esc(p)}</p>`).join('')}<p class="shelf__meta">${esc(c.details.status)}</p>`}<p class="shelf__links">${links.join(' ')}</p></li>`;
   }).join('');
   const P = t.pricing;

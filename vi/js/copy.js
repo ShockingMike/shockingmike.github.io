@@ -38,7 +38,8 @@ export const COPY = {
     },
     label: { role: 'Vai trò', tech: 'Công nghệ', year: 'Năm', status: 'Tình trạng' },
     records: {
-      kern: {
+      kern: { /* award:v1 */
+        award: { title: 'Đoạt giải', by: 'Website Design Awards', when: '17/10/2026, 8,5/10 điểm' },
         subtitle: 'Xưởng font độc lập',
         story: [
           'Font thì phải cho người ta nghịch mới bán được. Nên cái tên to đùng trên cùng chính là đồ chơi: chuột tới gần là chữ đậm lên, giãn ra.',
@@ -86,7 +87,8 @@ export const COPY = {
         details: { role: 'Tên, logo, thiết kế, code', tech: 'Chưa chọn', status: 'Còn nằm ở bệ phóng' },
         cta: { pricing: 'Muốn một trang như thế này?' }
       },
-      blind: {
+      blind: { /* award:v1 */
+        award: { title: 'Site of the Day', by: 'DesignNominees', when: '6/11/2026' },
         subtitle: 'Xưởng phim hoạt hình',
         story: [
           'Nét chì tẩy được, vết dao thì không. Nên ở Blind Alley chẳng ai cắt vội, và chỉ một khung sai cũng đủ khiến ai đó thức trắng đêm.',

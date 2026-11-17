@@ -37,7 +37,8 @@ export const COPY = {
     },
     label: { role: 'Role', tech: 'Built with', year: 'Year', status: 'Status' },
     records: {
-      kern: {
+      kern: { /* award:v1 */
+        award: { title: 'Winner', by: 'Website Design Awards', when: '17 Oct 2026, scored 8.5/10' },
         subtitle: 'Independent type foundry',
         story: [
           'Fonts sell when you get to play with them. So the name at the top of the page is the demo: letters thicken and stretch as your cursor gets close.',
@@ -85,7 +86,8 @@ export const COPY = {
         details: { role: 'Name, logo, design, code', tech: 'Not picked yet', status: 'Still on the launch pad' },
         cta: { pricing: 'Want a page like this?' }
       },
-      blind: {
+      blind: { /* award:v1 */
+        award: { title: 'Site of the Day', by: 'DesignNominees', when: '6 Nov 2026' },
         subtitle: 'Animation studio',
         story: [
           'A pencil line rubs out; a cut doesn’t. So at Blind Alley nobody cuts in a hurry, and one wrong frame is enough to keep somebody up all night.',

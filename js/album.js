@@ -4,7 +4,8 @@
    into metal with a thin-film colour shift), blind emboss (a bump map), paper fibre, ring wear and worn edges.
    Everything is drawn once at boot; nothing here runs during motion. */
 
-import { PAL, paperBump, backPaper, soonLabel } from './covers.js';
+import { PAL, paperBump, backPaper, soonLabel, awardSeal } from './covers.js';
+import { AWARDS } from './records.js';
 
 const SANS = 'Archivo';
 const MONO = '"JetBrains Mono"';
@@ -314,6 +315,9 @@ export function sleeveFront(S, rec, c, img, opts) {
     md.data[i + 3] = 255;
   }
   fctx.putImageData(md, 0, 0);
+  // an award seal stuck on the wrap: gold or blue foil, smooth and a little metallic, no rainbow shift
+  const aw = AWARDS[rec.id];
+  if (aw && !rec.sealed) { const at = { ...aw, x: aw.sx, y: aw.sy }; awardSeal(ctx, S, at); awardSeal(fctx, S, at, 'rgb(0,60,140)'); }
   // bump: fibre, plus the title raised (blind emboss) and the window plate very slightly sunk
   const fibre = paperBump(512);
   bmp.ctx.fillStyle = '#767676'; bmp.ctx.fillRect(0, 0, S, S);
