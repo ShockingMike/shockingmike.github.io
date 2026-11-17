@@ -28,7 +28,7 @@ export const COPY = {
       langToggle: 'English', langToggleAria: 'Read this page in English',
       back: 'Cất đĩa', helpLabel: 'Cách xem',
       help: 'Mỗi đĩa là một trang web mình làm. Chọn đĩa nào là đọc được chuyện đĩa ấy.',
-      comingSoon: 'Sắp phát hành', pricing: 'Bảng giá', record: 'Mở đĩa {title}', home: 'Về màn đầu',
+      comingSoon: 'Sắp phát hành', pricing: 'Bảng giá', open: 'Đang nhận dự án mới', seePrices: 'Xem bảng giá', /* open:v1 */ record: 'Mở đĩa {title}', home: 'Về màn đầu',
       loading: 'Đang quay đĩa cho đủ tốc độ', loadingPct: 'Đã tải {p}%', loadingDone: 'Đủ 33⅓ vòng/phút. Vào thôi.',
       sealed: 'Còn nguyên seal. Mở đĩa rồi mới đọc được.',
       details: 'Ghi công', flip: 'Xem mặt sau đĩa {title}',

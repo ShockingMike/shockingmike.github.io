@@ -26,7 +26,7 @@ export const COPY = {
       langToggle: 'Tiếng Việt', langToggleAria: 'Read this page in Vietnamese',
       back: 'Put it back', helpLabel: 'How this works',
       help: 'Every record here is a site I made. Pick one to read how it came together.',
-      comingSoon: 'Coming soon', pricing: 'Prices', record: 'Open {title}', home: 'Back to the start',
+      comingSoon: 'Coming soon', pricing: 'Prices', open: 'Open for new projects', seePrices: 'See prices', /* open:v1 */ record: 'Open {title}', home: 'Back to the start',
       loading: 'Getting the record up to speed', loadingPct: '{p}% loaded', loadingDone: '33⅓ rpm. Here we go.',
       // the two unmade records: the write-up is under the wrap, so all anyone gets is this line
       sealed: 'Still sealed. The write-up opens when the site does.',
