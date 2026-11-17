@@ -76,7 +76,7 @@ export const byId = (id) => RECORDS.find((r) => r.id === id);
    like everything else on the sleeves; the line on the open page comes from copy.js. */
 export const AWARDS = {
   kern: { url: 'https://websitedesignawards.com/site/kern-society', metal: 'gold', score: '8.5',
-          top: 'WINNER', bottom: 'WEBSITE DESIGN AWARDS · 2026', x: 0.76, y: 0.25, sx: 0.8, sy: 0.27, tilt: 0.14 },
+          top: 'WINNER', bottom: 'WEBSITE DESIGN AWARDS · 2026', x: 0.76, y: 0.25, sx: 0.835, sy: 0.235, tilt: 0.14 },
   blind: { url: 'https://www.designnominees.com/sites/blind-alley-pictures', metal: 'blue',
-           top: 'SITE OF THE DAY', bottom: 'DESIGN NOMINEES · 6 NOV 2026', x: 0.24, y: 0.25, sx: 0.2, sy: 0.27, tilt: -0.12 }
+           top: 'SITE OF THE DAY', bottom: 'DESIGN NOMINEES · 6 NOV 2026', x: 0.24, y: 0.25, sx: 0.165, sy: 0.235, tilt: -0.12 }
 };

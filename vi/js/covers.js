@@ -640,7 +640,7 @@ function sealMark(ctx, img, h, color) {
 }
 /* mask: when set, only the seal's outline is filled with that colour (for the sleeve's material mask) */
 export function awardSeal(ctx, S, a, mask) {
-  const R = S * .19, gold = a.metal === 'gold';
+  const R = S * .133, gold = a.metal === 'gold';
   const ink = gold ? '#1a1406' : '#ffffff', faint = gold ? 'rgba(26,20,6,.55)' : 'rgba(255,255,255,.7)';
   ctx.save(); ctx.translate(S * a.x, S * a.y); ctx.rotate(a.tilt);
   ctx.shadowColor = 'rgba(0,0,0,.45)'; ctx.shadowBlur = S * .03; ctx.shadowOffsetY = S * .012;
