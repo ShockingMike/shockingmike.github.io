@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="referrer" content="no-referrer">
+<title>Sổ 90 Ngày</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column; a 90-day ruler on top, then week cards, lead table, Monday numbers. */
+:root{
+  --bg:#f3f4f0; --panel:#ffffff; --fg:#17191c; --muted:#5d6268; --line:#dcded8;
+  --accent:#2747c9; --accent-soft:#e3e8fb; --tet:#c8321f; --tet-soft:#fbe5e1;
+  --ok:#1f7a4a; --ok-soft:#dcf1e4; --warn:#9a6a00; --warn-soft:#f8ecc9;
+  --sans:"Be Vietnam Pro",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#121417; --panel:#1b1e22; --fg:#eceee9; --muted:#9aa0a6; --line:#2d3137;
+  --accent:#8ea2ff; --accent-soft:#22294a; --tet:#ff7a63; --tet-soft:#3d1f1a;
+  --ok:#5fd394; --ok-soft:#183325; --warn:#e7b94c; --warn-soft:#3a2f12; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121417; --panel:#1b1e22; --fg:#eceee9; --muted:#9aa0a6; --line:#2d3137;
+  --accent:#8ea2ff; --accent-soft:#22294a; --tet:#ff7a63; --tet-soft:#3d1f1a;
+  --ok:#5fd394; --ok-soft:#183325; --warn:#e7b94c; --warn-soft:#3a2f12; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--sans);
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:28px 64px}
+.wrap{max-width:920px;margin:0 auto;display:flex;flex-direction:column;gap:36px}
+h1,h2,h3{margin:0;text-wrap:balance;line-height:1.2}
+h1{font-size:30px;font-weight:800;letter-spacing:-.01em}
+h2{font-size:19px;font-weight:700}
+.eyebrow{font:600 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.sub{color:var(--muted);margin:6px 0 0}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+section{display:flex;flex-direction:column;gap:14px}
+.status{font-size:13px;color:var(--warn);background:var(--warn-soft);padding:8px 12px;border-radius:6px}
+
+/* ruler */
+.ruler{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px 18px 14px;display:flex;flex-direction:column;gap:14px}
+.ruler-top{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:baseline}
+.daybig{font:600 34px/1 var(--mono)}
+.daybig small{font-size:15px;color:var(--muted)}
+.track{position:relative;height:38px}
+.bar{position:absolute;left:0;right:0;top:14px;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.mark{position:absolute;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:2px}
+.mark b{width:2px;height:12px;background:var(--fg);display:block}
+.mark span{font:600 10px/1 var(--mono);color:var(--muted);white-space:nowrap;margin-top:16px}
+.mark.tet b{background:var(--tet)} .mark.tet span{color:var(--tet)}
+.mark.l{transform:none;align-items:flex-start} .mark.r{transform:translateX(-100%);align-items:flex-end}
+
+/* funnel */
+.funnel{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.funnel div{background:var(--panel);padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.funnel .v{font:600 26px/1 var(--mono)}
+.funnel .k{font-size:12.5px;color:var(--muted)}
+.funnel .t{font:500 11px/1.2 var(--mono);color:var(--muted)}
+.funnel .hit .t{color:var(--ok)}
+@media (max-width:640px){.funnel{grid-template-columns:repeat(2,minmax(0,1fr))}.funnel div:last-child{grid-column:span 2}}
+
+/* weeks */
+.weeks{display:flex;flex-direction:column;gap:10px}
+details.week{background:var(--panel);border:1px solid var(--line);border-radius:10px}
+details.week[open]{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+summary{list-style:none;cursor:pointer;padding:14px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+summary::-webkit-details-marker{display:none}
+summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:10px}
+.wk-name{font-weight:700}
+.wk-date{font:12px var(--mono);color:var(--muted)}
+.wk-count{margin-left:auto;font:600 12px var(--mono);color:var(--muted)}
+.now{font:700 10px/1 var(--mono);letter-spacing:.08em;background:var(--accent);color:var(--panel);padding:4px 6px;border-radius:4px}
+.tasks{list-style:none;margin:0;padding:0 16px 12px;display:flex;flex-direction:column}
+.task{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:start;padding:9px 0;border-top:1px solid var(--line)}
+.task input{width:18px;height:18px;margin:2px 0 0;accent-color:var(--ok);cursor:pointer}
+.task.done .tt{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)}
+.tt{min-width:0}
+.tn{font-size:12.5px;color:var(--muted);margin-top:2px}
+.who{font:600 11px/1 var(--mono);padding:4px 7px;border-radius:4px;white-space:nowrap}
+.who.em{background:var(--accent-soft);color:var(--accent)}
+.who.anh{background:var(--tet-soft);color:var(--tet)}
+.done-at{font:11px var(--mono);color:var(--ok);margin-top:2px}
+
+/* leads */
+.tools{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font:600 12px/1 var(--sans);border:1px solid var(--line);background:var(--panel);color:var(--fg);padding:7px 11px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.chip:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tablewrap{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:13.5px}
+th{font:600 11px/1 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:left;padding:11px 12px;border-bottom:1px solid var(--line)}
+td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:last-child td{border-bottom:0}
+.niche{font:700 11px/1 var(--mono);padding:4px 6px;border-radius:4px}
+.niche.A{background:var(--accent-soft);color:var(--accent)} .niche.B{background:var(--tet-soft);color:var(--tet)}
+td a{color:var(--accent);text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent) 35%,transparent)}
+.mail{font:12px var(--mono);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.copy{font:600 11px var(--sans);border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:4px;padding:3px 6px;cursor:pointer}
+select{font:13px var(--sans);background:var(--panel);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:5px 6px}
+.pill{font:600 12px/1 var(--sans);padding:5px 8px;border-radius:999px;background:var(--line);white-space:nowrap}
+.pill.da-gui,.pill.da-nhac{background:var(--accent-soft);color:var(--accent)}
+.pill.tra-loi,.pill.ban-gia,.pill.bao-gia{background:var(--warn-soft);color:var(--warn)}
+.pill.chot{background:var(--ok-soft);color:var(--ok)}
+.task .box{width:16px;height:16px;border:1.5px solid var(--muted);border-radius:4px;margin-top:3px;display:grid;place-items:center;font:700 11px/1 var(--sans)}
+.task.done .box{background:var(--ok);border-color:var(--ok);color:var(--panel)}
+.empty{padding:22px 16px;color:var(--muted);text-align:center}
+
+/* monday numbers */
+.mon table{min-width:640px}
+.mon td.num,.mon th.num{text-align:right}
+
+/* decisions */
+.notes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.notes>div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.notes ul{margin:8px 0 0;padding-left:18px}
+.notes li{margin:4px 0}
+@media (max-width:640px){.notes{grid-template-columns:1fr}}
+.foot{font-size:12.5px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head><body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Shocking Mike · tìm khách</div>
+    <h1>Sổ 90 Ngày</h1>
+    <p class="sub">17/11/2026 → 15/2/2027. Em cập nhật sổ sau mỗi việc xong. Anh xong việc gì hoặc gửi thư nào thì nhắn em để em ghi vào.</p>
+  </header>
+
+  <div class="status" id="status" hidden></div>
+  <p class="foot" id="updated"></p>
+
+  <div class="ruler">
+    <div class="ruler-top">
+      <div><div class="eyebrow">Hôm nay</div><div class="daybig num" id="day">Ngày –<small> / 90</small></div></div>
+      <div style="text-align:right"><div class="eyebrow">Việc đã xong</div><div class="daybig num" id="pct">–%</div></div>
+    </div>
+    <div class="track" id="track"><div class="bar"><i id="barfill" style="width:0"></i></div></div>
+  </div>
+
+  <section>
+    <div><h2>Phễu thư chào</h2><p class="sub">Tự đếm từ bảng khách bên dưới. Mục tiêu là mốc 30 ngày (15/12).</p></div>
+    <div class="funnel" id="funnel"></div>
+  </section>
+
+  <section>
+    <div><h2>Việc theo tuần</h2><p class="sub">Xanh là việc của em, đỏ là việc của anh.</p></div>
+    <div class="weeks" id="weeks"><div class="empty">Đang tải danh sách việc…</div></div>
+  </section>
+
+  <section>
+    <div><h2>Khách tiềm năng</h2><p class="sub">Ngách A: studio sáng tạo quốc tế, thư tiếng Anh. Ngách B: thương hiệu quà Việt mùa Tết, thư tiếng Việt.</p></div>
+    <div class="tools" id="filters">
+      <button class="chip" aria-pressed="true" data-f="all">Tất cả</button>
+      <button class="chip" aria-pressed="false" data-f="A">Ngách A</button>
+      <button class="chip" aria-pressed="false" data-f="B">Ngách B</button>
+      <button class="chip" aria-pressed="false" data-f="open">Đang chờ</button>
+    </div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>#</th><th>Ngách</th><th>Thương hiệu</th><th>Liên hệ</th><th>Điểm yếu web hiện tại</th><th>Trạng thái</th></tr></thead>
+      <tbody id="leads"><tr><td colspan="6" class="empty">Đang tải…</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section class="mon">
+    <div><h2>Số mỗi thứ Hai</h2><p class="sub">Em điền sáng thứ Hai từ Cloudflare, Search Console và bảng khách.</p></div>
+    <div class="tablewrap"><table>
+      <thead><tr><th>Tuần</th><th class="num">Thư gửi</th><th class="num">Trả lời</th><th class="num">Bàn giá</th><th class="num">Xem trang giá</th><th class="num">Google lưu</th><th class="num">Gallery nộp / đăng</th><th class="num">Giờ của anh</th></tr></thead>
+      <tbody id="metrics"><tr><td colspan="8" class="empty">Đang tải…</td></tr></tbody>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Đã chốt và luật quyết định</h2>
+    <div class="notes">
+      <div><div class="eyebrow">Anh chốt 17/11</div><ul>
+        <li>Ngách dẫn đầu: studio sáng tạo quốc tế. Cà phê, trà, nước hoa, sô-cô-la sang ngách B.</li>
+        <li>X: 3 bài mỗi tuần.</li>
+        <li>Mở hợp tác với freelancer Framer/Shopify.</li>
+        <li>Không làm demo trước khi khách trả lời. Không ghi giá trong thư đầu.</li>
+      </ul></div>
+      <div><div class="eyebrow">Xem lại mỗi thứ Hai</div><ul>
+        <li>40 thư mà dưới 3 trả lời: đổi ngách hoặc đổi câu mở.</li>
+        <li>Có trả lời nhưng không ai hỏi giá: chào gói nhỏ hơn.</li>
+        <li>Trang giá dưới 15 lượt/tuần: đưa nút giá lên màn đầu từng trang dự án.</li>
+        <li>X dưới 5 lượt vào web trong 30 ngày: giảm còn 1–2 bài/tuần.</li>
+      </ul></div>
+    </div>
+  </section>
+
+  <p class="foot">Kế hoạch đầy đủ: C:\Work\Shocking Mike\Ke hoach\ke-hoach-marketing-90-ngay.md</p>
+</div>
+
+
+<script id="payload" type="application/json">{"iv": "ieZ-DG-xIsCYXD2k", "ct": "Ov3TFe5tYsvd1QmRy3AJ6ZMTfe0KEJSP9vjY05YrdVN7CXdwnuu4XuNV65G9vQscZ511tK-1_q5Ult-_OOlRVRB0pekYlir3MzO0NtKwqn3llNc7Z7BVnUk_BMlzRIJ-lJSThptQPYOKIx--KJeOqvE-KKKev0ihCMr_MPrypPF-OoWWfMoah20M6Vy6bUhfL9FOrGDLgB6HiJ51wARLVmViQelOUF9gGLcBCyqTBmxJIgtT8ByBSohqVmo-gj53zt-HbFF0VqyEre9NzjMaUxu8Cu7e3XxrYRg4M4QoCsVqE0bk4_yawfHu4sraieIvabwBC2unkLFOTW7-jtqqJiLdv5XeZmSKw8iFSpSuHmLebaTfXnQ5YmyFnz9LZFMdf5Zic75K9XuizG-fsP7ESPr1ZnF7fxSTgruCcSLAeaYJL9orNgG8bXQoQB6B1P00T8OXWizKMr0V3W08OXSrgzj5VqfVekXSl3WOJ_50Pkl4Cu0u-hagdzpdYd-9OXA9K96eCJEpo1ArD1d725eaQHL1CC7B3o21yfIzmvvfYqWC5L0HvlAmiUM7on8_G5274MoDXdidRS5QVhCxTwBXD8CqPDgGShmM7qZVDueqcERQyUzPIgXkUgp_bNPBOtqOrTYx8dX72ybwPAQBr1-U6E7P6uLx4F5htjowbR92xLKKUXqOiQoha3N-aj_XQ9rAVu0hTlTPF-J7AktRJ4KLm4mOKKi4gUO1T3tbnn2434_4SjH3cf2hDTrrTHr-EP4aNiNYXV_kNFBviapGQLgEHKcgNOgfQ-M48RPQGwQQgfakch8eMHDFmNn-0Ft-_DsPKNoDknjnm_MdgKDhV8kbCgmPrLeWGirkp0XCtMrY_dou3jWEWZaBaKCvIfdgQvFkvI-rsqlo97ZRTW21O_Q7dyz_Fl3m9nNwHqPHomB2tPgRCBoUCWjXh6evtGpmJQCgZ9A88BfY5PoFN_Ywxx0Gz48nTDWg0ftVFw9EaN-GrdzwFaqsP9_Z4ye2zl-H7WHofm2sW-PuNxzCyJ5_JiUJgX7MRCCxr6cXflsqKruyk7l_lwm9xjRiqmQLZw1O70DdLdAz3-2UwKf8O9l18vlmqQh2pGVEadIGtJaJ07DJf3SxVp6H7Wj6NhNRghuJOHE_GUuZOjR-zgY7ItSZhquPLJ_hHkAm7MbmfRN-RT3lhCGHI1qIan6RODSVg-79nCkcchTc5h7kzvzgKA4kpkNGvCS0UFmOpdZWEG2MroLtXsm-uH20gBx_NG5fIG7GNRdPzfTKq6aUt8Se5o0wffyWP5x23TrUB6djvvID5-tZSwseQRMJ2mRduZ9UYDLKNz1NkYs5PYDMpSenAMGfeXjT7S01_uIrXZcGdFCLuA9uV37UX-1D_QoDJ5pWFanSd-YBePX2DUZHgAPBdEuFTm_rd0Aj_EwrXEoCFF8MsAVAn_pOTrXUAZlcKSyqkEgc9zJW7vzZi4Ez1_5Z_HIukMRTyUzqu78cK4M1guGJ3P5pYXwf4jbjn8Wh9GGRkNFaYe7mWmdpLBaz29UU58WVER4ZlqXifyDnS-faCU98ZDzcVbAOGI0cQpkmzZL6_7U844O1q8Ur4NEw7tCg9MV--u5LaMpA5SWkuMUsKgkpY1d-kaYvPw3tMSWOaaVdUcML2OORxKJ0Cd2G5gPTvzYphwrPicRmKPTtO3DqstahESw8DbtEQwshYLv7bfhzSBIRvsdBbn1d8br8RoLpzHuWLzEpB575yAiPWxsAH9dJV4hyRk9HD8YfPYowhcGDLZnjHNEPuYj5niWm5YoKTvrvaZFddA3dJSfu2rMM7PFs2KAhimbIm47zWVaLCi8l7h6jcymwp4wzRtQQzWYRbujzEOHH-eKXZCFbJEBcFw2uJk6mHGmzETgcCUsJ4vacnvbH3yuPYUPJfFKBjXDNnq2LZO6PZNm12hZrKv6D1-JfPK5wu1kEn8TzCz8YFjAmrpY8N8BXVxE0vHYH6921xxGWQwmsvRMPOkTWZlnTDpVorV3JbxFDmGY1nK8y0EnhZ8Ngxjv6Vc4e8LJ1xIiwm2vnCrVKUMhPjU-Dz3KFfafK8g6giUEo4qziU0cK0hwjKSaL-rjyo7yp5i3Hklo5kLnbvJ6i_YGACjfF9n80DibehSOuAiYU_I5smYKTwEHU_wbxcD5bz4v9TJppQAn19XnnlVtNZcD0tn5gUqezsRGBuVOEOl9PBN0XWsfwkzTm4qVtVAdc-udNSEzTGPf2XBY0GlCUW7ioCzt3ijcYCXbIPnS5kT-bXTLP3lDRx7ZJsaEwYSsBeGYrPhjU_hQ51fOLTr7CRXNDmgtZZPJ_50KaQ6IoVXyFhnUwJiZrqMCaKQrTbFIkdjTLsk5AIsn3JW7xEUXOKW1yeZbkrzvTU-HRab670ZQJ8gIe6_YlEkNyhKh93dG7qcIBd1CiiJqB9Q-CiESQ02OT5tAShC7LQG2L-1r_XGyhZ7J7GxD1bxICwy0kogn4RMz_curS345L_uHq3Ead-ZLO9ETH_7cV4nlSK-ksM_OGKz9QS362o-osNyhRG6VZ_j6cmvsgagAAYpocvmN-R-R8Nzk-EZkZJlWd6MnNdJFhdsymoCvh5gUl-62ZFpZnyajZO83YBgZzElXsYUoDX9j78CU9B20SXb_eRNe3SzVtQLfYvDkAczhxJkI6gxGdEqpT5lQvVmQyDeLXrh-GPlLUtMDmWfONj18KYxX015ChhsRWbSGn3kfja7w7-RzFmxHgX58CzStsGn1xbu1a9TNd3ph6nHCJcgbVLGYclz4O5851ZWgcRBjPIlfF3FaWWVvzqntgEWhF7YJEezwqGM07ZnMtPrNrnDCHC99sZUkTT4k2FyVQv_vPyonGucQFUj90dEaM-0kcSuo042Yc9eOlVc0YaKcJvoXGD0lR7naFAphwZArY-OykW_oriV4BaT5gXp_72r1IbwTbCkXGHa8ixN_kdapd3K0YzcfLPsaWiZ0XboTwm6dKxxOU_YVTp3NZ9gaV1EYhfJoYXZSmnHFF5m8v6TR40NAIyKjn_vZt0Cb-ujW0Tb51uCqiaR0C5ZfxGEvgzzbnrEBTzMq1vC-hbG73Lu2uD_NRJg7Ccvumk-rFroNPy5NWfCn41MmjIM2KTe5Y2xACAM-ZF0tGuVcGegYGvwqcOw7Y4rHiD5-p5LfbXT4eZ_2X_2Ipbak5qB_cAmzxpcpw-gnV4xlw9EfcBOyewF3U8zKUf15BhjRU5_UGo7r0onlGulcJCkhitnzpPsQsMlZseIqlZ3F0oiK8I8e3mb8gUJc8vNNO8q6djlJo7fGd_p1LzIbT3lfjvPRSbtckPb323FQx6UaqEZVpkjb8YzTGMSAIfgOQmBUIURDoBvZ__GIJotXGYuq5DXHbHNcCQk8OZr9tnb5-073_y7iogMAZuQbYEkWGW__EMhJJXclOVbG5dbK6FM-uiJprlYZN9fniRG7iCM9Wj9H7YQ1ugaKQuiF_-_tZqXwz9v01m8uGq68RUxRUmV0UhxiERxRp6TkSkXO4qvdsnFl2AI5NI6pLjTX_aTMBUcNGXeCw9S6QzKQYZ_lkeTXTrKB_YD0VpKsQySNQ61rd0Cm8EfRI5tjnxgcHZHhJLEdoR3beMa1QSTxzrlsL9S0c2Vh7T7ON2-37npnGZrR6Nq397FlAlN93HqagZVxvbzOul-WIr2bqeu4d70ZHUAd185xdROPWeDrpuTMaPxG_h6b251bj9FyW5BdLlVwBd7-a8zoGUt5JMh0OjXRu0YEP2Qd_61Pm8fcyrwj04KNsTi3IhCMgBBgTG7Y6bjPP2icCfA88BbUtmzRZ6yQyx6GXYoD_bUb1BsFnR1OTxbcp727LFPOP4KHwuoRDq6T2VXP43DjvhtQKvX3ZuLTamNIY3oObKCojItc80KKj9IKSMpLVU0zRFSp1zynwp5XR1NyFn_tvZRqMzuAshvpUEVEE9tVA80oOBPqr3iGI2lYKhaJBlsguoV72hJyuqsyc15tgPptuJAe5TQp9Xohu81dqUPwwois21SdzqeHCLLB40bb8qHYPs11KFVu5QVhkzIM-mIbMld4ZoAuS9KW2_ff4OIaggNhRd12eI7CBaOG889Q5YSU0YYX3h4ZuFbNP-NQwgzkKoyWHJ_8alUbW2-gHPpNiyX-N6KAodTbFZOGe2dV93c9IhMpBsxWQyh_EZq24nezmcxDw3mlF738BrkFaGiSoIi_nBWyhlUJd1UmF1UkQoP2lmtm6SZrmhtU540fTJHjRONbONRallMlaJ38fDu_AdQyZSBvZoSidFWAFMwTUIi1JZrXEpnhSaKsLNR0lXVoMJlfYxgDFqvSxqqiG7bqfOEAT5y2_ApVL8V4Me5kP3MiOLjI_oIzluRPSNFVqyXFTem6AqVegtAJvrKhfrq5r3BerCTFWadK8_hqbU6VSeXgGSW5foPm9b8DMcWuBvSBqf3phFncUCL4QLcBk97lbGnaiA827o2zUt2_PCjyKw8b7AAwK9NNDW1MV7m4ggzZnP-vvnYbwaGJIPFipGcGUVD2UvHp8ovBHtL6GznQJhDI8XJRWhSS3AQJq1KYMIMbOUaOFJpO1Wdm7vCm6u7m9Qjv7Y7Ygoj8VRbkTv8rihWXhiosokj2i0XDKwa6dydSVdWJ_rRcBgR5nWi06wMaX_ZpJnON8eh3gRlV5T4n00fKGk0s6jUrHDNAxPcqsxCbVJWHxLZTaUw_y1iN4X9dvnvzJdaR50CYXCBvwtruhmlFswXZXHAso-efO-Qw0ClHMHZ8cyBV9E3E7cdB-L4IlxB5mTGGPtt1t_-grSo521hjEEm93X1jGP6njYRirpfYSfPiu2ft2CfPYdYrg3DTDfc0j5Kfc5VVAd0R-AkjLY72ZKsJ9DS63D24AWjDEmu0Yxx016t732yq1ZX7CFxvdidi6rZF0n3UJCWCQVb1JEhssCF8iOVJJpp86iVExFw-28y6k4dhIrPCVbcltiicggXesrR440IMAYS1w0rzgEeKdSNZSxc1OYnz3c6iUDV-BgL91iCQ8KEFAYNYpfNKI6ov0RCLeLsMtf07KsMMAx-ZTA4mGgzbIzxhfoyc2yzj7C-6KSHh7YUijNBmE-ne38gIc2PkCxTHQQHGy6UTn_rKhLqO3TsYIXQSgH-o-EChnRHzIpq771NjlQUjDXboPpD9W0HrCZwL0PriigZnBqJ14DZzNYAEfStqXr_lpUzwTshUwpWSvzVnDNYb_OJFpRbDxK0UxUdrQhwdCTwYKy1CFLcpqmOFBISKQLi-_UA8zojGtF4t6f2xt6kQKuEawl3SK4bnm09EAp9B2M0ZTA_sfmwhKu602NePMT7Eiaw54ccwzF397_ykR8IvpmmBKgLoIAZybJz6yBfoEYv3misLTtXG9FLprzDRvKonRpUr0NA5JAgLhhwIr4MBO5hrYEm1UH2hBRBwftJ8Odw6kgxGc_bXyfoDjp8peXWJBWPztsA0JGLzxRokXdOPC8te_I522Mw0vg5wxzpYd1jrJGJezG8wMWcr_TR525t50NhiPp5myTF9BkkeEKhGePcl78G-M2_psuE9zlnSEZJePt8nxutV6Rx0xfpCSqahPOaaOrq0KX4I5mAu9151s4lHgFMWAB2pXmMISU_IR3v0WTZlzCZ9ZXncENrOhCA2cpJ3JqpRjw2T956MRYSsy5bCLp3JPiWaVsgaU38b9pMoQrsVNAq1Ju64134c24uL7sZ2dQ1WQVVcG4nOCvPzYCrGJR7dKWfYYAZRQV1C73SJvqhKFqJ0m2cmCWeBzcIms26-JWNDV9mAP_LGnn7A7p4QEbDLW"}</script>
+<script>
+const START = Date.UTC(2026,10,17), DAY = 864e5, TOTAL = 90;
+const MARKS = [
+  {d:0,  t:'17/11', c:'l'}, {d:28, t:'Mốc 30 · 15/12'}, {d:60, t:'Mốc 60 · 16/1'},
+  {d:81, t:'Tết · 6/2', c:'tet'}, {d:90, t:'15/2', c:'r'}
+];
+const STATUSES = [
+  ['moi','Chưa gửi'],['da-gui','Đã gửi'],['da-nhac','Đã nhắc'],['tra-loi','Trả lời'],
+  ['ban-gia','Bàn giá'],['bao-gia','Đã báo giá'],['chot','Chốt'],['bo','Bỏ / không hợp']
+];
+const RANK = Object.fromEntries(STATUSES.map(([k],i)=>[k,i]));
+const $ = (id)=>document.getElementById(id);
+const esc = (s)=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let tasks = [], leads = [], metrics = [], filter = 'all';
+
+function today(){ const n=new Date(); return Math.floor((Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())-START)/DAY)+1; }
+
+function renderRuler(){
+  const d = Math.max(1,Math.min(TOTAL,today()));
+  $('day').innerHTML = `Ngày ${d}<small> / 90</small>`;
+  const tr = $('track');
+  tr.querySelectorAll('.mark').forEach(m=>m.remove());
+  for(const m of MARKS){
+    const el = document.createElement('div');
+    el.className = 'mark '+(m.c||''); el.style.left = (m.d/TOTAL*100)+'%';
+    el.innerHTML = `<b></b><span>${m.t}</span>`; tr.appendChild(el);
+  }
+  const done = tasks.filter(t=>t.done).length, all = tasks.length;
+  const pct = all ? Math.round(done/all*100) : 0;
+  $('pct').textContent = all ? pct+'%' : '–%';
+  $('barfill').style.width = (d/TOTAL*100)+'%';
+}
+
+function renderFunnel(){
+  const n = (min)=>leads.filter(l=>RANK[l.status]>=RANK[min] && l.status!=='bo').length;
+  const cells = [
+    ['Thư đã gửi', n('da-gui'), 40], ['Trả lời', n('tra-loi'), 3], ['Bàn giá', n('ban-gia'), 1],
+    ['Đã báo giá', n('bao-gia'), null], ['Khách chốt', n('chot'), null]
+  ];
+  $('funnel').innerHTML = cells.map(([k,v,t])=>`<div class="${t&&v>=t?'hit':''}"><span class="v">${v}</span><span class="k">${k}</span><span class="t">${t?`mục tiêu ${t}`:'mốc 60–90 ngày'}</span></div>`).join('');
+}
+
+function weekOf(){ const d=today(); return d<=7?'w1':d<=14?'w2':d<=21?'w3':d<=28?'w4':d<=60?'d60':'d90'; }
+const WEEKS = [
+  ['w1','Tuần 1','18–24/11'],['w2','Tuần 2','25/11–1/12'],['w3','Tuần 3','2–8/12'],
+  ['w4','Tuần 4','9–15/12'],['d60','Đến mốc 60 ngày','16/12–16/1'],['d90','Đến mốc 90 ngày','17/1–15/2']
+];
+function fmtDate(iso){ if(!iso) return ''; const d=new Date(iso); return `${d.getDate()}/${d.getMonth()+1}`; }
+
+function renderWeeks(){
+  if(!tasks.length){ $('weeks').innerHTML = '<div class="empty">Chưa có việc nào. Em sẽ thêm việc của từng tuần vào đây.</div>'; return; }
+  const cur = weekOf(), open = new Set([...document.querySelectorAll('details.week[open]')].map(d=>d.dataset.w));
+  const first = !document.querySelector('details.week');
+  $('weeks').innerHTML = WEEKS.map(([w,name,date])=>{
+    const list = tasks.filter(t=>t.week===w).sort((a,b)=>(a.order||0)-(b.order||0));
+    if(!list.length) return '';
+    const done = list.filter(t=>t.done).length;
+    const isOpen = first ? w===cur : open.has(w);
+    return `<details class="week" data-w="${w}" ${isOpen?'open':''}>
+      <summary><span class="wk-name">${name}</span><span class="wk-date">${date}</span>${w===cur?'<span class="now">ĐANG LÀM</span>':''}<span class="wk-count num">${done}/${list.length}</span></summary>
+      <ul class="tasks">${list.map(t=>`<li class="task ${t.done?'done':''}">
+        <span class="box" aria-label="${t.done?'Đã xong':'Chưa xong'}">${t.done?'✓':''}</span>
+        <div class="tt"><span>${esc(t.title)}</span>${t.note?`<div class="tn">${esc(t.note)}</div>`:''}${t.done&&t.doneAt?`<div class="done-at">xong ${fmtDate(t.doneAt)}</div>`:''}</div>
+        <span class="who ${t.owner==='anh'?'anh':'em'}">${t.owner==='anh'?'Anh':'Em'}</span></li>`).join('')}</ul>
+    </details>`;
+  }).join('');
+}
+
+function renderLeads(){
+  const list = leads.filter(l=> filter==='all' || l.niche===filter || (filter==='open' && ['da-gui','da-nhac','tra-loi','ban-gia','bao-gia'].includes(l.status)))
+    .sort((a,b)=>(a.order||0)-(b.order||0));
+  if(!leads.length){ $('leads').innerHTML = '<tr><td colspan="6" class="empty">Em đang lập lô 1 (10 thương hiệu, ưu tiên ngách B). Mỗi dòng sẽ có email thật kèm link nguồn.</td></tr>'; return; }
+  if(!list.length){ $('leads').innerHTML = '<tr><td colspan="6" class="empty">Không có dòng nào trong bộ lọc này.</td></tr>'; return; }
+  $('leads').innerHTML = list.map(l=>`<tr>
+    <td class="num">${esc(l.order)}</td>
+    <td><span class="niche ${l.niche==='A'?'A':'B'}">${l.niche==='A'?'A':'B'}</span></td>
+    <td><strong>${esc(l.name)}</strong>${l.site?`<br><a href="${esc(l.site)}" target="_blank" rel="noopener">${esc(l.site.replace(/^https?:\/\//,'').replace(/\/$/,''))}</a>`:''}${l.field?`<div class="tn">${esc(l.field)}</div>`:''}</td>
+    <td>${l.email?`<div class="mail"><span>${esc(l.email)}</span><button class="copy" data-copy="${esc(l.email)}">Chép</button></div>`:''}${l.source?`<div class="tn"><a href="${esc(l.source)}" target="_blank" rel="noopener">nguồn email</a></div>`:''}</td>
+    <td>${esc(l.gap)}${l.sentAt?`<div class="tn">gửi ${fmtDate(l.sentAt)}</div>`:''}</td>
+    <td><span class="pill ${esc(l.status)}">${esc((STATUSES.find(s=>s[0]===l.status)||STATUSES[0])[1])}</span></td>
+  </tr>`).join('');
+}
+
+function renderMetrics(){
+  if(!metrics.length){ $('metrics').innerHTML = '<tr><td colspan="8" class="empty">Số đầu tiên vào thứ Hai 23/11.</td></tr>'; return; }
+  const c = (v)=> v===undefined||v===null||v==='' ? '–' : esc(v);
+  $('metrics').innerHTML = [...metrics].sort((a,b)=>String(a.date).localeCompare(String(b.date))).map(m=>`<tr>
+    <td>${esc(m.label||m.date)}</td><td class="num">${c(m.emails)}</td><td class="num">${c(m.replies)}</td><td class="num">${c(m.priceTalks)}</td>
+    <td class="num">${c(m.pricingViews)}</td><td class="num">${c(m.indexed)}</td><td class="num">${c(m.galleries)}</td><td class="num">${c(m.hours)}</td></tr>`).join('');
+}
+
+function renderAll(){ renderRuler(); renderFunnel(); renderWeeks(); renderLeads(); renderMetrics(); }
+
+function showStatus(msg){ const s=$('status'); s.textContent=msg; s.hidden=!msg; }
+
+
+document.addEventListener('click', (e)=>{
+  const f = e.target.closest('[data-f]');
+  if(f){ filter=f.dataset.f; document.querySelectorAll('[data-f]').forEach(b=>b.setAttribute('aria-pressed', String(b===f))); renderLeads(); return; }
+  const c = e.target.closest('[data-copy]');
+  if(c){ const v=c.dataset.copy; const done=()=>{c.textContent='Đã chép';setTimeout(()=>c.textContent='Chép',1400)};
+    try{ navigator.clipboard.writeText(v).then(done,()=>selectText(c.previousElementSibling)); }catch{ selectText(c.previousElementSibling); } }
+});
+function selectText(el){ if(!el) return; const r=document.createRange(); r.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+function showStatus(msg){ const s=$('status'); s.textContent=msg; s.hidden=!msg; }
+const b64u=(s)=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')+'==='.slice((s.length+3)%4)),c=>c.charCodeAt(0));
+renderAll();
+(async()=>{
+  const k=location.hash.slice(1);
+  if(!k){ showStatus('Link thiếu phần chìa khoá. Mở đúng link đầy đủ em gửi.'); return; }
+  try{
+    const p=JSON.parse(document.getElementById('payload').textContent);
+    const key=await crypto.subtle.importKey('raw',b64u(k),'AES-GCM',false,['decrypt']);
+    const plain=await crypto.subtle.decrypt({name:'AES-GCM',iv:b64u(p.iv)},key,b64u(p.ct));
+    const d=JSON.parse(new TextDecoder().decode(plain));
+    tasks=d.tasks||[]; leads=d.leads||[]; metrics=d.metrics||[];
+    $('updated').textContent='Cập nhật lần cuối: '+d.updated;
+    renderAll();
+  }catch(err){ showStatus('Không mở được sổ. Link có thể bị thiếu hoặc sai một đoạn.'); }
+})();
+</script>
+</body></html>
