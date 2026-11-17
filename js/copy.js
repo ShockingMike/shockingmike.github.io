@@ -14,7 +14,7 @@ export const COPY = {
   
   en: {
     site: {
-      title: 'Shocking Mike · Design Engineer',
+      title: 'Shocking Mike · Landing pages & 3D websites for brands',
       description: 'Sites I designed and coded myself, stacked like records. Pull one out and it tells you how it was made.'
     },
     brand: {

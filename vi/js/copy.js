@@ -16,7 +16,7 @@ export const COPY = {
   
   vi: {
     site: {
-      title: 'Shocking Mike · Design Engineer ở Việt Nam',
+      title: 'Shocking Mike · Thiết kế landing page & website 3D',
       description: 'Những trang web mình tự thiết kế, tự code, xếp thành một chồng đĩa. Rút đĩa nào ra cũng có chuyện để kể.'
     },
     brand: {
